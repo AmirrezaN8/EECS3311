@@ -51,6 +51,14 @@ AgentController --> Planner
 interface AgentAction { +name()
 +describe()
 +execute() }
+class GetJobDescriptionAction
+class ImportResumeAction
+GetJobDescriptionAction ..|> AgentAction
+ImportResumeAction ..|> AgentAction
+GetJobDescriptionAction --> JobDescriptionIntake
+ImportResumeAction --> ResumeImporter
+AgentController --> GetJobDescriptionAction
+AgentController --> ImportResumeAction
 class FeatureCommand { -operation: Supplier<Object> }
 FeatureCommand ..|> AgentAction
 AgentController --> FeatureCommand : registers service operations
@@ -144,7 +152,7 @@ ChecklistService --> SqliteJobRepository
 ChecklistService --> SqliteResumeRepository
 interface JobDescriptionSource { +label()
 +needsApproval()
-+fetch(context) }
++fetch(request): JobDescription }
 class PastedTextSource
 class AdzunaExcerptSource
 class ExpandedEstimateSource
@@ -154,10 +162,33 @@ AdzunaExcerptSource ..|> JobDescriptionSource
 ExpandedEstimateSource ..|> JobDescriptionSource
 FullEstimateSource ..|> JobDescriptionSource
 JobDescriptionIntake --> JobDescriptionSource
-JobDescriptionIntake --> AdzunaTool
-class ResumeParserFactory { +createParser(path): ResumeParser }
-interface ResumeParser { +extractText(path): String }
+class JobDescriptionRequest
+class ToolManager { +register(tool)
++executeTool(name,args): ToolResult }
+interface Tool { +getName()
++execute(args): ToolResult }
+class ToolResult { +success: boolean
++data: List<SearchResult>
++message: String }
+AdzunaTool ..|> Tool
+WebSearchTool ..|> Tool
+ToolManager o-- Tool
+ToolManager --> ToolResult
+AgentController --> ToolManager
+JobDescriptionIntake --> ToolManager
+AdzunaExcerptSource --> ToolManager
+AdzunaExcerptSource --> DecisionClient
+JobDescriptionSource --> JobDescriptionRequest
+ExpandedEstimateSource --> Ai
+FullEstimateSource --> Ai
+class ResumeParserFactory { +createParser(path): ResumeParser
++createParser(fileType): ResumeParser }
+interface ResumeParser { +extractText(source): String }
 class PdfResumeParser
+class PastedTextResumeParser
+class DocResumeParser
+PastedTextResumeParser ..|> ResumeParser
+DocResumeParser ..|> ResumeParser
 class DocxResumeParser
 class MarkdownResumeParser
 PdfResumeParser ..|> ResumeParser
@@ -166,7 +197,7 @@ MarkdownResumeParser ..|> ResumeParser
 ResumeParserFactory ..> ResumeParser : creates
 ResumeImporter --> ResumeParserFactory
 ResumeImporter --> ResumeParser
-CompanyResearchService --> WebSearchTool
+CompanyResearchService --> ToolManager
 package "Domain entities (top-level records)" {
 class JobDescription
 class ResumeProfile { +getSkills(): List<Skill> }

@@ -28,6 +28,7 @@ public final class SelfTest {
     private static AdzunaTool noAdzuna(){return new AdzunaTool(new Config(),new HttpTransport(){
         @Override public String request(String url,Map<String,String> headers,String body){throw new IllegalStateException("Test fixture: Adzuna unavailable");}
     });}
+    private static ToolManager tools(Tool... tools){var manager=new ToolManager();for(var tool:tools)manager.register(tool);return manager;}
     private static SqliteStore db(String name){return new SqliteStore(temp.resolve(name+".db"));}
     private static final class UI implements AgentController.UserInteraction {
         boolean approved=true;int approvals;
@@ -37,7 +38,7 @@ public final class SelfTest {
     public static void main(String[] args)throws Exception {
         temp=Files.createTempDirectory("career-tests-");
         try{
-            json();storage();parsers();resume();job();memory();gap();tailoring();research();questions();mockInterview();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();
+            json();storage();parsers();resume();job();memory();gap();tailoring();research();questions();mockInterview();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
             
             System.out.println("PASS: "+checks+" assertions. All model responses were test fixtures; no live LLM claim.");
         }finally{try(var paths=Files.walk(temp)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}}
@@ -62,13 +63,13 @@ public final class SelfTest {
         check(Documents.read(store,"resume","r",ResumeProfile.class).equals(p),"typed records roundtrip");
     }
     private static void parsers()throws Exception {
-        ResumeParserFactory f=new ResumeParserFactory();Path text=temp.resolve("resume.MD");Files.writeString(text,"# Java developer");check(f.createParser(text).extractText(text).contains("Java"),"Markdown import");
+        ResumeParserFactory f=new ResumeParserFactory();Path text=temp.resolve("resume.MD");Files.writeString(text,"# Java developer");check(f.createParser(text).extractText(text.toString()).contains("Java"),"Markdown import");
         Path doc=temp.resolve("resume.docx");writeDocx(doc,"<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:body><w:p><w:r><w:t>Java developer</w:t></w:r></w:p></w:body></w:document>");
-        check(f.createParser(doc).extractText(doc).strip().equals("Java developer"),"DOCX extraction");
+        check(f.createParser(doc).extractText(doc.toString()).strip().equals("Java developer"),"DOCX extraction");
         Path malicious=temp.resolve("xxe.docx");writeDocx(malicious,"<!DOCTYPE foo [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]><w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:p>&xxe;</w:p></w:document>");
-        fails(()->{try{f.createParser(malicious).extractText(malicious);}catch(Exception e){throw new IllegalArgumentException(e);}},"DOCX XXE rejected");
-        fails(()->f.createParser(Path.of("r.doc")),"legacy .doc explicit error");
-        check(f.createParser(Path.of("r.pdf")) instanceof ResumeParserFactory.PdfResumeParser,"PDF strategy selected");
+        fails(()->{try{f.createParser(malicious).extractText(malicious.toString());}catch(Exception e){throw new IllegalArgumentException(e);}},"DOCX XXE rejected");
+        check(f.createParser(Path.of("r.doc")) instanceof DocResumeParser,"legacy Word strategy selected");
+        check(f.createParser(Path.of("r.pdf")) instanceof PdfResumeParser,"PDF strategy selected");
     }
     private static void writeDocx(Path p,String xml)throws Exception {try(var zip=new ZipOutputStream(Files.newOutputStream(p))){zip.putNextEntry(new ZipEntry("word/document.xml"));zip.write(xml.getBytes(StandardCharsets.UTF_8));zip.closeEntry();}}
     private static void resume(){
@@ -81,7 +82,7 @@ public final class SelfTest {
         fails(()->fixture("{\"choice\":\"evil\",\"confidence\":1}").decide("choose",List.of("yes","no")),"decision bounded");
     }
     private static void job(){
-        SqliteStore s=db("job");UI ui=new UI();ui.approved=false;JobDescriptionIntake intake=new JobDescriptionIntake(fixture("{\"text\":\"estimated Java role\"}"),noAdzuna(),s,new ApprovalGate(ui));
+        SqliteStore s=db("job");UI ui=new UI();ui.approved=false;JobDescriptionIntake intake=new JobDescriptionIntake(fixture("{\"text\":\"estimated Java role\"}"),tools(noAdzuna()),s,new ApprovalGate(ui));
         JobDescription job=intake.add("Developer","Acme","Canada","Java SQL\nApply by: 2026-12-01");check(job.country().equals("CA")&&job.deadline().equals(java.time.LocalDate.of(2026,12,1))&&job.sourceLabel()==SourceLabel.USER_PASTED,"job input provenance deadline");
         check(JobDescriptionIntake.explicitDeadline("2026-12-01 team meeting").isEmpty(),"no guessed deadline");check(JobDescriptionIntake.explicitDeadline("Deadline: 2026-02-30").isEmpty(),"invalid deadline");
         fails(()->intake.add("x","y","GB","z"),"country validation");
@@ -108,10 +109,10 @@ public final class SelfTest {
     }
     private static void research(){
         SqliteStore s=preparedDb("research");AtomicInteger searches=new AtomicInteger();WebSearchTool empty=new WebSearchTool(new Config(),new HttpTransport()){public List<SearchResult> search(String q){searches.incrementAndGet();return List.of();}};
-        fails(()->new CompanyResearchService(fixture("{\"text\":\"Acme values\"}"),empty,s).research(sampleJob()),"empty search does not invent summary");check(searches.get()==2&&s.find("company","job")==null,"bounded research retries");
+        fails(()->new CompanyResearchService(fixture("{\"text\":\"Acme values\"}"),tools(empty),s).research(sampleJob()),"empty search does not invent summary");check(searches.get()==2&&s.find("company","job")==null,"bounded research retries");
         WebSearchTool found=new WebSearchTool(new Config(),new HttpTransport()){public List<SearchResult> search(String q){return List.of(new SearchResult("Acme values","https://example.com/values","Acme values collaboration"));}};
         Ai a=scripted((p,t)->p.startsWith("Choose")?"{\"choice\":\"relevant\",\"confidence\":0.9}":p.startsWith("Summarize")?"{\"goals\":\"not stated\",\"values\":\"Collaboration https://example.com/values\"}":"{\"text\":\"Acme values\"}");
-        check(new CompanyResearchService(a,found,s).research(sampleJob()).sources().size()==1,"sourced company result");
+        check(new CompanyResearchService(a,tools(found),s).research(sampleJob()).sources().size()==1,"sourced company result");
     }
     private static String questionJson(){return "{\"questions\":[\"Explain Java?\",\"Describe a project?\",\"How do you test?\",\"How do you collaborate?\",\"Why this role?\"]}";}
     private static void questions(){

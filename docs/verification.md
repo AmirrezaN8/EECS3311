@@ -1,6 +1,26 @@
 # Verification record — November 14, 2026 (Toronto)
 
-## Current: domain and repository checkpoint
+## Current: user-run DOCX and basic GUI check
+
+The user supplied successful live DOCX import output with all expected sections populated and an empty warning, and stated the GUI worked. Together with prior evidence, pasted F01 intake and real Markdown/DOCX F02 extraction have passed. GUI evidence is a basic user confirmation, not exhaustive screen/error/cancellation coverage. No recording has been supplied. Adzuna/estimate and PDF/legacy Word checks remain pending.
+
+## Earlier: successful user-run live Markdown extraction
+
+After rebuilding the parser fix, the user reported a passing 325-assertion suite and successful real `resume import samples/resume.md`: Java/SQL/Git/JUnit, education, both experience items, project and certification were populated, with an empty warning. This is user-run evidence for the Markdown/Haiku extraction path, not an independently observed agent-side request. The preceding pasted F01 path also succeeded. DOCX/PDF/legacy Word, Adzuna/estimate and desktop checks remain pending. No new commit/push/video is claimed.
+
+## Earlier: user-reported resume extraction failure and parser regression fix
+
+User-run build passed 301 assertions and pasted F01 intake succeeded. Live F02 import failed with `Invalid JSON number` and correctly retained raw text; it is not marked live-verified. A Markdown-wrapped valid JSON fixture reproduced that exact parser error, but the original live response was not captured, so its exact format remains unknown.
+
+ResponseParser.validate now accepts one complete JSON code block, keeps strict syntax/schema/evidence validation, and rejects extra prose/multiple blocks. Ai passes the actual previous validation error into the retry prompt. Unknown JSON tokens no longer get misleading numeric diagnostics. AgentController emits warning for a raw-fallback resume result. No model response/resume content is logged in parse diagnostics.
+
+`sh scripts/build.sh`: PASS, 325 assertions (79 API/response, 79 repository, 74 input-feature, 93 prior service/core). Tests include the real adapter/importer/facade/repository route under a fenced-response fixture. Live rerun is pending. The two dependency-related SKIP notices remain honest and unchanged. No new commit/push/video is claimed.
+
+## Previous: F01/F02 checkpoint
+
+`sh scripts/build.sh` passes 301 assertions (61 API, 79 repositories, 68 input-feature and 93 prior service/core checks). This includes actual named commands/tool routing, consent/fallback behavior, explicit JSON negotiation, resume-section evidence, file/XML/input errors and non-destructive rejection/cancellation. The old hostile XML diagnostic is now suppressed by an explicit error handler while parsing still fails safely. The suite explicitly prints SKIP for real PDF/legacy Word paths lacking dependencies/samples. See checkpoint-3-inputs.md. An actual deterministic CLI job add/show smoke check also passed in separate processes against a temporary database, retaining content/source/deadline. Live AI/tool F01/F02 walkthrough, Maven package and desktop interaction remain pending; no new commit or video is claimed.
+
+## Previous: domain and repository checkpoint
 
 `sh scripts/build.sh` passes 233 assertions (61 API contract fixtures, 79 domain/repository checks and 93 core/service checks). The four named repositories are in actual feature use. Temporary legacy fixtures verify non-destructive reads; SQLite trigger-injected failures verify rollback; a separate JVM verifies saved data/relationships after process restart. No user's database was inspected or changed for these checks. See checkpoint-2-persistence.md for details. Separate CLI processes using a temporary database passed job add/show and history add/show, retaining IDs, source labels, deadline and fact timestamp. Personal configuration and decision notes remain ignored; no commit/push is claimed.
 

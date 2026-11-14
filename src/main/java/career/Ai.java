@@ -12,19 +12,19 @@ public final class Ai implements DecisionClient {
         this.decisions = Objects.requireNonNull(decisions);
     }
     public <T> T ask(String task, Object context, ModelTier tier, Function<Map<String, Object>, T> schema) {
-        return retry("Claude", attempt -> ResponseParser.validate(client.generate(
-            PromptBuilder.build(task, context, attempt > 0), tier), schema));
+        return retry("Claude", previousError -> ResponseParser.validate(client.generate(
+            PromptBuilder.build(task, context, previousError), tier), schema));
     }
     @Override public Decision decide(String question, List<String> options) {
         ResponseParser.validateOptions(options);
         List<String> allowed = List.copyOf(options);
-        return retry("Jev", attempt -> ResponseParser.validateDecision(decisions.decide(question, allowed), allowed));
+        return retry("Jev", previousError -> ResponseParser.validateDecision(decisions.decide(question, allowed), allowed));
     }
-    private static <T> T retry(String provider, Function<Integer, T> operation) {
+    private static <T> T retry(String provider, Function<String, T> operation) {
         RuntimeException last = null;
         for (int attempt = 0; attempt < 2; attempt++) {
             if (Thread.currentThread().isInterrupted()) throw new IllegalStateException("Operation cancelled");
-            try { return operation.apply(attempt); }
+            try { return operation.apply(last==null?null:last.getMessage()); }
             catch (RuntimeException e) { last = e; }
         }
         throw new IllegalStateException(provider + " request failed after two attempts: " + last.getMessage(), last);

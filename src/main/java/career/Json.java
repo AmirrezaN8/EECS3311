@@ -64,6 +64,7 @@ public final class Json {
             if(c=='['){i++;List<Object> l=new ArrayList<>();space();if(i<s.length()&&s.charAt(i)==']'){i++;return l;}
                 do{l.add(value(depth+1));space();c=take();if(c==']')return l;if(c!=',')throw new IllegalArgumentException("Expected comma");}while(true);}
             for(String literal:List.of("true","false","null"))if(s.startsWith(literal,i)){i+=literal.length();return literal.equals("null")?null:literal.equals("true");}
+            if("-0123456789".indexOf(c)<0)throw new IllegalArgumentException("Expected a JSON value at character "+i);
             int start=i;while(i<s.length()&&"0123456789eE+-.".indexOf(s.charAt(i))>=0)i++;
             String n=s.substring(start,i);if(!n.matches("-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+-]?[0-9]+)?"))throw new IllegalArgumentException("Invalid JSON number");
             if(!n.contains(".")&&!n.contains("e")&&!n.contains("E")){try{return Long.valueOf(n);}catch(NumberFormatException ignored){}}

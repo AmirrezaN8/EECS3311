@@ -3,7 +3,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Count 12 /Kids [ 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R ] >>
+<< /Type /Pages /Count 13 /Kids [ 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R ] >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier >>
@@ -15,7 +15,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
 endobj
 6 0 obj
-<< /Length 5101 >>
+<< /Length 5662 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
@@ -24,521 +24,586 @@ BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 202
 BT /F2 8 Tf 535.0 24.0 Td (1) Tj ET
 BT /F2 12 Tf 42.0 722.0 Td (EECS3311 Stage 2 - Implementation Report) Tj ET
 BT /F1 9 Tf 42.0 709.0 Td () Tj ET
-BT /F1 9 Tf 42.0 696.0 Td (CURRENT CHECKPOINT UPDATE: Named top-level domain entities and SqliteJobRepository,) Tj ET
-BT /F1 9 Tf 42.0 683.0 Td (SqliteResumeRepository, SqliteMemoryRepository and SqliteChecklistRepository are restored and) Tj ET
-BT /F1 9 Tf 42.0 670.0 Td (used by the services/facade. Typed skills, creation/edit dates, checklist identity/deadline and) Tj ET
-BT /F1 9 Tf 42.0 657.0 Td (job-linked question answers are implemented. Compatibility reads preserve older records; atomic) Tj ET
-BT /F1 9 Tf 42.0 644.0 Td (selection and interview/feedback restart are tested. Current build: 233 offline assertions pass,) Tj ET
-BT /F1 9 Tf 42.0 631.0 Td (including 79 domain/repository checks and a separate-JVM restart. See) Tj ET
-BT /F1 9 Tf 42.0 618.0 Td (docs/checkpoint-2-persistence.md. Later command/tool/state/F05/F10/UI corrections remain) Tj ET
-BT /F1 9 Tf 42.0 605.0 Td (pending. Existing string identity storage and native sqlite3 transport are retained and) Tj ET
-BT /F1 9 Tf 42.0 592.0 Td (documented; no JDBC implementation is claimed.) Tj ET
-BT /F1 9 Tf 42.0 579.0 Td () Tj ET
-BT /F1 9 Tf 42.0 566.0 Td (WORKING REPORT - NOT FINAL SUBMISSION. This original implementation snapshot predates strict) Tj ET
-BT /F1 9 Tf 42.0 553.0 Td (Stage 1 corrections. Checkpoint 1 has since restored JevAdapter/JevApi,) Tj ET
-BT /F1 9 Tf 42.0 540.0 Td (ClaudeAdapter/AnthropicApi, Decision probabilities, ModelTier.HAIKU/SONNET, PromptBuilder and) Tj ET
-BT /F1 9 Tf 42.0 527.0 Td (ResponseParser. The generic provider adapter is removed. Current verification: 154 offline) Tj ET
-BT /F1 9 Tf 42.0 514.0 Td (assertions pass; API smoke checks report missing keys. Sections below still include historical) Tj ET
-BT /F1 9 Tf 42.0 501.0 Td (architecture descriptions and must be reconciled with all checkpoint changes before submission.) Tj ET
-BT /F1 9 Tf 42.0 488.0 Td (See docs/checkpoint-1-apis.md for current provider evidence.) Tj ET
-BT /F1 9 Tf 42.0 475.0 Td () Tj ET
-BT /F1 9 Tf 42.0 462.0 Td (Career Preparation AI Agent) Tj ET
-BT /F1 9 Tf 42.0 449.0 Td (Repository: https://github.com/AmirrezaN8/EECS3311) Tj ET
-BT /F1 9 Tf 42.0 436.0 Td (Prepared for Amirreza N8 | November 14, 2026 | Toronto local time) Tj ET
-BT /F1 9 Tf 42.0 423.0 Td (Status: Java implementation with verified offline core; live integrations and desktop) Tj ET
-BT /F1 9 Tf 42.0 410.0 Td (demonstration pending.) Tj ET
-BT /F1 9 Tf 42.0 397.0 Td () Tj ET
-BT /F2 12 Tf 42.0 376.0 Td (1. Project overview and implementation status) Tj ET
-BT /F1 9 Tf 42.0 363.0 Td () Tj ET
-BT /F1 9 Tf 42.0 350.0 Td (The application helps new graduates prepare applications in Canada and the United States. It) Tj ET
-BT /F1 9 Tf 42.0 337.0 Td (accepts job postings and resumes, remembers career facts, identifies skill gaps, proposes) Tj ET
-BT /F1 9 Tf 42.0 324.0 Td (conservative tailored resume edits, researches employers, generates questions, runs typed) Tj ET
-BT /F1 9 Tf 42.0 311.0 Td (interviews, and tracks preparation. A bounded agent coordinates these services rather than) Tj ET
-BT /F1 9 Tf 42.0 298.0 Td (merely forwarding a chat prompt.) Tj ET
-BT /F1 9 Tf 42.0 285.0 Td () Tj ET
-BT /F1 9 Tf 42.0 272.0 Td (Implementation baseline: Stage1.md was read in full and uml.uxf panel attributes were extracted.) Tj ET
-BT /F1 9 Tf 42.0 259.0 Td (The repository initially contained only these design files and .gitattributes. Both original) Tj ET
-BT /F1 9 Tf 42.0 246.0 Td (documents remain byte-for-byte unchanged. The UMLet file contains class diagrams, but the) Tj ET
-BT /F1 9 Tf 42.0 233.0 Td (use-case/sequence diagrams mentioned in the Markdown are not present as corresponding UMLet) Tj ET
-BT /F1 9 Tf 42.0 220.0 Td (elements. Updated class, use-case and sequence sources accompany this report. No Stage 2) Tj ET
-BT /F1 9 Tf 42.0 207.0 Td (instruction PDF was supplied; compliance is assessed against the user's supplied requirements,) Tj ET
-BT /F1 9 Tf 42.0 194.0 Td (pending comparison with that PDF.) Tj ET
-BT /F1 9 Tf 42.0 181.0 Td () Tj ET
-BT /F1 9 Tf 42.0 168.0 Td (Architecture: Java 21-compatible source, built with Temurin 27. SwingGui and CliApp share) Tj ET
-BT /F1 9 Tf 42.0 155.0 Td (AgentController. Domain data consists of typed records in Models.java. Feature services use Ai) Tj ET
-BT /F1 9 Tf 42.0 142.0 Td (for validated JSON generation/decisions, Documents for explicit record conversion and) Tj ET
-BT /F1 9 Tf 42.0 129.0 Td (SqliteStore for durable SQLite documents. No web frontend, Python core or JavaScript core) Tj ET
-BT /F1 9 Tf 42.0 116.0 Td (exists. Maven configuration includes PDFBox and JUnit; an offline JDK-only build and) Tj ET
-BT /F1 9 Tf 42.0 103.0 Td (assert-based test runner avoid blocked downloads.) Tj ET
-BT /F1 9 Tf 42.0 90.0 Td () Tj ET
+BT /F1 9 Tf 42.0 696.0 Td (DOCX/GUI UPDATE: The user supplied successful real DOCX import output with all expected sections) Tj ET
+BT /F1 9 Tf 42.0 683.0 Td (and an empty warning, and confirmed basic GUI operation. This is user-run evidence, not) Tj ET
+BT /F1 9 Tf 42.0 670.0 Td (exhaustive GUI coverage. Pasted job intake and Markdown/DOCX extraction are ready to record) Tj ET
+BT /F1 9 Tf 42.0 657.0 Td (within that verified scope. Adzuna/estimate/PDF/legacy Word branches remain pending; no video) Tj ET
+BT /F1 9 Tf 42.0 644.0 Td (links or new checkpoint-3 commit are claimed.) Tj ET
+BT /F1 9 Tf 42.0 631.0 Td () Tj ET
+BT /F1 9 Tf 42.0 618.0 Td (LIVE RERUN UPDATE: After the parser correction and a passing 325-assertion build, the user) Tj ET
+BT /F1 9 Tf 42.0 605.0 Td (reported successful real Markdown resume extraction: all expected source-supported sections) Tj ET
+BT /F1 9 Tf 42.0 592.0 Td (populated, no inferred proficiency and an empty warning. F01 pasted intake and F02 Markdown) Tj ET
+BT /F1 9 Tf 42.0 579.0 Td (extraction have user-run success evidence. DOCX/PDF/legacy Word, Adzuna/estimate and desktop) Tj ET
+BT /F1 9 Tf 42.0 566.0 Td (paths remain pending. The precise original model response remains unknown; no video or new) Tj ET
+BT /F1 9 Tf 42.0 553.0 Td (checkpoint-3 commit is claimed.) Tj ET
+BT /F1 9 Tf 42.0 540.0 Td () Tj ET
+BT /F1 9 Tf 42.0 527.0 Td (LIVE DEFECT UPDATE: The user confirmed a passing 301-assertion build and successful F01 pasted) Tj ET
+BT /F1 9 Tf 42.0 514.0 Td (intake, but F02 raw fallback with Invalid JSON number. Its exact live model response is unknown.) Tj ET
+BT /F1 9 Tf 42.0 501.0 Td (A valid JSON code-block fixture reproduced the error; the parser now accepts exactly one such) Tj ET
+BT /F1 9 Tf 42.0 488.0 Td (wrapper, retains strict syntax/schema/evidence checks, sends validator errors into the bounded) Tj ET
+BT /F1 9 Tf 42.0 475.0 Td (retry and marks raw fallback with a warning event. The expanded suite passes 325 assertions;) Tj ET
+BT /F1 9 Tf 42.0 462.0 Td (successful live F02 rerun is still pending. These are actual failure/fix observations, not a) Tj ET
+BT /F1 9 Tf 42.0 449.0 Td (claim of verified live extraction.) Tj ET
+BT /F1 9 Tf 42.0 436.0 Td () Tj ET
+BT /F1 9 Tf 42.0 423.0 Td (LATEST CHECKPOINT 3: F01/F02 now run through GetJobDescriptionAction/ImportResumeAction, named) Tj ET
+BT /F1 9 Tf 42.0 410.0 Td (source/parser strategies and ToolManager/Tool/ToolResult. Resume extraction validates source) Tj ET
+BT /F1 9 Tf 42.0 397.0 Td (evidence for all five sections. Explicit Adzuna JSON negotiation and approved estimate failure) Tj ET
+BT /F1 9 Tf 42.0 384.0 Td (recovery are tested. Current build: 301 offline assertions; dependency-backed PDF/legacy Word,) Tj ET
+BT /F1 9 Tf 42.0 371.0 Td (live feature paths and desktop walkthrough remain pending. Safe fictional sample inputs and a) Tj ET
+BT /F1 9 Tf 42.0 358.0 Td (local recording gate are supplied in docs/checkpoint-3-inputs.md and samples/. Implementation) Tj ET
+BT /F1 9 Tf 42.0 345.0 Td (commit 99ca4c9 now exists \(Java core/API/repository milestone\); no new checkpoint-3 commit or) Tj ET
+BT /F1 9 Tf 42.0 332.0 Td (video is claimed. Earlier report text is historical until final reconciliation.) Tj ET
+BT /F1 9 Tf 42.0 319.0 Td () Tj ET
+BT /F1 9 Tf 42.0 306.0 Td (CURRENT CHECKPOINT UPDATE: Named top-level domain entities and SqliteJobRepository,) Tj ET
+BT /F1 9 Tf 42.0 293.0 Td (SqliteResumeRepository, SqliteMemoryRepository and SqliteChecklistRepository are restored and) Tj ET
+BT /F1 9 Tf 42.0 280.0 Td (used by the services/facade. Typed skills, creation/edit dates, checklist identity/deadline and) Tj ET
+BT /F1 9 Tf 42.0 267.0 Td (job-linked question answers are implemented. Compatibility reads preserve older records; atomic) Tj ET
+BT /F1 9 Tf 42.0 254.0 Td (selection and interview/feedback restart are tested. Current build: 233 offline assertions pass,) Tj ET
+BT /F1 9 Tf 42.0 241.0 Td (including 79 domain/repository checks and a separate-JVM restart. See) Tj ET
+BT /F1 9 Tf 42.0 228.0 Td (docs/checkpoint-2-persistence.md. Later command/tool/state/F05/F10/UI corrections remain) Tj ET
+BT /F1 9 Tf 42.0 215.0 Td (pending. Existing string identity storage and native sqlite3 transport are retained and) Tj ET
+BT /F1 9 Tf 42.0 202.0 Td (documented; no JDBC implementation is claimed.) Tj ET
+BT /F1 9 Tf 42.0 189.0 Td () Tj ET
+BT /F1 9 Tf 42.0 176.0 Td (WORKING REPORT - NOT FINAL SUBMISSION. This original implementation snapshot predates strict) Tj ET
+BT /F1 9 Tf 42.0 163.0 Td (Stage 1 corrections. Checkpoint 1 has since restored JevAdapter/JevApi,) Tj ET
+BT /F1 9 Tf 42.0 150.0 Td (ClaudeAdapter/AnthropicApi, Decision probabilities, ModelTier.HAIKU/SONNET, PromptBuilder and) Tj ET
+BT /F1 9 Tf 42.0 137.0 Td (ResponseParser. The generic provider adapter is removed. Current verification: 154 offline) Tj ET
+BT /F1 9 Tf 42.0 124.0 Td (assertions pass; API smoke checks report missing keys. Sections below still include historical) Tj ET
+BT /F1 9 Tf 42.0 111.0 Td (architecture descriptions and must be reconciled with all checkpoint changes before submission.) Tj ET
+BT /F1 9 Tf 42.0 98.0 Td (See docs/checkpoint-1-apis.md for current provider evidence.) Tj ET
+BT /F1 9 Tf 42.0 85.0 Td () Tj ET
+BT /F1 9 Tf 42.0 72.0 Td (Career Preparation AI Agent) Tj ET
 endstream
 endobj
 7 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
 endobj
 8 0 obj
-<< /Length 5447 >>
+<< /Length 5201 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
 BT /F2 8 Tf 535.0 24.0 Td (2) Tj ET
-BT /F1 9 Tf 42.0 730.0 Td (LLMAdapter communicates with an actual configured Ollama chat endpoint or HTTPS) Tj ET
-BT /F1 9 Tf 42.0 717.0 Td (OpenAI-compatible chat/completions endpoint. Local inference avoids a mandatory paid) Tj ET
-BT /F1 9 Tf 42.0 704.0 Td (subscription. Ai implements DecisionClient with bounded choices and confidence checks. Invalid) Tj ET
-BT /F1 9 Tf 42.0 691.0 Td (JSON, invalid choice, invalid count and unsupported evidence trigger at most one retry.) Tj ET
-BT /F1 9 Tf 42.0 678.0 Td (Service/credential failures are visible. No canned AI result is shipped in production. Explicit) Tj ET
-BT /F1 9 Tf 42.0 665.0 Td (model fixtures are limited to tests.) Tj ET
-BT /F1 9 Tf 42.0 652.0 Td () Tj ET
-BT /F1 9 Tf 42.0 639.0 Td (Working offline functionality verified: posting entry/selection/persistence, DOCX/Markdown/text) Tj ET
-BT /F1 9 Tf 42.0 626.0 Td (extraction, raw resume retention on AI failure, memory CRUD/deduplication, deterministic edit) Tj ET
-BT /F1 9 Tf 42.0 613.0 Td (validation, partial checklist/progress, JSON and error boundaries. AI-dependent service paths) Tj ET
-BT /F1 9 Tf 42.0 600.0 Td (and the complete orchestrated preparation/interview workflow passed with labeled fixtures. Live) Tj ET
-BT /F1 9 Tf 42.0 587.0 Td (model quality, provider connectivity, live company research and job search are NOT claimed) Tj ET
-BT /F1 9 Tf 42.0 574.0 Td (verified.) Tj ET
-BT /F1 9 Tf 42.0 561.0 Td () Tj ET
-BT /F1 9 Tf 42.0 548.0 Td (GUI: job/profile/history/preparation/interview/checklist tabs; typed inputs, readable results,) Tj ET
-BT /F1 9 Tf 42.0 535.0 Td (approval dialogs, progress events, check boxes and percentage progress. Long work runs in) Tj ET
-BT /F1 9 Tf 42.0 522.0 Td (SwingWorker; dialogs use the Swing event thread. CLI supports interactive and one-shot commands.) Tj ET
-BT /F1 9 Tf 42.0 509.0 Td (Both call the same facade. Desktop GUI interaction is pending; compilation and graceful headless) Tj ET
-BT /F1 9 Tf 42.0 496.0 Td (startup were verified.) Tj ET
-BT /F1 9 Tf 42.0 483.0 Td () Tj ET
-BT /F1 9 Tf 42.0 470.0 Td (Known limits: PDF parsing requires the Maven build and remains unverified here. Legacy binary) Tj ET
-BT /F1 9 Tf 42.0 457.0 Td (Word .doc, scanned and locked PDFs need pasted text. Tailoring permits only reordered existing) Tj ET
-BT /F1 9 Tf 42.0 444.0 Td (tokens; it rejects broader prose rewrites. Token preservation is not a proof of semantic) Tj ET
-BT /F1 9 Tf 42.0 431.0 Td (equivalence, so user review remains essential. Skill matching is conservative/literal and marks) Tj ET
-BT /F1 9 Tf 42.0 418.0 Td (uncertain evidence. Automatic deadlines recognize explicitly labeled ISO dates only. Research) Tj ET
-BT /F1 9 Tf 42.0 405.0 Td (summarizes search snippets, not entire crawled sites. Local SQLite data is unencrypted. Videos) Tj ET
-BT /F1 9 Tf 42.0 392.0 Td (have not been recorded. The Git weekly requirements are currently unmet.) Tj ET
-BT /F1 9 Tf 42.0 379.0 Td () Tj ET
-BT /F2 12 Tf 42.0 358.0 Td (2. Feature-to-implementation mapping) Tj ET
-BT /F1 9 Tf 42.0 345.0 Td () Tj ET
-BT /F1 9 Tf 42.0 332.0 Td (All ten Stage 1 features have application paths. 'Implemented' here describes connected code) Tj ET
-BT /F1 9 Tf 42.0 319.0 Td (plus specified verification; it does not mean a live external service has been exercised.) Tj ET
-BT /F1 9 Tf 42.0 306.0 Td (Modified scope is called out explicitly. All file names below are under src/main/java/career/) Tj ET
-BT /F1 9 Tf 42.0 293.0 Td (unless stated otherwise. Source links and commands are also indexed in docs/demo-guide.md.) Tj ET
-BT /F1 9 Tf 42.0 280.0 Td () Tj ET
-BT /F2 12 Tf 42.0 259.0 Td (F01 - Job description intake) Tj ET
-BT /F1 9 Tf 42.0 246.0 Td () Tj ET
-BT /F1 9 Tf 42.0 233.0 Td (Reference: Stage1.md F01, UC01, SD01 reference. Status: Implemented with provider/consolidation) Tj ET
-BT /F1 9 Tf 42.0 220.0 Td (changes. Type: hybrid.) Tj ET
-BT /F1 9 Tf 42.0 207.0 Td (Files/classes: JobDescriptionIntake.java; JobDescriptionSource.java; AdzunaTool.java;) Tj ET
-BT /F1 9 Tf 42.0 194.0 Td (Models.Job/SourceLabel; AgentController.java; SqliteStore.java.) Tj ET
-BT /F1 9 Tf 42.0 181.0 Td (Methods: JobDescriptionIntake.add\(\), find\(\), save\(\), explicitDeadline\(\);) Tj ET
-BT /F1 9 Tf 42.0 168.0 Td (JobDescriptionSource.fetch\(\)/label\(\)/needsApproval\(\); AdzunaTool.search\(\);) Tj ET
-BT /F1 9 Tf 42.0 155.0 Td (AgentController.runFeature\(\).) Tj ET
-BT /F1 9 Tf 42.0 142.0 Td (Flow: GUI Job form or CLI job add/find -> facade -> intake/source strategy -> Adzuna lookup with) Tj ET
-BT /F1 9 Tf 42.0 129.0 Td (retry -> constrained listing selection -> explicit approval for expanded/full estimate ->) Tj ET
-BT /F1 9 Tf 42.0 116.0 Td (persist labeled Job and attribution. Rejected expansion may retain an approved partial excerpt.) Tj ET
-BT /F1 9 Tf 42.0 103.0 Td (No estimate is silently treated as an official posting. Missing credentials permit approved) Tj ET
-BT /F1 9 Tf 42.0 90.0 Td (full-estimate fallback or instruct the user to paste.) Tj ET
-BT /F1 9 Tf 42.0 77.0 Td (Patterns: Facade, Strategy, Adapter; the facade dispatches intake directly rather than) Tj ET
-BT /F1 9 Tf 42.0 64.0 Td (allocating a separate named GetJobDescriptionAction.) Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Repository: https://github.com/AmirrezaN8/EECS3311) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (Prepared for Amirreza N8 | November 14, 2026 | Toronto local time) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (Status: Java implementation with verified offline core; live integrations and desktop) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (demonstration pending.) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td () Tj ET
+BT /F2 12 Tf 42.0 657.0 Td (1. Project overview and implementation status) Tj ET
+BT /F1 9 Tf 42.0 644.0 Td () Tj ET
+BT /F1 9 Tf 42.0 631.0 Td (The application helps new graduates prepare applications in Canada and the United States. It) Tj ET
+BT /F1 9 Tf 42.0 618.0 Td (accepts job postings and resumes, remembers career facts, identifies skill gaps, proposes) Tj ET
+BT /F1 9 Tf 42.0 605.0 Td (conservative tailored resume edits, researches employers, generates questions, runs typed) Tj ET
+BT /F1 9 Tf 42.0 592.0 Td (interviews, and tracks preparation. A bounded agent coordinates these services rather than) Tj ET
+BT /F1 9 Tf 42.0 579.0 Td (merely forwarding a chat prompt.) Tj ET
+BT /F1 9 Tf 42.0 566.0 Td () Tj ET
+BT /F1 9 Tf 42.0 553.0 Td (Implementation baseline: Stage1.md was read in full and uml.uxf panel attributes were extracted.) Tj ET
+BT /F1 9 Tf 42.0 540.0 Td (The repository initially contained only these design files and .gitattributes. Both original) Tj ET
+BT /F1 9 Tf 42.0 527.0 Td (documents remain byte-for-byte unchanged. The UMLet file contains class diagrams, but the) Tj ET
+BT /F1 9 Tf 42.0 514.0 Td (use-case/sequence diagrams mentioned in the Markdown are not present as corresponding UMLet) Tj ET
+BT /F1 9 Tf 42.0 501.0 Td (elements. Updated class, use-case and sequence sources accompany this report. No Stage 2) Tj ET
+BT /F1 9 Tf 42.0 488.0 Td (instruction PDF was supplied; compliance is assessed against the user's supplied requirements,) Tj ET
+BT /F1 9 Tf 42.0 475.0 Td (pending comparison with that PDF.) Tj ET
+BT /F1 9 Tf 42.0 462.0 Td () Tj ET
+BT /F1 9 Tf 42.0 449.0 Td (Architecture: Java 21-compatible source, built with Temurin 27. SwingGui and CliApp share) Tj ET
+BT /F1 9 Tf 42.0 436.0 Td (AgentController. Domain data consists of named top-level records; Models contains shared) Tj ET
+BT /F1 9 Tf 42.0 423.0 Td (input/identity utilities. Feature services use Ai for validated generation/decision) Tj ET
+BT /F1 9 Tf 42.0 410.0 Td (coordination, the four planned repositories for entity persistence, Documents for record) Tj ET
+BT /F1 9 Tf 42.0 397.0 Td (conversion and SqliteStore for low-level SQLite transactions. No web frontend, Python core or) Tj ET
+BT /F1 9 Tf 42.0 384.0 Td (JavaScript core exists. Maven configuration includes PDFBox, Apache POI and JUnit; an offline) Tj ET
+BT /F1 9 Tf 42.0 371.0 Td (JDK-only build and assert-based test runner avoid blocked downloads.) Tj ET
+BT /F1 9 Tf 42.0 358.0 Td () Tj ET
+BT /F1 9 Tf 42.0 345.0 Td (JevAdapter/JevApi implement DecisionClient through the TypeSafe API; ClaudeAdapter/AnthropicApi) Tj ET
+BT /F1 9 Tf 42.0 332.0 Td (implement LLMClient for Haiku 4.5 and Sonnet 5.5. Ai coordinates bounded validation/retry across) Tj ET
+BT /F1 9 Tf 42.0 319.0 Td (these separate providers. The user reported successful real connectivity checks for all three) Tj ET
+BT /F1 9 Tf 42.0 306.0 Td (planned model roles. Invalid JSON, invalid choice, invalid count and unsupported evidence) Tj ET
+BT /F1 9 Tf 42.0 293.0 Td (trigger at most one retry. Service/credential failures are visible. No canned AI result is) Tj ET
+BT /F1 9 Tf 42.0 280.0 Td (shipped in production. Explicit model fixtures are limited to tests.) Tj ET
+BT /F1 9 Tf 42.0 267.0 Td () Tj ET
+BT /F1 9 Tf 42.0 254.0 Td (Working offline functionality verified: posting entry/selection/persistence, DOCX/Markdown/text) Tj ET
+BT /F1 9 Tf 42.0 241.0 Td (extraction, raw resume retention on AI failure, memory CRUD/deduplication, deterministic edit) Tj ET
+BT /F1 9 Tf 42.0 228.0 Td (validation, partial checklist/progress, JSON and error boundaries. AI-dependent service paths) Tj ET
+BT /F1 9 Tf 42.0 215.0 Td (and the complete orchestrated preparation/interview workflow passed with labeled fixtures. Live) Tj ET
+BT /F1 9 Tf 42.0 202.0 Td (model quality, provider connectivity, live company research and job search are NOT claimed) Tj ET
+BT /F1 9 Tf 42.0 189.0 Td (verified.) Tj ET
+BT /F1 9 Tf 42.0 176.0 Td () Tj ET
+BT /F1 9 Tf 42.0 163.0 Td (GUI: job/profile/history/preparation/interview/checklist tabs; typed inputs, readable results,) Tj ET
+BT /F1 9 Tf 42.0 150.0 Td (approval dialogs, progress events, check boxes and percentage progress. Long work runs in) Tj ET
+BT /F1 9 Tf 42.0 137.0 Td (SwingWorker; dialogs use the Swing event thread. CLI supports interactive and one-shot commands.) Tj ET
+BT /F1 9 Tf 42.0 124.0 Td (Both call the same facade. Desktop GUI interaction is pending; compilation and graceful headless) Tj ET
+BT /F1 9 Tf 42.0 111.0 Td (startup were verified.) Tj ET
+BT /F1 9 Tf 42.0 98.0 Td () Tj ET
 endstream
 endobj
 9 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
 endobj
 10 0 obj
-<< /Length 5051 >>
+<< /Length 5453 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
 BT /F2 8 Tf 535.0 24.0 Td (3) Tj ET
-BT /F1 9 Tf 42.0 730.0 Td (Verification: pasted source/country/deadline/persistence and approved/rejected estimate tests.) Tj ET
-BT /F1 9 Tf 42.0 717.0 Td (Real Adzuna selection remains unverified. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Job and CLI) Tj ET
-BT /F1 9 Tf 42.0 704.0 Td (job show.) Tj ET
-BT /F1 9 Tf 42.0 691.0 Td () Tj ET
-BT /F2 12 Tf 42.0 670.0 Td (F02 - Resume import and skill extraction) Tj ET
-BT /F1 9 Tf 42.0 657.0 Td () Tj ET
-BT /F1 9 Tf 42.0 644.0 Td (Reference: F02, UC02. Status: Implemented; PDF path pending dependency/runtime verification.) Tj ET
-BT /F1 9 Tf 42.0 631.0 Td (Type: hybrid.) Tj ET
-BT /F1 9 Tf 42.0 618.0 Td (Files/classes: ResumeImporter.java, ResumeParser.java, ResumeParserFactory.java) Tj ET
-BT /F1 9 Tf 42.0 605.0 Td (\(PdfResumeParser, DocxResumeParser, MarkdownResumeParser, PastedTextResumeParser\),) Tj ET
-BT /F1 9 Tf 42.0 592.0 Td (Models.ResumeProfile, Ai.java.) Tj ET
-BT /F1 9 Tf 42.0 579.0 Td (Methods: importResume\(\), importText\(\), current\(\), createParser\(\), extractText\(\).) Tj ET
-BT /F1 9 Tf 42.0 566.0 Td (Flow: file/paste -> format strategy -> text -> strict model extraction into skills, education,) Tj ET
-BT /F1 9 Tf 42.0 553.0 Td (experience, projects, certifications -> new base record and selected-profile pointer. Extracted) Tj ET
-BT /F1 9 Tf 42.0 540.0 Td (skills must occur in the source text. After two model failures raw text is saved with a visible) Tj ET
-BT /F1 9 Tf 42.0 527.0 Td (warning. Original profiles are retained across imports.) Tj ET
-BT /F1 9 Tf 42.0 514.0 Td (Patterns: Factory, Strategy, Adapter, Facade. A pasted-text helper accepts a String, while file) Tj ET
-BT /F1 9 Tf 42.0 501.0 Td (strategies implement ResumeParser\(Path\).) Tj ET
-BT /F1 9 Tf 42.0 488.0 Td (Verification: Markdown/DOCX extraction, external-entity rejection, format selection,) Tj ET
-BT /F1 9 Tf 42.0 475.0 Td (invalid/blank input, evidence rejection, labeled raw fallback and persistence. PDFBox extraction) Tj ET
-BT /F1 9 Tf 42.0 462.0 Td (is not exercised. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Resume.) Tj ET
-BT /F1 9 Tf 42.0 449.0 Td () Tj ET
-BT /F2 12 Tf 42.0 428.0 Td (F03 - User history memory) Tj ET
-BT /F1 9 Tf 42.0 415.0 Td () Tj ET
-BT /F1 9 Tf 42.0 402.0 Td (Reference: F03, UC03. Status: Implemented. Type: hybrid.) Tj ET
-BT /F1 9 Tf 42.0 389.0 Td (Files/classes: MemoryManager.java, Models.MemoryFact, AgentController.java, SqliteStore.java.) Tj ET
-BT /F1 9 Tf 42.0 376.0 Td (Methods: recordTurn\(\), loadFacts\(\), save\(\), editFact\(\), delete\(\); facade chat/history commands) Tj ET
-BT /F1 9 Tf 42.0 363.0 Td (and handleGoal\(\).) Tj ET
-BT /F1 9 Tf 42.0 350.0 Td (Flow: career chat/goal -> constrained save/skip decision -> short structured fact ->) Tj ET
-BT /F1 9 Tf 42.0 337.0 Td (deduplication -> contradiction decision against existing facts -> user approval for a suspected) Tj ET
-BT /F1 9 Tf 42.0 324.0 Td (conflict -> save. Explicit history operations work without AI. Failed automatic memory) Tj ET
-BT /F1 9 Tf 42.0 311.0 Td (operations publish a warning while leaving existing facts intact. A conflict can be saved) Tj ET
-BT /F1 9 Tf 42.0 298.0 Td (alongside prior facts only with approval, allowing manual review rather than silent replacement.) Tj ET
-BT /F1 9 Tf 42.0 285.0 Td (Patterns: Facade, Adapter, Observer for warnings.) Tj ET
-BT /F1 9 Tf 42.0 272.0 Td (Verification: normalized deduplication, editing, deletion, unknown-ID errors and failed-AI) Tj ET
-BT /F1 9 Tf 42.0 259.0 Td (isolation. Automatic semantic conflict detection is not live-model verified. Demo: NOT RECORDED;) Tj ET
-BT /F1 9 Tf 42.0 246.0 Td (URL/TIMESTAMP TBD; My History and CLI history show.) Tj ET
-BT /F1 9 Tf 42.0 233.0 Td () Tj ET
-BT /F2 12 Tf 42.0 212.0 Td (F04 - Skill-gap identification) Tj ET
-BT /F1 9 Tf 42.0 199.0 Td () Tj ET
-BT /F1 9 Tf 42.0 186.0 Td (Reference: F04, UC04. Status: Implemented with conservative evidence matching. Type: hybrid.) Tj ET
-BT /F1 9 Tf 42.0 173.0 Td (Files/classes: SkillGapService.java; Models.SkillGapReport, SkillAssessment, GapGroup; Ai.java.) Tj ET
-BT /F1 9 Tf 42.0 160.0 Td (Methods: identify\(\), groupedByPriority\(\), uncertain\(\), decide\(\).) Tj ET
-BT /F1 9 Tf 42.0 147.0 Td (Flow: selected posting/profile -> model extracts literal posting skill names ->) Tj ET
-BT /F1 9 Tf 42.0 134.0 Td (normalize/deduplicate -> constrained MISSING/STRONG/DECENT classification -> force unsupported) Tj ET
-BT /F1 9 Tf 42.0 121.0 Td (positive claims to uncertain MISSING -> ordered saved report. Missing inputs generate clear) Tj ET
-BT /F1 9 Tf 42.0 108.0 Td (import/add instructions. Strong/decency decisions rely on model assessment of the raw resume) Tj ET
-BT /F1 9 Tf 42.0 95.0 Td (evidence.) Tj ET
-BT /F1 9 Tf 42.0 82.0 Td (Patterns: Command through FeatureCommand, Facade, Adapter.) Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Known limits: PDF parsing requires the Maven build and remains unverified here. Legacy binary) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (Word .doc has a POI strategy requiring packaged dependencies and valid-sample verification;) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (scanned and locked PDFs need pasted text. Tailoring permits only reordered existing tokens; it) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (rejects broader prose rewrites. Token preservation is not a proof of semantic equivalence, so) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td (user review remains essential. Skill matching is conservative/literal and marks uncertain) Tj ET
+BT /F1 9 Tf 42.0 665.0 Td (evidence. Automatic deadlines recognize explicitly labeled ISO dates only. Research summarizes) Tj ET
+BT /F1 9 Tf 42.0 652.0 Td (search snippets, not entire crawled sites. Local SQLite data is unencrypted. Videos have not) Tj ET
+BT /F1 9 Tf 42.0 639.0 Td (been recorded. The Git weekly requirements are currently unmet.) Tj ET
+BT /F1 9 Tf 42.0 626.0 Td () Tj ET
+BT /F2 12 Tf 42.0 605.0 Td (2. Feature-to-implementation mapping) Tj ET
+BT /F1 9 Tf 42.0 592.0 Td () Tj ET
+BT /F1 9 Tf 42.0 579.0 Td (All ten Stage 1 features have application paths. 'Implemented' here describes connected code) Tj ET
+BT /F1 9 Tf 42.0 566.0 Td (plus specified verification; it does not mean a live external service has been exercised.) Tj ET
+BT /F1 9 Tf 42.0 553.0 Td (Modified scope is called out explicitly. All file names below are under src/main/java/career/) Tj ET
+BT /F1 9 Tf 42.0 540.0 Td (unless stated otherwise. Source links and commands are also indexed in docs/demo-guide.md.) Tj ET
+BT /F1 9 Tf 42.0 527.0 Td () Tj ET
+BT /F2 12 Tf 42.0 506.0 Td (F01 - Job description intake) Tj ET
+BT /F1 9 Tf 42.0 493.0 Td () Tj ET
+BT /F1 9 Tf 42.0 480.0 Td (Reference: Stage1.md F01 / UC01. Status: Implemented and offline-tested; live lookup/estimation) Tj ET
+BT /F1 9 Tf 42.0 467.0 Td (walkthrough pending. Type: hybrid.) Tj ET
+BT /F1 9 Tf 42.0 454.0 Td (Files/classes: GetJobDescriptionAction, JobDescriptionIntake, JobDescriptionRequest,) Tj ET
+BT /F1 9 Tf 42.0 441.0 Td (JobDescriptionSource and) Tj ET
+BT /F1 9 Tf 42.0 428.0 Td (PastedTextSource/AdzunaExcerptSource/ExpandedEstimateSource/FullEstimateSource;) Tj ET
+BT /F1 9 Tf 42.0 415.0 Td (ToolManager/Tool/ToolResult/AdzunaTool; JevAdapter, ClaudeAdapter; SqliteJobRepository;) Tj ET
+BT /F1 9 Tf 42.0 402.0 Td (JobDescription/SourceLabel.) Tj ET
+BT /F1 9 Tf 42.0 389.0 Td (Methods: AgentController.runFeature\(\), GetJobDescriptionAction.execute\(\),) Tj ET
+BT /F1 9 Tf 42.0 376.0 Td (JobDescriptionIntake.getDescription\(\), JobDescriptionSource.fetch\(\)/label\(\)/needsApproval\(\),) Tj ET
+BT /F1 9 Tf 42.0 363.0 Td (ToolManager.executeTool\(\), AdzunaTool.execute\(\)/search\(\), SqliteJobRepository.saveAndSelect\(\).) Tj ET
+BT /F1 9 Tf 42.0 350.0 Td (Flow: GUI/CLI input -> named command -> validated request -> pasted or tool-backed source -> Jev) Tj ET
+BT /F1 9 Tf 42.0 337.0 Td (fixed-option listing selection -> labeled partial excerpt/source attribution -> consent for) Tj ET
+BT /F1 9 Tf 42.0 324.0 Td (Sonnet expanded/full estimate -> atomic labeled save and selection. Declined/failed paths retain) Tj ET
+BT /F1 9 Tf 42.0 311.0 Td (prior work, offer the original partial excerpt if appropriate or instruct paste. Adzuna/tool and) Tj ET
+BT /F1 9 Tf 42.0 298.0 Td (model retries are bounded; save failures are not presented as model failures.) Tj ET
+BT /F1 9 Tf 42.0 285.0 Td (Patterns: Command, Strategy, Facade, Adapter. Tools register centrally. Country restricted to) Tj ET
+BT /F1 9 Tf 42.0 272.0 Td (CA/US; automatic posting deadlines still have the documented ISO-only limitation pending later) Tj ET
+BT /F1 9 Tf 42.0 259.0 Td (deadline work.) Tj ET
+BT /F1 9 Tf 42.0 246.0 Td (Verification: actual command/service/tool paths under fixtures cover input labels, attribution,) Tj ET
+BT /F1 9 Tf 42.0 233.0 Td (selection, query/JSON format, retries, all approval/rejection/fallback paths, cancellation and) Tj ET
+BT /F1 9 Tf 42.0 220.0 Td (preserved selections. Real Adzuna/desktop walkthrough is pending. Demo: NOT RECORDED;) Tj ET
+BT /F1 9 Tf 42.0 207.0 Td (URL/TIMESTAMP TBD; GUI Job and CLI job commands.) Tj ET
+BT /F1 9 Tf 42.0 194.0 Td () Tj ET
+BT /F2 12 Tf 42.0 173.0 Td (F02 - Resume import and skill extraction) Tj ET
+BT /F1 9 Tf 42.0 160.0 Td () Tj ET
+BT /F1 9 Tf 42.0 147.0 Td (Reference: Stage1.md F02 / UC02. Status: Implemented and offline-tested; dependency-backed) Tj ET
+BT /F1 9 Tf 42.0 134.0 Td (PDF/legacy Word and live extraction walkthrough pending. Type: hybrid.) Tj ET
+BT /F1 9 Tf 42.0 121.0 Td (Files/classes: ImportResumeAction, ResumeImporter, ResumeParserFactory, ResumeParser; top-level) Tj ET
+BT /F1 9 Tf 42.0 108.0 Td (PastedTextResumeParser/MarkdownResumeParser/DocxResumeParser/PdfResumeParser/DocResumeParser;) Tj ET
+BT /F1 9 Tf 42.0 95.0 Td (ResumeProfile/Skill, ClaudeAdapter, SqliteResumeRepository.) Tj ET
+BT /F1 9 Tf 42.0 82.0 Td (Methods: ImportResumeAction.execute\(\), importResume\(\), importText\(\), createParser\(\),) Tj ET
+BT /F1 9 Tf 42.0 69.0 Td (extractText\(String source\), ResumeProfile.getSkills\(\), SqliteResumeRepository.saveAndSelect\(\).) Tj ET
 endstream
 endobj
 11 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 12 0 R >>
 endobj
 12 0 obj
-<< /Length 5036 >>
+<< /Length 5315 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
 BT /F2 8 Tf 535.0 24.0 Td (4) Tj ET
-BT /F1 9 Tf 42.0 730.0 Td (Verification: missing-first ordering, demonstrated strength, forced uncertain classification) Tj ET
-BT /F1 9 Tf 42.0 717.0 Td (without evidence. Literal matching can miss synonyms; uncertainty is explicitly shown. Demo: NOT) Tj ET
-BT /F1 9 Tf 42.0 704.0 Td (RECORDED; URL/TIMESTAMP TBD; GUI Preparation or CLI gap.) Tj ET
-BT /F1 9 Tf 42.0 691.0 Td () Tj ET
-BT /F2 12 Tf 42.0 670.0 Td (F05 - Resume tailoring) Tj ET
-BT /F1 9 Tf 42.0 657.0 Td () Tj ET
-BT /F1 9 Tf 42.0 644.0 Td (Reference: F05, UC05. Status: Modified: conservative extractive tailoring rather than) Tj ET
-BT /F1 9 Tf 42.0 631.0 Td (unrestricted rewording. Type: hybrid.) Tj ET
-BT /F1 9 Tf 42.0 618.0 Td (Files/classes: ResumeTailorService.java; Models.ResumeChange, ResumeVersion; ApprovalGate.java.) Tj ET
-BT /F1 9 Tf 42.0 605.0 Td (Methods: tailor\(\), safeChange\(\), tokens\(\), review\(\).) Tj ET
-BT /F1 9 Tf 42.0 592.0 Td (Flow: profile/posting -> proposed edits with original/revised/reason -> deterministic) Tj ET
-BT /F1 9 Tf 42.0 579.0 Td (unique-substring and token-multiset validation -> per-change user accept/reject dialog -> save a) Tj ET
-BT /F1 9 Tf 42.0 566.0 Td (new job/base-linked version. Changed numbers/new skill tokens are rejected. Previously stored) Tj ET
-BT /F1 9 Tf 42.0 553.0 Td (original resume is never overwritten. Each approval displays both texts together; GUI uses a) Tj ET
-BT /F1 9 Tf 42.0 540.0 Td (scrollable comparison dialog rather than two permanent columns.) Tj ET
-BT /F1 9 Tf 42.0 527.0 Td (Patterns: Command, Facade, Adapter.) Tj ET
-BT /F1 9 Tf 42.0 514.0 Td (Verification: accepted/rejected edits, unsupported skill and invented-number rejection,) Tj ET
-BT /F1 9 Tf 42.0 501.0 Td (ambiguous repeated substring rejection and original preservation. Review is still needed to) Tj ET
-BT /F1 9 Tf 42.0 488.0 Td (catch meaning changes from reordered words. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI tailoring) Tj ET
-BT /F1 9 Tf 42.0 475.0 Td (dialog and CLI resume versions.) Tj ET
-BT /F1 9 Tf 42.0 462.0 Td () Tj ET
-BT /F2 12 Tf 42.0 441.0 Td (F06 - Company goals and values research) Tj ET
-BT /F1 9 Tf 42.0 428.0 Td () Tj ET
-BT /F1 9 Tf 42.0 415.0 Td (Reference: F06, UC06. Status: Implemented; live service pending. Type: hybrid/agentic.) Tj ET
-BT /F1 9 Tf 42.0 402.0 Td (Files/classes: CompanyResearchService.java; WebSearchTool.java; Models.CompanySummary,) Tj ET
-BT /F1 9 Tf 42.0 389.0 Td (SearchResult; Ai.java.) Tj ET
-BT /F1 9 Tf 42.0 376.0 Td (Methods: research\(\), search\(\), decide\(\), ask\(\).) Tj ET
-BT /F1 9 Tf 42.0 363.0 Td (Flow: model query -> Brave search snippets -> per-source relevant/irrelevant decision ->) Tj ET
-BT /F1 9 Tf 42.0 350.0 Td (reformulated query if empty, maximum two searches -> sourced goals/values summary -> persist) Tj ET
-BT /F1 9 Tf 42.0 337.0 Td (sources alongside result. Missing configuration or no relevant sources yields an error and no) Tj ET
-BT /F1 9 Tf 42.0 324.0 Td (new summary. Stored older evidence is retained rather than overwritten with invented content.) Tj ET
-BT /F1 9 Tf 42.0 311.0 Td (Patterns: Command, Adapter, Facade.) Tj ET
-BT /F1 9 Tf 42.0 298.0 Td (Verification: bounded empty-result retry/no invented summary and relevant-source storage with) Tj ET
-BT /F1 9 Tf 42.0 285.0 Td (explicit fixtures. Factual summarization/relevance quality and live Brave connectivity are) Tj ET
-BT /F1 9 Tf 42.0 272.0 Td (unverified. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Research/company CLI.) Tj ET
-BT /F1 9 Tf 42.0 259.0 Td () Tj ET
-BT /F2 12 Tf 42.0 238.0 Td (F07 - Interview question preparation) Tj ET
-BT /F1 9 Tf 42.0 225.0 Td () Tj ET
-BT /F1 9 Tf 42.0 212.0 Td (Reference: F07, UC07. Status: Implemented. Type: AI-based.) Tj ET
-BT /F1 9 Tf 42.0 199.0 Td (Files/classes: InterviewPrepService.java and QuestionSet; Models.InterviewQuestion;) Tj ET
-BT /F1 9 Tf 42.0 186.0 Td (AgentController.java.) Tj ET
-BT /F1 9 Tf 42.0 173.0 Td (Methods: prepare\(\); facade interview prep and startMockInterview\(\).) Tj ET
-BT /F1 9 Tf 42.0 160.0 Td (Flow: job/profile/company/history -> reasoning-tier generation instructions -> fast-tier exactly) Tj ET
-BT /F1 9 Tf 42.0 147.0 Td (five distinct questions -> validation/retry -> persistence -> separate approval to start an) Tj ET
-BT /F1 9 Tf 42.0 134.0 Td (interview. A rejected interview offer leaves the questions saved.) Tj ET
-BT /F1 9 Tf 42.0 121.0 Td (Patterns: Command, Adapter, Facade.) Tj ET
-BT /F1 9 Tf 42.0 108.0 Td (Verification: five unique questions accepted/saved; invalid counts rejected; integrated) Tj ET
-BT /F1 9 Tf 42.0 95.0 Td (interview flow tested with fixtures. Personalization quality requires a live model check. Demo:) Tj ET
-BT /F1 9 Tf 42.0 82.0 Td (NOT RECORDED; URL/TIMESTAMP TBD; GUI Preparation.) Tj ET
-BT /F1 9 Tf 42.0 69.0 Td () Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Flow: GUI/CLI file/paste -> named command -> shared parser contract selected by factory ->) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (readable text -> Haiku extraction of five sections with literal source-evidence validation ->) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (atomic new base/selection save. Unsupported model output retries once then stores raw text with) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (warning. Bad files/cancellation do not replace the selected profile. Original profiles remain) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td (preserved. No proficiency is invented.) Tj ET
+BT /F1 9 Tf 42.0 665.0 Td (Patterns: Command, Factory, Strategy, Facade, Adapter. Supporting DocResumeParser covers) Tj ET
+BT /F1 9 Tf 42.0 652.0 Td (originally promised Word 97-2003 input using POI; PDF uses PDFBox. Missing offline dependencies) Tj ET
+BT /F1 9 Tf 42.0 639.0 Td (are explicitly reported, never simulated.) Tj ET
+BT /F1 9 Tf 42.0 626.0 Td (Verification: Markdown/DOCX/pasted extraction, malicious XML rejection, invalid UTF-8,) Tj ET
+BT /F1 9 Tf 42.0 613.0 Td (missing/directory/oversized/corrupt files, all sections, invented education rejection, retry/raw) Tj ET
+BT /F1 9 Tf 42.0 600.0 Td (fallback and retention. Maven suite includes conditional actual text/blank/corrupt/protected PDF) Tj ET
+BT /F1 9 Tf 42.0 587.0 Td (tests; those are skipped here without dependencies. Valid binary Word sample and live extraction) Tj ET
+BT /F1 9 Tf 42.0 574.0 Td (remain pending. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Resume plus CLI resume commands.) Tj ET
+BT /F1 9 Tf 42.0 561.0 Td () Tj ET
+BT /F2 12 Tf 42.0 540.0 Td (F03 - User history memory) Tj ET
+BT /F1 9 Tf 42.0 527.0 Td () Tj ET
+BT /F1 9 Tf 42.0 514.0 Td (Reference: F03, UC03. Status: Implemented. Type: hybrid.) Tj ET
+BT /F1 9 Tf 42.0 501.0 Td (Files/classes: MemoryManager.java, Models.MemoryFact, AgentController.java, SqliteStore.java.) Tj ET
+BT /F1 9 Tf 42.0 488.0 Td (Methods: recordTurn\(\), loadFacts\(\), save\(\), editFact\(\), delete\(\); facade chat/history commands) Tj ET
+BT /F1 9 Tf 42.0 475.0 Td (and handleGoal\(\).) Tj ET
+BT /F1 9 Tf 42.0 462.0 Td (Flow: career chat/goal -> constrained save/skip decision -> short structured fact ->) Tj ET
+BT /F1 9 Tf 42.0 449.0 Td (deduplication -> contradiction decision against existing facts -> user approval for a suspected) Tj ET
+BT /F1 9 Tf 42.0 436.0 Td (conflict -> save. Explicit history operations work without AI. Failed automatic memory) Tj ET
+BT /F1 9 Tf 42.0 423.0 Td (operations publish a warning while leaving existing facts intact. A conflict can be saved) Tj ET
+BT /F1 9 Tf 42.0 410.0 Td (alongside prior facts only with approval, allowing manual review rather than silent replacement.) Tj ET
+BT /F1 9 Tf 42.0 397.0 Td (Patterns: Facade, Adapter, Observer for warnings.) Tj ET
+BT /F1 9 Tf 42.0 384.0 Td (Verification: normalized deduplication, editing, deletion, unknown-ID errors and failed-AI) Tj ET
+BT /F1 9 Tf 42.0 371.0 Td (isolation. Automatic semantic conflict detection is not live-model verified. Demo: NOT RECORDED;) Tj ET
+BT /F1 9 Tf 42.0 358.0 Td (URL/TIMESTAMP TBD; My History and CLI history show.) Tj ET
+BT /F1 9 Tf 42.0 345.0 Td () Tj ET
+BT /F2 12 Tf 42.0 324.0 Td (F04 - Skill-gap identification) Tj ET
+BT /F1 9 Tf 42.0 311.0 Td () Tj ET
+BT /F1 9 Tf 42.0 298.0 Td (Reference: F04, UC04. Status: Implemented with conservative evidence matching. Type: hybrid.) Tj ET
+BT /F1 9 Tf 42.0 285.0 Td (Files/classes: SkillGapService.java; Models.SkillGapReport, SkillAssessment, GapGroup; Ai.java.) Tj ET
+BT /F1 9 Tf 42.0 272.0 Td (Methods: identify\(\), groupedByPriority\(\), uncertain\(\), decide\(\).) Tj ET
+BT /F1 9 Tf 42.0 259.0 Td (Flow: selected posting/profile -> model extracts literal posting skill names ->) Tj ET
+BT /F1 9 Tf 42.0 246.0 Td (normalize/deduplicate -> constrained MISSING/STRONG/DECENT classification -> force unsupported) Tj ET
+BT /F1 9 Tf 42.0 233.0 Td (positive claims to uncertain MISSING -> ordered saved report. Missing inputs generate clear) Tj ET
+BT /F1 9 Tf 42.0 220.0 Td (import/add instructions. Strong/decency decisions rely on model assessment of the raw resume) Tj ET
+BT /F1 9 Tf 42.0 207.0 Td (evidence.) Tj ET
+BT /F1 9 Tf 42.0 194.0 Td (Patterns: Command through FeatureCommand, Facade, Adapter.) Tj ET
+BT /F1 9 Tf 42.0 181.0 Td (Verification: missing-first ordering, demonstrated strength, forced uncertain classification) Tj ET
+BT /F1 9 Tf 42.0 168.0 Td (without evidence. Literal matching can miss synonyms; uncertainty is explicitly shown. Demo: NOT) Tj ET
+BT /F1 9 Tf 42.0 155.0 Td (RECORDED; URL/TIMESTAMP TBD; GUI Preparation or CLI gap.) Tj ET
+BT /F1 9 Tf 42.0 142.0 Td () Tj ET
+BT /F2 12 Tf 42.0 121.0 Td (F05 - Resume tailoring) Tj ET
+BT /F1 9 Tf 42.0 108.0 Td () Tj ET
+BT /F1 9 Tf 42.0 95.0 Td (Reference: F05, UC05. Status: Modified: conservative extractive tailoring rather than) Tj ET
+BT /F1 9 Tf 42.0 82.0 Td (unrestricted rewording. Type: hybrid.) Tj ET
+BT /F1 9 Tf 42.0 69.0 Td (Files/classes: ResumeTailorService.java; Models.ResumeChange, ResumeVersion; ApprovalGate.java.) Tj ET
 endstream
 endobj
 13 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 14 0 R >>
 endobj
 14 0 obj
-<< /Length 5191 >>
+<< /Length 4756 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
 BT /F2 8 Tf 535.0 24.0 Td (5) Tj ET
-BT /F2 12 Tf 42.0 722.0 Td (F08 - Mock interview with feedback) Tj ET
-BT /F1 9 Tf 42.0 709.0 Td () Tj ET
-BT /F1 9 Tf 42.0 696.0 Td (Reference: F08, UC08. Status: Implemented. Type: AI-based/agentic.) Tj ET
-BT /F1 9 Tf 42.0 683.0 Td (Files/classes: MockInterviewService.java; Models.InterviewSession, FeedbackReport;) Tj ET
-BT /F1 9 Tf 42.0 670.0 Td (MemoryManager.java.) Tj ET
-BT /F1 9 Tf 42.0 657.0 Td (Methods: start\(\), nextQuestion\(\), answer\(\), stop\(\), feedback\(\); facade startMockInterview\(\).) Tj ET
-BT /F1 9 Tf 42.0 644.0 Td (Flow: load saved questions/session -> one question -> persist answer immediately -> constrained) Tj ET
-BT /F1 9 Tf 42.0 631.0 Td (follow-up/next choice -> at most one generated follow-up per base question -> persist follow-up) Tj ET
-BT /F1 9 Tf 42.0 618.0 Td (answer -> continue. No feedback is requested mid-interview. End/approved early feedback ->) Tj ET
-BT /F1 9 Tf 42.0 605.0 Td (evaluate only answered questions -> validate count -> save final report and weaknesses. Stop) Tj ET
-BT /F1 9 Tf 42.0 592.0 Td (pauses and preserves progress; start continues; restart archives the previous session.) Tj ET
-BT /F1 9 Tf 42.0 579.0 Td (Patterns: Facade, Adapter; persistent interview data is separate from the main agent's State) Tj ET
-BT /F1 9 Tf 42.0 566.0 Td (pattern.) Tj ET
-BT /F1 9 Tf 42.0 553.0 Td (Verification: full and partial feedback, suppression during interview, follow-up limit,) Tj ET
-BT /F1 9 Tf 42.0 540.0 Td (pause/resume across saved state, completion, restart archive and weakness storage. Demo: NOT) Tj ET
-BT /F1 9 Tf 42.0 527.0 Td (RECORDED; URL/TIMESTAMP TBD; GUI Mock Interview plus CLI continuation.) Tj ET
-BT /F1 9 Tf 42.0 514.0 Td () Tj ET
-BT /F2 12 Tf 42.0 493.0 Td (F09 - Preparation checklist) Tj ET
-BT /F1 9 Tf 42.0 480.0 Td () Tj ET
-BT /F1 9 Tf 42.0 467.0 Td (Reference: F09, UC09. Status: Implemented with ISO-deadline limitation and deterministic) Tj ET
-BT /F1 9 Tf 42.0 454.0 Td (fallback. Type: hybrid.) Tj ET
-BT /F1 9 Tf 42.0 441.0 Td (Files/classes: ChecklistService.java; Models.Checklist, ChecklistItem; SwingGui.java.) Tj ET
-BT /F1 9 Tf 42.0 428.0 Td (Methods: build\(\), tick\(\), Checklist.progress\(\), ChecklistItem.tick\(\), SwingGui.showChecklist\(\).) Tj ET
-BT /F1 9 Tf 42.0 415.0 Td (Flow: read saved gap/company/questions/versions and explicit posting deadline -> useful) Tj ET
-BT /F1 9 Tf 42.0 402.0 Td (partial/full task set -> AI prioritizes unchanged labels -> deterministic priority fallback on) Tj ET
-BT /F1 9 Tf 42.0 389.0 Td (AI failure -> save checklist preserving ticks/IDs of unchanged tasks. GUI renders tick boxes;) Tj ET
-BT /F1 9 Tf 42.0 376.0 Td (CLI tick/untick updates persistent progress. Partial checklist command offers approved missing) Tj ET
-BT /F1 9 Tf 42.0 363.0 Td (features. After those complete, rebuild refreshes task labels.) Tj ET
-BT /F1 9 Tf 42.0 350.0 Td (Patterns: Command, Facade, Adapter.) Tj ET
-BT /F1 9 Tf 42.0 337.0 Td (Verification: partial offline checklist, no invented deadline, item-ID validation, tick/untick,) Tj ET
-BT /F1 9 Tf 42.0 324.0 Td (progress and preservation on rebuild/restart. Non-ISO deadlines require manual tracking. Demo:) Tj ET
-BT /F1 9 Tf 42.0 311.0 Td (NOT RECORDED; URL/TIMESTAMP TBD; GUI Checklist and CLI checklist show.) Tj ET
-BT /F1 9 Tf 42.0 298.0 Td () Tj ET
-BT /F2 12 Tf 42.0 277.0 Td (F10 - Prepare me for this job) Tj ET
-BT /F1 9 Tf 42.0 264.0 Td () Tj ET
-BT /F1 9 Tf 42.0 251.0 Td (Reference: F10, UC10. Status: Implemented with consolidated command classes. Type:) Tj ET
-BT /F1 9 Tf 42.0 238.0 Td (hybrid/agentic.) Tj ET
-BT /F1 9 Tf 42.0 225.0 Td (Files/classes: AgentController.java; Planner.java; AgentAction.java/FeatureCommand;) Tj ET
-BT /F1 9 Tf 42.0 212.0 Td (AgentSession.java and five state implementations; ApprovalGate.java; AgentEventPublisher.java.) Tj ET
-BT /F1 9 Tf 42.0 199.0 Td (Methods: handleGoal\(\), chooseNext\(\), execute\(\), handleInput\(\), AgentState.advance\(\), setState\(\),) Tj ET
-BT /F1 9 Tf 42.0 186.0 Td (publish\(\), review\(\).) Tj ET
-BT /F1 9 Tf 42.0 173.0 Td (Flow: remember goal and retrieve history -> explicitly obtain missing job/profile and optionally) Tj ET
-BT /F1 9 Tf 42.0 160.0 Td (a personal fact -> planner selects among eligible steps using current persisted) Tj ET
-BT /F1 9 Tf 42.0 147.0 Td (results/profile/history -> approval -> command execution -> event/state transition -> remove) Tj ET
-BT /F1 9 Tf 42.0 134.0 Td (attempted action -> repeat. Checklist is eligible only after other steps have been attempted.) Tj ET
-BT /F1 9 Tf 42.0 121.0 Td (Failures/rejections are recorded and skipped. Cancellation or ten-step cap ends the loop. Final) Tj ET
-BT /F1 9 Tf 42.0 108.0 Td (timestamped trace is saved in SQLite and returned. The workflow does not auto-apply edits or) Tj ET
-BT /F1 9 Tf 42.0 95.0 Td (automatically launch a mock interview.) Tj ET
-BT /F1 9 Tf 42.0 82.0 Td (Patterns: Facade, Command, State, Observer, Adapter.) Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Methods: tailor\(\), safeChange\(\), tokens\(\), review\(\).) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (Flow: profile/posting -> proposed edits with original/revised/reason -> deterministic) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (unique-substring and token-multiset validation -> per-change user accept/reject dialog -> save a) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (new job/base-linked version. Changed numbers/new skill tokens are rejected. Previously stored) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td (original resume is never overwritten. Each approval displays both texts together; GUI uses a) Tj ET
+BT /F1 9 Tf 42.0 665.0 Td (scrollable comparison dialog rather than two permanent columns.) Tj ET
+BT /F1 9 Tf 42.0 652.0 Td (Patterns: Command, Facade, Adapter.) Tj ET
+BT /F1 9 Tf 42.0 639.0 Td (Verification: accepted/rejected edits, unsupported skill and invented-number rejection,) Tj ET
+BT /F1 9 Tf 42.0 626.0 Td (ambiguous repeated substring rejection and original preservation. Review is still needed to) Tj ET
+BT /F1 9 Tf 42.0 613.0 Td (catch meaning changes from reordered words. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI tailoring) Tj ET
+BT /F1 9 Tf 42.0 600.0 Td (dialog and CLI resume versions.) Tj ET
+BT /F1 9 Tf 42.0 587.0 Td () Tj ET
+BT /F2 12 Tf 42.0 566.0 Td (F06 - Company goals and values research) Tj ET
+BT /F1 9 Tf 42.0 553.0 Td () Tj ET
+BT /F1 9 Tf 42.0 540.0 Td (Reference: F06, UC06. Status: Implemented; live service pending. Type: hybrid/agentic.) Tj ET
+BT /F1 9 Tf 42.0 527.0 Td (Files/classes: CompanyResearchService.java; WebSearchTool.java; Models.CompanySummary,) Tj ET
+BT /F1 9 Tf 42.0 514.0 Td (SearchResult; Ai.java.) Tj ET
+BT /F1 9 Tf 42.0 501.0 Td (Methods: research\(\), search\(\), decide\(\), ask\(\).) Tj ET
+BT /F1 9 Tf 42.0 488.0 Td (Flow: model query -> Brave search snippets -> per-source relevant/irrelevant decision ->) Tj ET
+BT /F1 9 Tf 42.0 475.0 Td (reformulated query if empty, maximum two searches -> sourced goals/values summary -> persist) Tj ET
+BT /F1 9 Tf 42.0 462.0 Td (sources alongside result. Missing configuration or no relevant sources yields an error and no) Tj ET
+BT /F1 9 Tf 42.0 449.0 Td (new summary. Stored older evidence is retained rather than overwritten with invented content.) Tj ET
+BT /F1 9 Tf 42.0 436.0 Td (Patterns: Command, Adapter, Facade.) Tj ET
+BT /F1 9 Tf 42.0 423.0 Td (Verification: bounded empty-result retry/no invented summary and relevant-source storage with) Tj ET
+BT /F1 9 Tf 42.0 410.0 Td (explicit fixtures. Factual summarization/relevance quality and live Brave connectivity are) Tj ET
+BT /F1 9 Tf 42.0 397.0 Td (unverified. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Research/company CLI.) Tj ET
+BT /F1 9 Tf 42.0 384.0 Td () Tj ET
+BT /F2 12 Tf 42.0 363.0 Td (F07 - Interview question preparation) Tj ET
+BT /F1 9 Tf 42.0 350.0 Td () Tj ET
+BT /F1 9 Tf 42.0 337.0 Td (Reference: F07, UC07. Status: Implemented. Type: AI-based.) Tj ET
+BT /F1 9 Tf 42.0 324.0 Td (Files/classes: InterviewPrepService.java and QuestionSet; Models.InterviewQuestion;) Tj ET
+BT /F1 9 Tf 42.0 311.0 Td (AgentController.java.) Tj ET
+BT /F1 9 Tf 42.0 298.0 Td (Methods: prepare\(\); facade interview prep and startMockInterview\(\).) Tj ET
+BT /F1 9 Tf 42.0 285.0 Td (Flow: job/profile/company/history -> reasoning-tier generation instructions -> fast-tier exactly) Tj ET
+BT /F1 9 Tf 42.0 272.0 Td (five distinct questions -> validation/retry -> persistence -> separate approval to start an) Tj ET
+BT /F1 9 Tf 42.0 259.0 Td (interview. A rejected interview offer leaves the questions saved.) Tj ET
+BT /F1 9 Tf 42.0 246.0 Td (Patterns: Command, Adapter, Facade.) Tj ET
+BT /F1 9 Tf 42.0 233.0 Td (Verification: five unique questions accepted/saved; invalid counts rejected; integrated) Tj ET
+BT /F1 9 Tf 42.0 220.0 Td (interview flow tested with fixtures. Personalization quality requires a live model check. Demo:) Tj ET
+BT /F1 9 Tf 42.0 207.0 Td (NOT RECORDED; URL/TIMESTAMP TBD; GUI Preparation.) Tj ET
+BT /F1 9 Tf 42.0 194.0 Td () Tj ET
+BT /F2 12 Tf 42.0 173.0 Td (F08 - Mock interview with feedback) Tj ET
+BT /F1 9 Tf 42.0 160.0 Td () Tj ET
+BT /F1 9 Tf 42.0 147.0 Td (Reference: F08, UC08. Status: Implemented. Type: AI-based/agentic.) Tj ET
+BT /F1 9 Tf 42.0 134.0 Td (Files/classes: MockInterviewService.java; Models.InterviewSession, FeedbackReport;) Tj ET
+BT /F1 9 Tf 42.0 121.0 Td (MemoryManager.java.) Tj ET
+BT /F1 9 Tf 42.0 108.0 Td (Methods: start\(\), nextQuestion\(\), answer\(\), stop\(\), feedback\(\); facade startMockInterview\(\).) Tj ET
 endstream
 endobj
 15 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 16 0 R >>
 endobj
 16 0 obj
-<< /Length 5068 >>
+<< /Length 5166 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
 BT /F2 8 Tf 535.0 24.0 Td (6) Tj ET
-BT /F1 9 Tf 42.0 730.0 Td (Verification: state transitions, visible tool failure continuation, rejected actions never) Tj ET
-BT /F1 9 Tf 42.0 717.0 Td (executing, stop, ten-step bound, full service orchestration to persisted checklist and feedback) Tj ET
-BT /F1 9 Tf 42.0 704.0 Td (under fixture models. Planner behavior is not live-model verified. Demo: NOT RECORDED;) Tj ET
-BT /F1 9 Tf 42.0 691.0 Td (URL/TIMESTAMP TBD; GUI goal or CLI prepare.) Tj ET
-BT /F1 9 Tf 42.0 678.0 Td () Tj ET
-BT /F1 9 Tf 42.0 665.0 Td (Added supporting operations \(not counted as extra features\): selection/listing of stored jobs,) Tj ET
-BT /F1 9 Tf 42.0 652.0 Td (inspection of outputs/versions, direct fact addition, resume of paused interviews, archived) Tj ET
-BT /F1 9 Tf 42.0 639.0 Td (restarts, checklist untick, CLI help and cancellation. They reuse the above services and are) Tj ET
-BT /F1 9 Tf 42.0 626.0 Td (demonstrated within those feature segments.) Tj ET
-BT /F1 9 Tf 42.0 613.0 Td () Tj ET
-BT /F2 12 Tf 42.0 592.0 Td (3. Implemented design patterns) Tj ET
-BT /F1 9 Tf 42.0 579.0 Td () Tj ET
-BT /F1 9 Tf 42.0 566.0 Td (Seven distinct patterns participate in real application behavior. The runnable implementation) Tj ET
-BT /F1 9 Tf 42.0 553.0 Td (uses nested record/state types where that avoids file-only boilerplate. Source:) Tj ET
-BT /F1 9 Tf 42.0 540.0 Td (docs/implemented-class-diagram.puml. A readable vector class diagram is included after the) Tj ET
-BT /F1 9 Tf 42.0 527.0 Td (report text in the PDF. Updated use-case and sequence diagram sources:) Tj ET
-BT /F1 9 Tf 42.0 514.0 Td (docs/implemented-use-cases.puml and docs/implemented-sequence.puml.) Tj ET
-BT /F1 9 Tf 42.0 501.0 Td () Tj ET
-BT /F1 9 Tf 42.0 488.0 Td (Facade: AgentController is the facade; SwingGui and CliApp are clients. runFeature\(\),) Tj ET
-BT /F1 9 Tf 42.0 475.0 Td (handleGoal\(\) and startMockInterview\(\) coordinate services/persistence/approvals. Both interfaces) Tj ET
-BT /F1 9 Tf 42.0 462.0 Td (invoke the same operations. This matches Stage 1 and avoids duplicate business logic.) Tj ET
-BT /F1 9 Tf 42.0 449.0 Td () Tj ET
-BT /F1 9 Tf 42.0 436.0 Td (Command: AgentAction defines name\(\)/describe\(\)/execute\(\). FeatureCommand stores a service) Tj ET
-BT /F1 9 Tf 42.0 423.0 Td (Supplier<Object> and is instantiated by AgentController.actions\(\) for gap, tailoring, company) Tj ET
-BT /F1 9 Tf 42.0 410.0 Td (research, interview prep and checklist. Planner chooses an AgentAction and ExecutingState) Tj ET
-BT /F1 9 Tf 42.0 397.0 Td (invokes execute\(\). Unlike Stage 1's seven separate concrete classes, the same meaningful command) Tj ET
-BT /F1 9 Tf 42.0 384.0 Td (implementation captures five operations; intake/import are direct input-bound facade calls. This) Tj ET
-BT /F1 9 Tf 42.0 371.0 Td (preserves uniform planner execution without one trivial forwarding class per feature.) Tj ET
-BT /F1 9 Tf 42.0 358.0 Td () Tj ET
-BT /F1 9 Tf 42.0 345.0 Td (Strategy: ResumeParser.extractText\(Path\) has PDF, DOCX and Markdown/text strategies chosen by) Tj ET
-BT /F1 9 Tf 42.0 332.0 Td (the importer. JobDescriptionSource.fetch\(\)/label\(\)/needsApproval\(\) has pasted, excerpt, expanded) Tj ET
-BT /F1 9 Tf 42.0 319.0 Td (estimate and full estimate strategies. Intake selects the strategy after user approvals. Source) Tj ET
-BT /F1 9 Tf 42.0 306.0 Td (strategies encapsulate retrieval/generation differences, while parser strategies encapsulate) Tj ET
-BT /F1 9 Tf 42.0 293.0 Td (format differences. Pasted resume input has a String helper instead of pretending to be a path.) Tj ET
-BT /F1 9 Tf 42.0 280.0 Td () Tj ET
-BT /F1 9 Tf 42.0 267.0 Td (Factory: ResumeParserFactory.createParser\(Path\) selects PdfResumeParser, DocxResumeParser or) Tj ET
-BT /F1 9 Tf 42.0 254.0 Td (MarkdownResumeParser. ResumeImporter calls the returned interface and does not implement) Tj ET
-BT /F1 9 Tf 42.0 241.0 Td (extension-switching itself. This directly preserves the proposed factory role. Unknown) Tj ET
-BT /F1 9 Tf 42.0 228.0 Td (extensions are rejected.) Tj ET
-BT /F1 9 Tf 42.0 215.0 Td () Tj ET
-BT /F1 9 Tf 42.0 202.0 Td (State: AgentSession holds AgentState; IdleState, PlanningState, AwaitingApprovalState,) Tj ET
-BT /F1 9 Tf 42.0 189.0 Td (ExecutingState and FinishedState each implement advance\(session\). Planning owns selection,) Tj ET
-BT /F1 9 Tf 42.0 176.0 Td (approval owns consent/rejection, execution owns result/failure transition. setState\(\) publishes) Tj ET
-BT /F1 9 Tf 42.0 163.0 Td (transitions. Session drives state behavior with a bounded loop instead of implementing all) Tj ET
-BT /F1 9 Tf 42.0 150.0 Td (behavior in a single switch. advance\(\) replaces the Stage 1 onInput/onApproval pair because) Tj ET
-BT /F1 9 Tf 42.0 137.0 Td (approval is synchronous at the shared interaction boundary.) Tj ET
-BT /F1 9 Tf 42.0 124.0 Td () Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Flow: load saved questions/session -> one question -> persist answer immediately -> constrained) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (follow-up/next choice -> at most one generated follow-up per base question -> persist follow-up) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (answer -> continue. No feedback is requested mid-interview. End/approved early feedback ->) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (evaluate only answered questions -> validate count -> save final report and weaknesses. Stop) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td (pauses and preserves progress; start continues; restart archives the previous session.) Tj ET
+BT /F1 9 Tf 42.0 665.0 Td (Patterns: Facade, Adapter; persistent interview data is separate from the main agent's State) Tj ET
+BT /F1 9 Tf 42.0 652.0 Td (pattern.) Tj ET
+BT /F1 9 Tf 42.0 639.0 Td (Verification: full and partial feedback, suppression during interview, follow-up limit,) Tj ET
+BT /F1 9 Tf 42.0 626.0 Td (pause/resume across saved state, completion, restart archive and weakness storage. Demo: NOT) Tj ET
+BT /F1 9 Tf 42.0 613.0 Td (RECORDED; URL/TIMESTAMP TBD; GUI Mock Interview plus CLI continuation.) Tj ET
+BT /F1 9 Tf 42.0 600.0 Td () Tj ET
+BT /F2 12 Tf 42.0 579.0 Td (F09 - Preparation checklist) Tj ET
+BT /F1 9 Tf 42.0 566.0 Td () Tj ET
+BT /F1 9 Tf 42.0 553.0 Td (Reference: F09, UC09. Status: Implemented with ISO-deadline limitation and deterministic) Tj ET
+BT /F1 9 Tf 42.0 540.0 Td (fallback. Type: hybrid.) Tj ET
+BT /F1 9 Tf 42.0 527.0 Td (Files/classes: ChecklistService.java; Models.Checklist, ChecklistItem; SwingGui.java.) Tj ET
+BT /F1 9 Tf 42.0 514.0 Td (Methods: build\(\), tick\(\), Checklist.progress\(\), ChecklistItem.tick\(\), SwingGui.showChecklist\(\).) Tj ET
+BT /F1 9 Tf 42.0 501.0 Td (Flow: read saved gap/company/questions/versions and explicit posting deadline -> useful) Tj ET
+BT /F1 9 Tf 42.0 488.0 Td (partial/full task set -> AI prioritizes unchanged labels -> deterministic priority fallback on) Tj ET
+BT /F1 9 Tf 42.0 475.0 Td (AI failure -> save checklist preserving ticks/IDs of unchanged tasks. GUI renders tick boxes;) Tj ET
+BT /F1 9 Tf 42.0 462.0 Td (CLI tick/untick updates persistent progress. Partial checklist command offers approved missing) Tj ET
+BT /F1 9 Tf 42.0 449.0 Td (features. After those complete, rebuild refreshes task labels.) Tj ET
+BT /F1 9 Tf 42.0 436.0 Td (Patterns: Command, Facade, Adapter.) Tj ET
+BT /F1 9 Tf 42.0 423.0 Td (Verification: partial offline checklist, no invented deadline, item-ID validation, tick/untick,) Tj ET
+BT /F1 9 Tf 42.0 410.0 Td (progress and preservation on rebuild/restart. Non-ISO deadlines require manual tracking. Demo:) Tj ET
+BT /F1 9 Tf 42.0 397.0 Td (NOT RECORDED; URL/TIMESTAMP TBD; GUI Checklist and CLI checklist show.) Tj ET
+BT /F1 9 Tf 42.0 384.0 Td () Tj ET
+BT /F2 12 Tf 42.0 363.0 Td (F10 - Prepare me for this job) Tj ET
+BT /F1 9 Tf 42.0 350.0 Td () Tj ET
+BT /F1 9 Tf 42.0 337.0 Td (Reference: F10, UC10. Status: Implemented with consolidated command classes. Type:) Tj ET
+BT /F1 9 Tf 42.0 324.0 Td (hybrid/agentic.) Tj ET
+BT /F1 9 Tf 42.0 311.0 Td (Files/classes: AgentController.java; Planner.java; AgentAction.java/FeatureCommand;) Tj ET
+BT /F1 9 Tf 42.0 298.0 Td (AgentSession.java and five state implementations; ApprovalGate.java; AgentEventPublisher.java.) Tj ET
+BT /F1 9 Tf 42.0 285.0 Td (Methods: handleGoal\(\), chooseNext\(\), execute\(\), handleInput\(\), AgentState.advance\(\), setState\(\),) Tj ET
+BT /F1 9 Tf 42.0 272.0 Td (publish\(\), review\(\).) Tj ET
+BT /F1 9 Tf 42.0 259.0 Td (Flow: remember goal and retrieve history -> explicitly obtain missing job/profile and optionally) Tj ET
+BT /F1 9 Tf 42.0 246.0 Td (a personal fact -> planner selects among eligible steps using current persisted) Tj ET
+BT /F1 9 Tf 42.0 233.0 Td (results/profile/history -> approval -> command execution -> event/state transition -> remove) Tj ET
+BT /F1 9 Tf 42.0 220.0 Td (attempted action -> repeat. Checklist is eligible only after other steps have been attempted.) Tj ET
+BT /F1 9 Tf 42.0 207.0 Td (Failures/rejections are recorded and skipped. Cancellation or ten-step cap ends the loop. Final) Tj ET
+BT /F1 9 Tf 42.0 194.0 Td (timestamped trace is saved in SQLite and returned. The workflow does not auto-apply edits or) Tj ET
+BT /F1 9 Tf 42.0 181.0 Td (automatically launch a mock interview.) Tj ET
+BT /F1 9 Tf 42.0 168.0 Td (Patterns: Facade, Command, State, Observer, Adapter.) Tj ET
+BT /F1 9 Tf 42.0 155.0 Td (Verification: state transitions, visible tool failure continuation, rejected actions never) Tj ET
+BT /F1 9 Tf 42.0 142.0 Td (executing, stop, ten-step bound, full service orchestration to persisted checklist and feedback) Tj ET
+BT /F1 9 Tf 42.0 129.0 Td (under fixture models. Planner behavior is not live-model verified. Demo: NOT RECORDED;) Tj ET
+BT /F1 9 Tf 42.0 116.0 Td (URL/TIMESTAMP TBD; GUI goal or CLI prepare.) Tj ET
+BT /F1 9 Tf 42.0 103.0 Td () Tj ET
 endstream
 endobj
 17 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 18 0 R >>
 endobj
 18 0 obj
-<< /Length 5079 >>
+<< /Length 5585 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
 BT /F2 8 Tf 535.0 24.0 Td (7) Tj ET
-BT /F1 9 Tf 42.0 730.0 Td (Observer: AgentEventPublisher holds ProgressObserver callbacks; attach\(\)/detach\(\)/publish\(\)) Tj ET
-BT /F1 9 Tf 42.0 717.0 Td (manage subscriptions and notifications. AgentSession and MemoryManager publish progress/warnings) Tj ET
-BT /F1 9 Tf 42.0 704.0 Td (without knowing GUI widgets. CliApp prints events, while SwingGui schedules updates onto the) Tj ET
-BT /F1 9 Tf 42.0 691.0 Td (event thread. Failing observers cannot abort saved work. This preserves Stage 1, using lambdas) Tj ET
-BT /F1 9 Tf 42.0 678.0 Td (rather than making the entire UI class implement a marker role.) Tj ET
-BT /F1 9 Tf 42.0 665.0 Td () Tj ET
-BT /F1 9 Tf 42.0 652.0 Td (Adapter: LLMAdapter implements LLMClient, translating real Ollama/compatible request and) Tj ET
-BT /F1 9 Tf 42.0 639.0 Td (response envelopes. Ai adapts structured generations to DecisionClient's fixed-choice decisions.) Tj ET
-BT /F1 9 Tf 42.0 626.0 Td (HttpTransport centralizes timeouts/status/secure endpoint handling. The application does not) Tj ET
-BT /F1 9 Tf 42.0 613.0 Td (depend on Jev/Anthropic-specific API types. The change makes model selection configurable and) Tj ET
-BT /F1 9 Tf 42.0 600.0 Td (removes unverified speculative model-version requirements.) Tj ET
-BT /F1 9 Tf 42.0 587.0 Td () Tj ET
-BT /F1 9 Tf 42.0 574.0 Td (Relationships visible in the class diagram: UI clients depend on facade; facade creates command) Tj ET
-BT /F1 9 Tf 42.0 561.0 Td (objects and a session; session owns a state and uses planner/gate/events; planner depends on) Tj ET
-BT /F1 9 Tf 42.0 548.0 Td (DecisionClient and selects AgentAction; Ai realizes DecisionClient and uses LLMClient;) Tj ET
-BT /F1 9 Tf 42.0 535.0 Td (LLMAdapter realizes LLMClient; services use typed domain records and Documents/SqliteStore;) Tj ET
-BT /F1 9 Tf 42.0 522.0 Td (importer uses parser factory/strategy; intake uses source strategies. Domain compositions) Tj ET
-BT /F1 9 Tf 42.0 509.0 Td (include report-assessments, version-changes, summary-sources, interview-questions and) Tj ET
-BT /F1 9 Tf 42.0 496.0 Td (checklist-items.) Tj ET
-BT /F1 9 Tf 42.0 483.0 Td () Tj ET
-BT /F2 12 Tf 42.0 462.0 Td (4. Changes and rationale) Tj ET
-BT /F1 9 Tf 42.0 449.0 Td () Tj ET
-BT /F1 9 Tf 42.0 436.0 Td (Original design -> implemented change -> reason -> impact:) Tj ET
-BT /F1 9 Tf 42.0 423.0 Td () Tj ET
-BT /F1 9 Tf 42.0 410.0 Td (Jev decisions + named Claude Haiku/Sonnet versions -> Ai constrained decisions plus configurable) Tj ET
-BT /F1 9 Tf 42.0 397.0 Td (LLMAdapter fast/reasoning tiers -> avoid reliance on unavailable/unverified provider/model names) Tj ET
-BT /F1 9 Tf 42.0 384.0 Td (and permit local inference -> same application capabilities and Adapter boundary;) Tj ET
-BT /F1 9 Tf 42.0 371.0 Td (latency/quality depend on configured model. No claimed Jev/Claude integration.) Tj ET
-BT /F1 9 Tf 42.0 358.0 Td () Tj ET
-BT /F1 9 Tf 42.0 345.0 Td (Separate JevApi/AnthropicApi and ToolManager/PromptBuilder/ResponseParser wrappers ->) Tj ET
-BT /F1 9 Tf 42.0 332.0 Td (HttpTransport, typed tools and Ai.ask\(\) validation -> keep real responsibilities without) Tj ET
-BT /F1 9 Tf 42.0 319.0 Td (duplicate forwarding layers -> provider/tool error handling and prompt validation remain) Tj ET
-BT /F1 9 Tf 42.0 306.0 Td (centralized; no unused wrapper classes are claimed.) Tj ET
-BT /F1 9 Tf 42.0 293.0 Td () Tj ET
-BT /F1 9 Tf 42.0 280.0 Td (Four Sqlite repositories and generic Object CRUD -> one kind/id SQLite document store plus) Tj ET
-BT /F1 9 Tf 42.0 267.0 Td (explicit typed Documents mapping -> minimize repetitive CRUD and avoid unavailable JDBC download) Tj ET
-BT /F1 9 Tf 42.0 254.0 Td (-> same local persistence and record relationships, with sqlite3 executable required. Each save) Tj ET
-BT /F1 9 Tf 42.0 241.0 Td (is transactional, but a multi-step workflow is intentionally not one transaction; completed) Tj ET
-BT /F1 9 Tf 42.0 228.0 Td (steps survive later failures.) Tj ET
-BT /F1 9 Tf 42.0 215.0 Td () Tj ET
-BT /F1 9 Tf 42.0 202.0 Td (Separate concrete command classes for each service -> actual FeatureCommand objects capturing) Tj ET
-BT /F1 9 Tf 42.0 189.0 Td (service calls, with intake/import directly dispatched -> fewer one-method classes -> planner) Tj ET
-BT /F1 9 Tf 42.0 176.0 Td (still selects/executes commands polymorphically; design mapping explicitly records the) Tj ET
-BT /F1 9 Tf 42.0 163.0 Td (consolidation.) Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Added supporting operations \(not counted as extra features\): selection/listing of stored jobs,) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (inspection of outputs/versions, direct fact addition, resume of paused interviews, archived) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (restarts, checklist untick, CLI help and cancellation. They reuse the above services and are) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (demonstrated within those feature segments.) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td () Tj ET
+BT /F2 12 Tf 42.0 657.0 Td (3. Implemented design patterns) Tj ET
+BT /F1 9 Tf 42.0 644.0 Td () Tj ET
+BT /F1 9 Tf 42.0 631.0 Td (Seven distinct patterns participate in real application behavior. Domain records and the) Tj ET
+BT /F1 9 Tf 42.0 618.0 Td (restored F01/F02 strategies/commands are top-level classes; the main agent states remain nested) Tj ET
+BT /F1 9 Tf 42.0 605.0 Td (pending their planned input/approval checkpoint. Source: docs/implemented-class-diagram.puml. A) Tj ET
+BT /F1 9 Tf 42.0 592.0 Td (readable vector class diagram is included after the report text in the PDF. Updated use-case and) Tj ET
+BT /F1 9 Tf 42.0 579.0 Td (sequence diagram sources: docs/implemented-use-cases.puml and docs/implemented-sequence.puml.) Tj ET
+BT /F1 9 Tf 42.0 566.0 Td () Tj ET
+BT /F1 9 Tf 42.0 553.0 Td (Facade: AgentController is the facade; SwingGui and CliApp are clients. runFeature\(\),) Tj ET
+BT /F1 9 Tf 42.0 540.0 Td (handleGoal\(\) and startMockInterview\(\) coordinate services/persistence/approvals. Both interfaces) Tj ET
+BT /F1 9 Tf 42.0 527.0 Td (invoke the same operations. This matches Stage 1 and avoids duplicate business logic.) Tj ET
+BT /F1 9 Tf 42.0 514.0 Td () Tj ET
+BT /F1 9 Tf 42.0 501.0 Td (Command: AgentAction defines name\(\)/describe\(\)/execute\(\). FeatureCommand stores a service) Tj ET
+BT /F1 9 Tf 42.0 488.0 Td (Supplier<Object> and is instantiated by AgentController.actions\(\) for gap, tailoring, company) Tj ET
+BT /F1 9 Tf 42.0 475.0 Td (research, interview prep and checklist. Planner chooses an AgentAction and ExecutingState) Tj ET
+BT /F1 9 Tf 42.0 462.0 Td (invokes execute\(\). GetJobDescriptionAction and ImportResumeAction are restored named commands in) Tj ET
+BT /F1 9 Tf 42.0 449.0 Td (actual GUI/CLI execution. The remaining five operations still use FeatureCommand pending their) Tj ET
+BT /F1 9 Tf 42.0 436.0 Td (respective feature checkpoints. This preserves uniform planner execution without one trivial) Tj ET
+BT /F1 9 Tf 42.0 423.0 Td (forwarding class per feature.) Tj ET
+BT /F1 9 Tf 42.0 410.0 Td () Tj ET
+BT /F1 9 Tf 42.0 397.0 Td (Strategy: ResumeParser.extractText\(Path\) has PDF, DOCX and Markdown/text strategies chosen by) Tj ET
+BT /F1 9 Tf 42.0 384.0 Td (the importer. JobDescriptionSource.fetch\(\)/label\(\)/needsApproval\(\) has pasted, excerpt, expanded) Tj ET
+BT /F1 9 Tf 42.0 371.0 Td (estimate and full estimate strategies. Intake selects the strategy after user approvals. Source) Tj ET
+BT /F1 9 Tf 42.0 358.0 Td (strategies encapsulate retrieval/generation differences, while parser strategies encapsulate) Tj ET
+BT /F1 9 Tf 42.0 345.0 Td (format differences. PastedTextResumeParser implements the same interface as file strategies and) Tj ET
+BT /F1 9 Tf 42.0 332.0 Td (is selected by the factory using the pasted input type.) Tj ET
+BT /F1 9 Tf 42.0 319.0 Td () Tj ET
+BT /F1 9 Tf 42.0 306.0 Td (Factory: ResumeParserFactory.createParser\(Path\) selects PdfResumeParser, DocxResumeParser or) Tj ET
+BT /F1 9 Tf 42.0 293.0 Td (MarkdownResumeParser. ResumeImporter calls the returned interface and does not implement) Tj ET
+BT /F1 9 Tf 42.0 280.0 Td (extension-switching itself. This directly preserves the proposed factory role. The same factory) Tj ET
+BT /F1 9 Tf 42.0 267.0 Td (also chooses PastedTextResumeParser and the supporting legacy DocResumeParser. Unknown) Tj ET
+BT /F1 9 Tf 42.0 254.0 Td (extensions are rejected.) Tj ET
+BT /F1 9 Tf 42.0 241.0 Td () Tj ET
+BT /F1 9 Tf 42.0 228.0 Td (State: AgentSession holds AgentState; IdleState, PlanningState, AwaitingApprovalState,) Tj ET
+BT /F1 9 Tf 42.0 215.0 Td (ExecutingState and FinishedState each implement advance\(session\). Planning owns selection,) Tj ET
+BT /F1 9 Tf 42.0 202.0 Td (approval owns consent/rejection, execution owns result/failure transition. setState\(\) publishes) Tj ET
+BT /F1 9 Tf 42.0 189.0 Td (transitions. Session drives state behavior with a bounded loop instead of implementing all) Tj ET
+BT /F1 9 Tf 42.0 176.0 Td (behavior in a single switch. advance\(\) replaces the Stage 1 onInput/onApproval pair because) Tj ET
+BT /F1 9 Tf 42.0 163.0 Td (approval is synchronous at the shared interaction boundary.) Tj ET
 BT /F1 9 Tf 42.0 150.0 Td () Tj ET
-BT /F1 9 Tf 42.0 137.0 Td (AgentState onInput/onApproval -> state-specific advance\(\) -> use the same blocking approval) Tj ET
-BT /F1 9 Tf 42.0 124.0 Td (abstraction from CLI and background GUI -> preserves five runtime stages and allows typed shared) Tj ET
-BT /F1 9 Tf 42.0 111.0 Td (interaction callbacks. Core application work remains off the Swing event thread.) Tj ET
-BT /F1 9 Tf 42.0 98.0 Td () Tj ET
+BT /F1 9 Tf 42.0 137.0 Td (Observer: AgentEventPublisher holds ProgressObserver callbacks; attach\(\)/detach\(\)/publish\(\)) Tj ET
+BT /F1 9 Tf 42.0 124.0 Td (manage subscriptions and notifications. AgentSession and MemoryManager publish progress/warnings) Tj ET
+BT /F1 9 Tf 42.0 111.0 Td (without knowing GUI widgets. CliApp prints events, while SwingGui schedules updates onto the) Tj ET
+BT /F1 9 Tf 42.0 98.0 Td (event thread. Failing observers cannot abort saved work. This preserves Stage 1, using lambdas) Tj ET
+BT /F1 9 Tf 42.0 85.0 Td (rather than making the entire UI class implement a marker role.) Tj ET
+BT /F1 9 Tf 42.0 72.0 Td () Tj ET
 endstream
 endobj
 19 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 20 0 R >>
 endobj
 20 0 obj
-<< /Length 5035 >>
+<< /Length 5253 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
 BT /F2 8 Tf 535.0 24.0 Td (8) Tj ET
-BT /F1 9 Tf 42.0 730.0 Td (Broad free-form resume rewriting -> token-preserving extractive reordering with unique original) Tj ET
-BT /F1 9 Tf 42.0 717.0 Td (match and per-edit consent -> provide an enforceable deterministic protection against new skill) Tj ET
-BT /F1 9 Tf 42.0 704.0 Td (names/numbers -> reduced wording flexibility; Stage 1 F05 is marked Modified rather than) Tj ET
-BT /F1 9 Tf 42.0 691.0 Td (overstated. Human review is still needed for semantic changes.) Tj ET
-BT /F1 9 Tf 42.0 678.0 Td () Tj ET
-BT /F1 9 Tf 42.0 665.0 Td (All Word/PDF formats implied -> DOCX through safe JDK XML/ZIP; PDFBox via Maven;) Tj ET
-BT /F1 9 Tf 42.0 652.0 Td (.doc/scanned/locked input directed to paste -> avoid hand-written fragile PDF/binary Word) Tj ET
-BT /F1 9 Tf 42.0 639.0 Td (parsing -> offline build supports text/DOCX/Markdown now; PDF functionality requires dependency) Tj ET
-BT /F1 9 Tf 42.0 626.0 Td (build and remains unverified.) Tj ET
-BT /F1 9 Tf 42.0 613.0 Td () Tj ET
-BT /F1 9 Tf 42.0 600.0 Td (Unspecified posting deadline format -> explicitly labeled valid ISO dates only -> avoid) Tj ET
-BT /F1 9 Tf 42.0 587.0 Td (inventing or guessing deadlines -> partial deadline automation, documented manual tracking for) Tj ET
-BT /F1 9 Tf 42.0 574.0 Td (other formats.) Tj ET
-BT /F1 9 Tf 42.0 561.0 Td () Tj ET
-BT /F1 9 Tf 42.0 548.0 Td (Permanent side-by-side tailoring columns -> original/revised/reason together in approval dialog) Tj ET
-BT /F1 9 Tf 42.0 535.0 Td (-> one shared per-change approval mechanism -> equivalent review/accept/reject flow with a) Tj ET
-BT /F1 9 Tf 42.0 522.0 Td (layout difference.) Tj ET
-BT /F1 9 Tf 42.0 509.0 Td () Tj ET
-BT /F1 9 Tf 42.0 496.0 Td (Checklist solely model-prioritized -> model ordering validated as an exact permutation, with) Tj ET
-BT /F1 9 Tf 42.0 483.0 Td (deterministic fallback -> keep useful preparation work available without AI -> fallback never) Tj ET
-BT /F1 9 Tf 42.0 470.0 Td (presents fabricated LLM content and preserves checked progress on rebuild.) Tj ET
-BT /F1 9 Tf 42.0 457.0 Td () Tj ET
-BT /F1 9 Tf 42.0 444.0 Td (Implied separate use-case/sequence artifacts -> supplied explicit updated PlantUML sources ->) Tj ET
-BT /F1 9 Tf 42.0 431.0 Td (UMLet source only contains class elements -> original files preserved and implemented flow) Tj ET
-BT /F1 9 Tf 42.0 418.0 Td (documented. The PDF vector diagram is a selected-class view; the PlantUML source provides fuller) Tj ET
-BT /F1 9 Tf 42.0 405.0 Td (service/domain coverage.) Tj ET
-BT /F1 9 Tf 42.0 392.0 Td () Tj ET
-BT /F2 12 Tf 42.0 371.0 Td (5. AI tools and collaboration log) Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Adapter: JevAdapter implements DecisionClient and translates typed Choice requests/responses) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (through JevApi. ClaudeAdapter implements LLMClient and translates HAIKU/SONNET generation to) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (AnthropicApi Messages requests. Ai coordinates retries and schema/evidence validation without) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (substituting providers. HttpTransport centralizes HTTP handling. This restores the Stage 1) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td (provider boundaries; real connectivity has user-run PASS evidence, while full feature behavior) Tj ET
+BT /F1 9 Tf 42.0 665.0 Td (remains separately verified.) Tj ET
+BT /F1 9 Tf 42.0 652.0 Td () Tj ET
+BT /F1 9 Tf 42.0 639.0 Td (Relationships visible in the class diagram: UI clients depend on facade; facade creates command) Tj ET
+BT /F1 9 Tf 42.0 626.0 Td (objects and a session; session owns a state and uses planner/gate/events; planner depends on) Tj ET
+BT /F1 9 Tf 42.0 613.0 Td (DecisionClient and selects AgentAction; Ai coordinates DecisionClient/LLMClient; JevAdapter) Tj ET
+BT /F1 9 Tf 42.0 600.0 Td (realizes DecisionClient and ClaudeAdapter realizes LLMClient; services use typed domain records) Tj ET
+BT /F1 9 Tf 42.0 587.0 Td (and the four planned repositories backed by Documents/SqliteStore; importer uses parser) Tj ET
+BT /F1 9 Tf 42.0 574.0 Td (factory/strategy; intake uses source strategies. Domain compositions include report-assessments,) Tj ET
+BT /F1 9 Tf 42.0 561.0 Td (version-changes, summary-sources, interview-questions and checklist-items.) Tj ET
+BT /F1 9 Tf 42.0 548.0 Td () Tj ET
+BT /F2 12 Tf 42.0 527.0 Td (4. Changes and rationale) Tj ET
+BT /F1 9 Tf 42.0 514.0 Td () Tj ET
+BT /F1 9 Tf 42.0 501.0 Td (Original design -> implemented change -> reason -> impact:) Tj ET
+BT /F1 9 Tf 42.0 488.0 Td () Tj ET
+BT /F1 9 Tf 42.0 475.0 Td (Initial generic-provider deviation -> restored JevAdapter/JevApi plus ClaudeAdapter/AnthropicApi) Tj ET
+BT /F1 9 Tf 42.0 462.0 Td (and HAIKU/SONNET roles -> preserve the approved Stage 1 plan using verified official API) Tj ET
+BT /F1 9 Tf 42.0 449.0 Td (contracts/model IDs -> no generic provider fallback; user-run live connectivity passed for the) Tj ET
+BT /F1 9 Tf 42.0 436.0 Td (planned models.) Tj ET
+BT /F1 9 Tf 42.0 423.0 Td () Tj ET
+BT /F1 9 Tf 42.0 410.0 Td (Separate JevApi/AnthropicApi and ToolManager/PromptBuilder/ResponseParser wrappers ->) Tj ET
+BT /F1 9 Tf 42.0 397.0 Td (HttpTransport, typed tools and Ai.ask\(\) validation -> keep real responsibilities without) Tj ET
+BT /F1 9 Tf 42.0 384.0 Td (duplicate forwarding layers -> provider/tool error handling and prompt validation remain) Tj ET
+BT /F1 9 Tf 42.0 371.0 Td (centralized; no unused wrapper classes are claimed.) Tj ET
 BT /F1 9 Tf 42.0 358.0 Td () Tj ET
-BT /F1 9 Tf 42.0 345.0 Td (Actual tool: OpenAI Codex agent in this coding conversation, identified by the environment as) Tj ET
-BT /F1 9 Tf 42.0 332.0 Td (based on GPT-6. Exact serving model variant, token accounting and monetary cost are unavailable.) Tj ET
-BT /F1 9 Tf 42.0 319.0 Td (No usage/cost values have been invented. The coding environment used shell tools, javac/java,) Tj ET
-BT /F1 9 Tf 42.0 306.0 Td (sqlite3, generated Java sources and offline assertion checks. No human manual coding was) Tj ET
-BT /F1 9 Tf 42.0 293.0 Td (requested; the user supplied the assignment direction and repository.) Tj ET
-BT /F1 9 Tf 42.0 280.0 Td () Tj ET
-BT /F1 9 Tf 42.0 267.0 Td (Tasks performed by the agent: read Stage1.md and UML attributes; map F01-F10; choose) Tj ET
-BT /F1 9 Tf 42.0 254.0 Td (configurable AI adapter and small Java architecture; implement) Tj ET
-BT /F1 9 Tf 42.0 241.0 Td (domain/storage/parsers/services/state/command/event/facade/UI/CLI; write fixtures and tests; fix) Tj ET
-BT /F1 9 Tf 42.0 228.0 Td (observed failures; write report, diagrams, examples and recording instructions; generate PDF. No) Tj ET
-BT /F1 9 Tf 42.0 215.0 Td (sub-agents were used.) Tj ET
+BT /F1 9 Tf 42.0 345.0 Td (Initial consolidated-store deviation -> restored) Tj ET
+BT /F1 9 Tf 42.0 332.0 Td (SqliteJobRepository/SqliteResumeRepository/SqliteMemoryRepository/SqliteChecklistRepository with) Tj ET
+BT /F1 9 Tf 42.0 319.0 Td (typed Repository contract -> preserve Stage 1 responsibilities and entity links -> services now) Tj ET
+BT /F1 9 Tf 42.0 306.0 Td (use repositories; existing data remains readable through compatibility decoding, using native) Tj ET
+BT /F1 9 Tf 42.0 293.0 Td (sqlite3 for low-level access. Each save is transactional, but a multi-step workflow is) Tj ET
+BT /F1 9 Tf 42.0 280.0 Td (intentionally not one transaction; completed steps survive later failures.) Tj ET
+BT /F1 9 Tf 42.0 267.0 Td () Tj ET
+BT /F1 9 Tf 42.0 254.0 Td (Initial command consolidation -> restored GetJobDescriptionAction and ImportResumeAction for) Tj ET
+BT /F1 9 Tf 42.0 241.0 Td (F01/F02, with remaining FeatureCommand replacements pending later checkpoints -> preserve named) Tj ET
+BT /F1 9 Tf 42.0 228.0 Td (Stage 1 participants incrementally without breaking running services -> input commands are now) Tj ET
+BT /F1 9 Tf 42.0 215.0 Td (real facade paths; full command/state/planner alignment is not yet claimed.) Tj ET
 BT /F1 9 Tf 42.0 202.0 Td () Tj ET
-BT /F1 9 Tf 42.0 189.0 Td (Representative actual interactions:) Tj ET
-BT /F1 9 Tf 42.0 176.0 Td (1. User: 'I want to take one of my github repos and continue it in this folder.' Agent inspected) Tj ET
-BT /F1 9 Tf 42.0 163.0 Td (folder/Git setup; cloning by the session was blocked by permissions. User cloned it; subsequent) Tj ET
-BT /F1 9 Tf 42.0 150.0 Td (inspection found origin/main and Stage 1 documents.) Tj ET
-BT /F1 9 Tf 42.0 137.0 Td (2. User supplied the GitHub URL and requested future implementation and commit guidance. Agent) Tj ET
-BT /F1 9 Tf 42.0 124.0 Td (requested assignment requirements before coding.) Tj ET
-BT /F1 9 Tf 42.0 111.0 Td (3. User supplied the Stage 2 master prompt requiring Java, ten features, shared GUI/CLI, real) Tj ET
-BT /F1 9 Tf 42.0 98.0 Td (LLM, patterns, tests and truthful reporting. Agent read all Stage 1 material and created) Tj ET
-BT /F1 9 Tf 42.0 85.0 Td (implementation-plan.md.) Tj ET
+BT /F1 9 Tf 42.0 189.0 Td (AgentState onInput/onApproval -> state-specific advance\(\) -> use the same blocking approval) Tj ET
+BT /F1 9 Tf 42.0 176.0 Td (abstraction from CLI and background GUI -> preserves five runtime stages and allows typed shared) Tj ET
+BT /F1 9 Tf 42.0 163.0 Td (interaction callbacks. Core application work remains off the Swing event thread.) Tj ET
+BT /F1 9 Tf 42.0 150.0 Td () Tj ET
+BT /F1 9 Tf 42.0 137.0 Td (Broad free-form resume rewriting -> token-preserving extractive reordering with unique original) Tj ET
+BT /F1 9 Tf 42.0 124.0 Td (match and per-edit consent -> provide an enforceable deterministic protection against new skill) Tj ET
+BT /F1 9 Tf 42.0 111.0 Td (names/numbers -> reduced wording flexibility; Stage 1 F05 is marked Modified rather than) Tj ET
+BT /F1 9 Tf 42.0 98.0 Td (overstated. Human review is still needed for semantic changes.) Tj ET
+BT /F1 9 Tf 42.0 85.0 Td () Tj ET
 endstream
 endobj
 21 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 22 0 R >>
 endobj
 22 0 obj
-<< /Length 5406 >>
+<< /Length 5135 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
 BT /F2 8 Tf 535.0 24.0 Td (9) Tj ET
-BT /F1 9 Tf 42.0 730.0 Td (4. Agent reported missing Maven/network access and blocked Git lock writes, then implemented a) Tj ET
-BT /F1 9 Tf 42.0 717.0 Td (dependency-free Java build while retaining Maven/PDFBox configuration.) Tj ET
-BT /F1 9 Tf 42.0 704.0 Td (5. Verification exposed integer round-trip and paused-interview defects; agent changed the codec) Tj ET
-BT /F1 9 Tf 42.0 691.0 Td (and interview lifecycle and reran checks.) Tj ET
-BT /F1 9 Tf 42.0 678.0 Td (6. Agent disclosed that live integrations, HTTP fixtures and a desktop GUI walkthrough were) Tj ET
-BT /F1 9 Tf 42.0 665.0 Td (unverified, rather than substituting demonstration outputs.) Tj ET
-BT /F1 9 Tf 42.0 652.0 Td () Tj ET
-BT /F1 9 Tf 42.0 639.0 Td (Application-model usage is distinct from coding-tool usage: no live application LLM request was) Tj ET
-BT /F1 9 Tf 42.0 626.0 Td (successfully verified in this session. Test responses are clearly identified fixtures. Runtime) Tj ET
-BT /F1 9 Tf 42.0 613.0 Td (hosted-provider billing is controlled by the user's configuration; actual runtime token/cost) Tj ET
-BT /F1 9 Tf 42.0 600.0 Td (data is unavailable.) Tj ET
-BT /F1 9 Tf 42.0 587.0 Td () Tj ET
-BT /F2 12 Tf 42.0 566.0 Td (6. Development and verification summary) Tj ET
-BT /F1 9 Tf 42.0 553.0 Td () Tj ET
-BT /F1 9 Tf 42.0 540.0 Td (Actual repository history inspected: only two commits exist at the time of this report.) Tj ET
-BT /F1 9 Tf 42.0 527.0 Td (- 10360c8, October 5, 2026, 16:30:56 -04:00: Initial commit. Link:) Tj ET
-BT /F1 9 Tf 42.0 514.0 Td (https://github.com/AmirrezaN8/EECS3311/commit/10360c8) Tj ET
-BT /F1 9 Tf 42.0 501.0 Td (- e037277, October 5, 2026, 16:46:39 -04:00: stage 1 project plan and uml in .uxf format built) Tj ET
-BT /F1 9 Tf 42.0 488.0 Td (with umlet in eclipse. Link: https://github.com/AmirrezaN8/EECS3311/commit/e037277) Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Word/PDF input promise -> shared parser interface with top-level DOCX/Markdown/pasted/PDF) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (strategies and supporting DocResumeParser for binary Word -> use Apache PDFBox/POI instead of) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (handwritten binary parsing -> offline build verifies DOCX/Markdown/paste; PDF and binary Word) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (require Maven dependencies and remaining runtime checks. The supporting .doc class implements) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td (the original Word feature rather than adding a separate feature.) Tj ET
+BT /F1 9 Tf 42.0 665.0 Td () Tj ET
+BT /F1 9 Tf 42.0 652.0 Td (Unspecified posting deadline format -> explicitly labeled valid ISO dates only -> avoid) Tj ET
+BT /F1 9 Tf 42.0 639.0 Td (inventing or guessing deadlines -> partial deadline automation, documented manual tracking for) Tj ET
+BT /F1 9 Tf 42.0 626.0 Td (other formats.) Tj ET
+BT /F1 9 Tf 42.0 613.0 Td () Tj ET
+BT /F1 9 Tf 42.0 600.0 Td (Permanent side-by-side tailoring columns -> original/revised/reason together in approval dialog) Tj ET
+BT /F1 9 Tf 42.0 587.0 Td (-> one shared per-change approval mechanism -> equivalent review/accept/reject flow with a) Tj ET
+BT /F1 9 Tf 42.0 574.0 Td (layout difference.) Tj ET
+BT /F1 9 Tf 42.0 561.0 Td () Tj ET
+BT /F1 9 Tf 42.0 548.0 Td (Checklist solely model-prioritized -> model ordering validated as an exact permutation, with) Tj ET
+BT /F1 9 Tf 42.0 535.0 Td (deterministic fallback -> keep useful preparation work available without AI -> fallback never) Tj ET
+BT /F1 9 Tf 42.0 522.0 Td (presents fabricated LLM content and preserves checked progress on rebuild.) Tj ET
+BT /F1 9 Tf 42.0 509.0 Td () Tj ET
+BT /F1 9 Tf 42.0 496.0 Td (Implied separate use-case/sequence artifacts -> supplied explicit updated PlantUML sources ->) Tj ET
+BT /F1 9 Tf 42.0 483.0 Td (UMLet source only contains class elements -> original files preserved and implemented flow) Tj ET
+BT /F1 9 Tf 42.0 470.0 Td (documented. The PDF vector diagram is a selected-class view; the PlantUML source provides fuller) Tj ET
+BT /F1 9 Tf 42.0 457.0 Td (service/domain coverage.) Tj ET
+BT /F1 9 Tf 42.0 444.0 Td () Tj ET
+BT /F2 12 Tf 42.0 423.0 Td (5. AI tools and collaboration log) Tj ET
+BT /F1 9 Tf 42.0 410.0 Td () Tj ET
+BT /F1 9 Tf 42.0 397.0 Td (Actual tool: OpenAI Codex agent in this coding conversation, identified by the environment as) Tj ET
+BT /F1 9 Tf 42.0 384.0 Td (based on GPT-6. Exact serving model variant, token accounting and monetary cost are unavailable.) Tj ET
+BT /F1 9 Tf 42.0 371.0 Td (No usage/cost values have been invented. The coding environment used shell tools, javac/java,) Tj ET
+BT /F1 9 Tf 42.0 358.0 Td (sqlite3, generated Java sources and offline assertion checks. No human manual coding was) Tj ET
+BT /F1 9 Tf 42.0 345.0 Td (requested; the user supplied the assignment direction and repository.) Tj ET
+BT /F1 9 Tf 42.0 332.0 Td () Tj ET
+BT /F1 9 Tf 42.0 319.0 Td (Tasks performed by the agent: read Stage1.md and UML attributes; map F01-F10; choose) Tj ET
+BT /F1 9 Tf 42.0 306.0 Td (configurable AI adapter and small Java architecture; implement) Tj ET
+BT /F1 9 Tf 42.0 293.0 Td (domain/storage/parsers/services/state/command/event/facade/UI/CLI; write fixtures and tests; fix) Tj ET
+BT /F1 9 Tf 42.0 280.0 Td (observed failures; write report, diagrams, examples and recording instructions; generate PDF. No) Tj ET
+BT /F1 9 Tf 42.0 267.0 Td (sub-agents were used.) Tj ET
+BT /F1 9 Tf 42.0 254.0 Td () Tj ET
+BT /F1 9 Tf 42.0 241.0 Td (Representative actual interactions:) Tj ET
+BT /F1 9 Tf 42.0 228.0 Td (1. User: 'I want to take one of my github repos and continue it in this folder.' Agent inspected) Tj ET
+BT /F1 9 Tf 42.0 215.0 Td (folder/Git setup; cloning by the session was blocked by permissions. User cloned it; subsequent) Tj ET
+BT /F1 9 Tf 42.0 202.0 Td (inspection found origin/main and Stage 1 documents.) Tj ET
+BT /F1 9 Tf 42.0 189.0 Td (2. User supplied the GitHub URL and requested future implementation and commit guidance. Agent) Tj ET
+BT /F1 9 Tf 42.0 176.0 Td (requested assignment requirements before coding.) Tj ET
+BT /F1 9 Tf 42.0 163.0 Td (3. User supplied the Stage 2 master prompt requiring Java, ten features, shared GUI/CLI, real) Tj ET
+BT /F1 9 Tf 42.0 150.0 Td (LLM, patterns, tests and truthful reporting. Agent read all Stage 1 material and created) Tj ET
+BT /F1 9 Tf 42.0 137.0 Td (implementation-plan.md.) Tj ET
+BT /F1 9 Tf 42.0 124.0 Td (4. Agent reported missing Maven/network access and blocked Git lock writes, then implemented a) Tj ET
+BT /F1 9 Tf 42.0 111.0 Td (dependency-free Java build while retaining Maven/PDFBox configuration.) Tj ET
+BT /F1 9 Tf 42.0 98.0 Td (5. Verification exposed integer round-trip and paused-interview defects; agent changed the codec) Tj ET
+BT /F1 9 Tf 42.0 85.0 Td (and interview lifecycle and reran checks.) Tj ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 24 0 R >>
+endobj
+24 0 obj
+<< /Length 5041 >>
+stream
+0.15 0.2 0.28 rg
+BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
+0.75 G 42 754 m 570 754 l S 0 g
+BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
+BT /F2 8 Tf 535.0 24.0 Td (10) Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (6. Agent disclosed that live integrations, HTTP fixtures and a desktop GUI walkthrough were) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (unverified, rather than substituting demonstration outputs.) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td () Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (Application-model usage is distinct from coding-tool usage: no live application LLM request was) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td (successfully verified in this session. Test responses are clearly identified fixtures. Runtime) Tj ET
+BT /F1 9 Tf 42.0 665.0 Td (hosted-provider billing is controlled by the user's configuration; actual runtime token/cost) Tj ET
+BT /F1 9 Tf 42.0 652.0 Td (data is unavailable.) Tj ET
+BT /F1 9 Tf 42.0 639.0 Td () Tj ET
+BT /F2 12 Tf 42.0 618.0 Td (6. Development and verification summary) Tj ET
+BT /F1 9 Tf 42.0 605.0 Td () Tj ET
+BT /F1 9 Tf 42.0 592.0 Td (Actual repository history inspected: three commits exist at this checkpoint; later uncommitted) Tj ET
+BT /F1 9 Tf 42.0 579.0 Td (F01/F02 changes are not represented as a completed commit.) Tj ET
+BT /F1 9 Tf 42.0 566.0 Td (- 10360c8, October 5, 2026, 16:30:56 -04:00: Initial commit. Link:) Tj ET
+BT /F1 9 Tf 42.0 553.0 Td (https://github.com/AmirrezaN8/EECS3311/commit/10360c8) Tj ET
+BT /F1 9 Tf 42.0 540.0 Td (- e037277, October 5, 2026, 16:46:39 -04:00: stage 1 project plan and uml in .uxf format built) Tj ET
+BT /F1 9 Tf 42.0 527.0 Td (with umlet in eclipse. Link: https://github.com/AmirrezaN8/EECS3311/commit/e037277) Tj ET
+BT /F1 9 Tf 42.0 514.0 Td () Tj ET
+BT /F1 9 Tf 42.0 501.0 Td (- 99ca4c9, November 14, 2026, 17:49:04 -05:00: feat: add Java core with Jev and Claude adapters) Tj ET
+BT /F1 9 Tf 42.0 488.0 Td (and typed SQLite repositories. Link: https://github.com/AmirrezaN8/EECS3311/commit/99ca4c9) Tj ET
 BT /F1 9 Tf 42.0 475.0 Td () Tj ET
 BT /F1 9 Tf 42.0 462.0 Td (Toronto weekly reporting summary:) Tj ET
 BT /F1 9 Tf 42.0 449.0 Td (- October 20-26, 2026: 0 meaningful code commits; requirement of 5 NOT MET.) Tj ET
@@ -547,126 +612,129 @@ BT /F1 9 Tf 42.0 423.0 Td (- November 3-9, 2026: 0 meaningful code commits; requ
 BT /F1 9 Tf 42.0 410.0 Td () Tj ET
 BT /F1 9 Tf 42.0 397.0 Td (The supplied instructions specify a single five-point deduction when one or more windows miss) Tj ET
 BT /F1 9 Tf 42.0 384.0 Td (the minimum. No historical activity was fabricated/backdated, and no history was rewritten.) Tj ET
-BT /F1 9 Tf 42.0 371.0 Td (Current implementation changes were produced November 14, 2026. Git add/commit was attempted and) Tj ET
-BT /F1 9 Tf 42.0 358.0 Td (rejected because the session cannot create .git/index.lock. Therefore there are no new) Tj ET
-BT /F1 9 Tf 42.0 345.0 Td (implementation commit hashes or links to claim. docs/commit-guide.md supplies five logical) Tj ET
-BT /F1 9 Tf 42.0 332.0 Td (current-date commit groups for the user to review/run. After genuine commits, update this) Tj ET
-BT /F1 9 Tf 42.0 319.0 Td (section from actual Git history and regenerate the PDF. No push was performed or authorized.) Tj ET
-BT /F1 9 Tf 42.0 306.0 Td () Tj ET
-BT /F1 9 Tf 42.0 293.0 Td (Executed build: sh scripts/build.sh. Result: production sources compiled with javac --release) Tj ET
-BT /F1 9 Tf 42.0 280.0 Td (21; executable target/career-agent.jar built; SelfTest compiled and passed 97 assertions. Tests) Tj ET
-BT /F1 9 Tf 42.0 267.0 Td (used sqlite3 and labeled model/tool fixtures. JUnit entry OfflineTest delegates to the same) Tj ET
-BT /F1 9 Tf 42.0 254.0 Td (checks but Maven/JUnit execution was unavailable.) Tj ET
-BT /F1 9 Tf 42.0 241.0 Td () Tj ET
-BT /F1 9 Tf 42.0 228.0 Td (Verification covered: strict JSON/CLI parsing; UTF-8 SQL-safe persistence and restart; typed) Tj ET
-BT /F1 9 Tf 42.0 215.0 Td (record mapping; DOCX and malicious XML; parser selection; AI malformed retry and choice) Tj ET
-BT /F1 9 Tf 42.0 202.0 Td (validation; source labels/countries/deadlines; raw profile fallback; memory CRUD/dedup/error) Tj ET
-BT /F1 9 Tf 42.0 189.0 Td (isolation; skill evidence/grouping; reviewed token-preserving edits; bounded no-source research;) Tj ET
-BT /F1 9 Tf 42.0 176.0 Td (exactly five questions; interview follow-up/feedback/pause/restart; partial checklist/ticks;) Tj ET
-BT /F1 9 Tf 42.0 163.0 Td (real State/Command workflow approvals, stop, cap and failed-step continuation; LLM envelope) Tj ET
-BT /F1 9 Tf 42.0 150.0 Td (decoding; full fixture-driven preparation -> interview -> feedback -> checklist -> app restart.) Tj ET
-BT /F1 9 Tf 42.0 137.0 Td () Tj ET
-BT /F1 9 Tf 42.0 124.0 Td (Additional executed checks: separate CLI job add/show processes returned the same saved) Tj ET
-BT /F1 9 Tf 42.0 111.0 Td (job/source/deadline; CLI help output correct; headless Swing startup provides a clear display) Tj ET
-BT /F1 9 Tf 42.0 98.0 Td (requirement and exits without a crash; git diff --check showed no tracked whitespace errors.) Tj ET
-BT /F1 9 Tf 42.0 85.0 Td (Original Stage 1 checksums are recorded in docs/verification.md.) Tj ET
-BT /F1 9 Tf 42.0 72.0 Td () Tj ET
-endstream
-endobj
-23 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 24 0 R >>
-endobj
-24 0 obj
-<< /Length 5216 >>
-stream
-0.15 0.2 0.28 rg
-BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
-0.75 G 42 754 m 570 754 l S 0 g
-BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
-BT /F2 8 Tf 535.0 24.0 Td (10) Tj ET
-BT /F1 9 Tf 42.0 730.0 Td (Important defects found/fixed: integer JSON round trips lost integer form; parser now preserves) Tj ET
-BT /F1 9 Tf 42.0 717.0 Td (representable integer tokens. Interview stop initially marked unfinished sessions irreversibly) Tj ET
-BT /F1 9 Tf 42.0 704.0 Td (finished; stop now persists a paused session, with feedback approval handled separately. Planner) Tj ET
-BT /F1 9 Tf 42.0 691.0 Td (context initially used a snapshot; it now reads current saved preparation results at each) Tj ET
-BT /F1 9 Tf 42.0 678.0 Td (decision. GUI prevents overlapping new work while cancelled background work unwinds.) Tj ET
-BT /F1 9 Tf 42.0 665.0 Td () Tj ET
-BT /F1 9 Tf 42.0 652.0 Td (Blocked/unverified checks: optional HTTP fixture run failed at localhost bind with) Tj ET
-BT /F1 9 Tf 42.0 639.0 Td (SocketException: Operation not permitted; it is not counted as a passing network test. Live) Tj ET
-BT /F1 9 Tf 42.0 626.0 Td (Ollama/hosted inference, Adzuna/Brave requests, Maven packaging/dependency resolution, PDFBox) Tj ET
-BT /F1 9 Tf 42.0 613.0 Td (extraction and interactive GUI behavior were not verified. Report PDF was generated from this) Tj ET
-BT /F1 9 Tf 42.0 600.0 Td (Markdown using scripts/ReportPdf.java; structural checks confirm PDF header, page objects,) Tj ET
-BT /F1 9 Tf 42.0 587.0 Td (cross-reference offsets and end marker. Visual page-by-page review was not performed.) Tj ET
-BT /F1 9 Tf 42.0 574.0 Td () Tj ET
-BT /F1 9 Tf 42.0 561.0 Td (No claim is made of exhaustive Stage 3 testing. Remaining checks before submission: real-model) Tj ET
-BT /F1 9 Tf 42.0 548.0 Td (feature walkthrough; live job/company service checks if those are to be demonstrated; Maven/PDF) Tj ET
-BT /F1 9 Tf 42.0 535.0 Td (import; desktop GUI operation and cancellation; record/upload videos and replace placeholders;) Tj ET
-BT /F1 9 Tf 42.0 522.0 Td (compare official Stage 2 PDF; genuine commits and report update. These do not require pretending) Tj ET
-BT /F1 9 Tf 42.0 509.0 Td (implementation already passed external acceptance.) Tj ET
-BT /F1 9 Tf 42.0 496.0 Td () Tj ET
-BT /F2 12 Tf 42.0 475.0 Td (7. Demonstration index) Tj ET
-BT /F1 9 Tf 42.0 462.0 Td () Tj ET
-BT /F1 9 Tf 42.0 449.0 Td (No video links or timestamps exist yet. The following placeholders are intentional and must be) Tj ET
-BT /F1 9 Tf 42.0 436.0 Td (replaced with real recordings. See docs/demo-guide.md for exact actions and evidence.) Tj ET
-BT /F1 9 Tf 42.0 423.0 Td () Tj ET
-BT /F1 9 Tf 42.0 410.0 Td (F01 | Job intake/labels/estimate consent | GUI Job + CLI job show | NOT RECORDED | URL TBD |) Tj ET
-BT /F1 9 Tf 42.0 397.0 Td (timestamp TBD) Tj ET
-BT /F1 9 Tf 42.0 384.0 Td (F02 | File/paste resume and extraction | GUI Resume | NOT RECORDED | URL TBD | timestamp TBD) Tj ET
-BT /F1 9 Tf 42.0 371.0 Td (F03 | Remember, show, edit, delete facts | My History + CLI | NOT RECORDED | URL TBD | timestamp) Tj ET
-BT /F1 9 Tf 42.0 358.0 Td (TBD) Tj ET
-BT /F1 9 Tf 42.0 345.0 Td (F04 | Ordered gap groups and uncertainty | GUI Preparation / CLI gap | NOT RECORDED | URL TBD |) Tj ET
-BT /F1 9 Tf 42.0 332.0 Td (timestamp TBD) Tj ET
-BT /F1 9 Tf 42.0 319.0 Td (F05 | Original/revised/reason, accept/reject, version | GUI Preparation + CLI | NOT RECORDED |) Tj ET
-BT /F1 9 Tf 42.0 306.0 Td (URL TBD | timestamp TBD) Tj ET
-BT /F1 9 Tf 42.0 293.0 Td (F06 | Live sourced company research, no-result handling | GUI Preparation | NOT RECORDED | URL) Tj ET
-BT /F1 9 Tf 42.0 280.0 Td (TBD | timestamp TBD) Tj ET
-BT /F1 9 Tf 42.0 267.0 Td (F07 | Five personalized questions and interview offer | GUI Preparation | NOT RECORDED | URL TBD) Tj ET
-BT /F1 9 Tf 42.0 254.0 Td (| timestamp TBD) Tj ET
-BT /F1 9 Tf 42.0 241.0 Td (F08 | Typed answers, follow-up, pause/resume, feedback | GUI Mock Interview + CLI | NOT RECORDED) Tj ET
-BT /F1 9 Tf 42.0 228.0 Td (| URL TBD | timestamp TBD) Tj ET
-BT /F1 9 Tf 42.0 215.0 Td (F09 | Partial/full checklist, ticks and restart progress | GUI Checklist + CLI | NOT RECORDED |) Tj ET
-BT /F1 9 Tf 42.0 202.0 Td (URL TBD | timestamp TBD) Tj ET
-BT /F1 9 Tf 42.0 189.0 Td (F10 | Goal, decisions, approvals, failures, trace, checklist | GUI Preparation + CLI | NOT) Tj ET
-BT /F1 9 Tf 42.0 176.0 Td (RECORDED | URL TBD | timestamp TBD) Tj ET
-BT /F1 9 Tf 42.0 163.0 Td () Tj ET
-BT /F1 9 Tf 42.0 150.0 Td (Recording order: build and configure services; use non-sensitive sample inputs; show GUI) Tj ET
-BT /F1 9 Tf 42.0 137.0 Td (job/resume/history; execute gap/tailor/research/questions; complete an interview; tick) Tj ET
-BT /F1 9 Tf 42.0 124.0 Td (checklist; restart to show persistence; run a separate autonomous workflow and one CLI) Tj ET
-BT /F1 9 Tf 42.0 111.0 Td (operation. Keep API keys and private resume information off screen. A missing-credential error) Tj ET
-BT /F1 9 Tf 42.0 98.0 Td (demonstrates error handling, not a successful live integration.) Tj ET
-BT /F1 9 Tf 42.0 85.0 Td () Tj ET
-BT /F1 9 Tf 42.0 72.0 Td (Source references consulted for API contracts:) Tj ET
+BT /F1 9 Tf 42.0 371.0 Td (Current implementation changes were produced November 14, 2026. The initial agent-side Git write) Tj ET
+BT /F1 9 Tf 42.0 358.0 Td (was rejected because the session could not create .git/index.lock. The user subsequently made) Tj ET
+BT /F1 9 Tf 42.0 345.0 Td (implementation commit 99ca4c9 in their own Terminal; origin/main was synchronized with it when) Tj ET
+BT /F1 9 Tf 42.0 332.0 Td (checkpoint 3 began. No F01/F02 checkpoint commit or push has yet been made. docs/commit-guide.md) Tj ET
+BT /F1 9 Tf 42.0 319.0 Td (now follows actual completed milestones rather than a prescribed total count. Update final) Tj ET
+BT /F1 9 Tf 42.0 306.0 Td (hashes/links from actual history.) Tj ET
+BT /F1 9 Tf 42.0 293.0 Td () Tj ET
+BT /F1 9 Tf 42.0 280.0 Td (Executed build: sh scripts/build.sh. Result: production sources compiled with javac --release) Tj ET
+BT /F1 9 Tf 42.0 267.0 Td (21; executable target/career-agent.jar built; SelfTest compiled and passed 301 assertions, with) Tj ET
+BT /F1 9 Tf 42.0 254.0 Td (explicit dependency-related skips outside successful runtime claims. Tests used sqlite3 and) Tj ET
+BT /F1 9 Tf 42.0 241.0 Td (labeled model/tool fixtures. JUnit entry OfflineTest delegates to the same checks but) Tj ET
+BT /F1 9 Tf 42.0 228.0 Td (Maven/JUnit execution was unavailable.) Tj ET
+BT /F1 9 Tf 42.0 215.0 Td () Tj ET
+BT /F1 9 Tf 42.0 202.0 Td (Verification covered: strict JSON/CLI parsing; UTF-8 SQL-safe persistence and restart; typed) Tj ET
+BT /F1 9 Tf 42.0 189.0 Td (record mapping; DOCX and malicious XML; parser selection; AI malformed retry and choice) Tj ET
+BT /F1 9 Tf 42.0 176.0 Td (validation; source labels/countries/deadlines; raw profile fallback; memory CRUD/dedup/error) Tj ET
+BT /F1 9 Tf 42.0 163.0 Td (isolation; skill evidence/grouping; reviewed token-preserving edits; bounded no-source research;) Tj ET
+BT /F1 9 Tf 42.0 150.0 Td (exactly five questions; interview follow-up/feedback/pause/restart; partial checklist/ticks;) Tj ET
+BT /F1 9 Tf 42.0 137.0 Td (real State/Command workflow approvals, stop, cap and failed-step continuation; LLM envelope) Tj ET
+BT /F1 9 Tf 42.0 124.0 Td (decoding; full fixture-driven preparation -> interview -> feedback -> checklist -> app restart.) Tj ET
+BT /F1 9 Tf 42.0 111.0 Td () Tj ET
 endstream
 endobj
 25 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 26 0 R >>
 endobj
 26 0 obj
-<< /Length 838 >>
+<< /Length 5035 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
 BT /F2 8 Tf 535.0 24.0 Td (11) Tj ET
-BT /F1 9 Tf 42.0 730.0 Td (Ollama API: https://github.com/ollama/ollama/blob/main/docs/api.md) Tj ET
-BT /F1 9 Tf 42.0 717.0 Td (Adzuna API overview: https://developer.adzuna.com/overview) Tj ET
-BT /F1 9 Tf 42.0 704.0 Td (Brave Search API: https://api-dashboard.search.brave.com/app/documentation/web-search) Tj ET
-BT /F1 9 Tf 42.0 691.0 Td () Tj ET
-BT /F1 9 Tf 42.0 678.0 Td (End of editable report. The PDF adds a selected-class UML view rendered directly as vector) Tj ET
-BT /F1 9 Tf 42.0 665.0 Td (boxes/arrows. Full class, use-case and sequence diagram sources accompany the submission.) Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Additional executed checks: separate CLI job add/show processes returned the same saved) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (job/source/deadline; CLI help output correct; headless Swing startup provides a clear display) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (requirement and exits without a crash; git diff --check showed no tracked whitespace errors.) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (Original Stage 1 checksums are recorded in docs/verification.md.) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td () Tj ET
+BT /F1 9 Tf 42.0 665.0 Td (Important defects found/fixed: integer JSON round trips lost integer form; parser now preserves) Tj ET
+BT /F1 9 Tf 42.0 652.0 Td (representable integer tokens. Interview stop initially marked unfinished sessions irreversibly) Tj ET
+BT /F1 9 Tf 42.0 639.0 Td (finished; stop now persists a paused session, with feedback approval handled separately. Planner) Tj ET
+BT /F1 9 Tf 42.0 626.0 Td (context initially used a snapshot; it now reads current saved preparation results at each) Tj ET
+BT /F1 9 Tf 42.0 613.0 Td (decision. GUI prevents overlapping new work while cancelled background work unwinds.) Tj ET
+BT /F1 9 Tf 42.0 600.0 Td () Tj ET
+BT /F1 9 Tf 42.0 587.0 Td (Blocked/unverified checks: optional HTTP fixture run failed at localhost bind with) Tj ET
+BT /F1 9 Tf 42.0 574.0 Td (SocketException: Operation not permitted; it is not counted as a passing network test. Full live) Tj ET
+BT /F1 9 Tf 42.0 561.0 Td (Claude/Jev application workflows, Adzuna/Brave requests, Maven packaging/dependency resolution,) Tj ET
+BT /F1 9 Tf 42.0 548.0 Td (PDFBox extraction and interactive GUI behavior were not verified. Report PDF was generated from) Tj ET
+BT /F1 9 Tf 42.0 535.0 Td (this Markdown using scripts/ReportPdf.java; structural checks confirm PDF header, page objects,) Tj ET
+BT /F1 9 Tf 42.0 522.0 Td (cross-reference offsets and end marker. Visual page-by-page review was not performed.) Tj ET
+BT /F1 9 Tf 42.0 509.0 Td () Tj ET
+BT /F1 9 Tf 42.0 496.0 Td (No claim is made of exhaustive Stage 3 testing. Remaining checks before submission: real-model) Tj ET
+BT /F1 9 Tf 42.0 483.0 Td (feature walkthrough; live job/company service checks if those are to be demonstrated; Maven/PDF) Tj ET
+BT /F1 9 Tf 42.0 470.0 Td (import; desktop GUI operation and cancellation; record/upload videos and replace placeholders;) Tj ET
+BT /F1 9 Tf 42.0 457.0 Td (compare official Stage 2 PDF; genuine commits and report update. These do not require pretending) Tj ET
+BT /F1 9 Tf 42.0 444.0 Td (implementation already passed external acceptance.) Tj ET
+BT /F1 9 Tf 42.0 431.0 Td () Tj ET
+BT /F2 12 Tf 42.0 410.0 Td (7. Demonstration index) Tj ET
+BT /F1 9 Tf 42.0 397.0 Td () Tj ET
+BT /F1 9 Tf 42.0 384.0 Td (No video links or timestamps exist yet. The following placeholders are intentional and must be) Tj ET
+BT /F1 9 Tf 42.0 371.0 Td (replaced with real recordings. See docs/demo-guide.md for exact actions and evidence.) Tj ET
+BT /F1 9 Tf 42.0 358.0 Td () Tj ET
+BT /F1 9 Tf 42.0 345.0 Td (F01 | Job intake/labels/estimate consent | GUI Job + CLI job show | NOT RECORDED | URL TBD |) Tj ET
+BT /F1 9 Tf 42.0 332.0 Td (timestamp TBD) Tj ET
+BT /F1 9 Tf 42.0 319.0 Td (F02 | File/paste resume and extraction | GUI Resume | NOT RECORDED | URL TBD | timestamp TBD) Tj ET
+BT /F1 9 Tf 42.0 306.0 Td (F03 | Remember, show, edit, delete facts | My History + CLI | NOT RECORDED | URL TBD | timestamp) Tj ET
+BT /F1 9 Tf 42.0 293.0 Td (TBD) Tj ET
+BT /F1 9 Tf 42.0 280.0 Td (F04 | Ordered gap groups and uncertainty | GUI Preparation / CLI gap | NOT RECORDED | URL TBD |) Tj ET
+BT /F1 9 Tf 42.0 267.0 Td (timestamp TBD) Tj ET
+BT /F1 9 Tf 42.0 254.0 Td (F05 | Original/revised/reason, accept/reject, version | GUI Preparation + CLI | NOT RECORDED |) Tj ET
+BT /F1 9 Tf 42.0 241.0 Td (URL TBD | timestamp TBD) Tj ET
+BT /F1 9 Tf 42.0 228.0 Td (F06 | Live sourced company research, no-result handling | GUI Preparation | NOT RECORDED | URL) Tj ET
+BT /F1 9 Tf 42.0 215.0 Td (TBD | timestamp TBD) Tj ET
+BT /F1 9 Tf 42.0 202.0 Td (F07 | Five personalized questions and interview offer | GUI Preparation | NOT RECORDED | URL TBD) Tj ET
+BT /F1 9 Tf 42.0 189.0 Td (| timestamp TBD) Tj ET
+BT /F1 9 Tf 42.0 176.0 Td (F08 | Typed answers, follow-up, pause/resume, feedback | GUI Mock Interview + CLI | NOT RECORDED) Tj ET
+BT /F1 9 Tf 42.0 163.0 Td (| URL TBD | timestamp TBD) Tj ET
+BT /F1 9 Tf 42.0 150.0 Td (F09 | Partial/full checklist, ticks and restart progress | GUI Checklist + CLI | NOT RECORDED |) Tj ET
+BT /F1 9 Tf 42.0 137.0 Td (URL TBD | timestamp TBD) Tj ET
+BT /F1 9 Tf 42.0 124.0 Td (F10 | Goal, decisions, approvals, failures, trace, checklist | GUI Preparation + CLI | NOT) Tj ET
+BT /F1 9 Tf 42.0 111.0 Td (RECORDED | URL TBD | timestamp TBD) Tj ET
+BT /F1 9 Tf 42.0 98.0 Td () Tj ET
 endstream
 endobj
 27 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 28 0 R >>
 endobj
 28 0 obj
+<< /Length 1651 >>
+stream
+0.15 0.2 0.28 rg
+BT /F2 10 Tf 42.0 766.0 Td (Stage 2 Implementation Report) Tj ET
+0.75 G 42 754 m 570 754 l S 0 g
+BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
+BT /F2 8 Tf 535.0 24.0 Td (12) Tj ET
+BT /F1 9 Tf 42.0 730.0 Td (Recording order: build and configure services; use non-sensitive sample inputs; show GUI) Tj ET
+BT /F1 9 Tf 42.0 717.0 Td (job/resume/history; execute gap/tailor/research/questions; complete an interview; tick) Tj ET
+BT /F1 9 Tf 42.0 704.0 Td (checklist; restart to show persistence; run a separate autonomous workflow and one CLI) Tj ET
+BT /F1 9 Tf 42.0 691.0 Td (operation. Keep API keys and private resume information off screen. A missing-credential error) Tj ET
+BT /F1 9 Tf 42.0 678.0 Td (demonstrates error handling, not a successful live integration.) Tj ET
+BT /F1 9 Tf 42.0 665.0 Td () Tj ET
+BT /F1 9 Tf 42.0 652.0 Td (Source references consulted for API contracts:) Tj ET
+BT /F1 9 Tf 42.0 639.0 Td (Jev API: https://docs.typesafe.ai/introduction/quickstart) Tj ET
+BT /F1 9 Tf 42.0 626.0 Td (Anthropic Messages API: https://platform.claude.com/docs/en/api/messages/create) Tj ET
+BT /F1 9 Tf 42.0 613.0 Td (Adzuna API overview: https://developer.adzuna.com/overview) Tj ET
+BT /F1 9 Tf 42.0 600.0 Td (Brave Search API: https://api-dashboard.search.brave.com/app/documentation/web-search) Tj ET
+BT /F1 9 Tf 42.0 587.0 Td () Tj ET
+BT /F1 9 Tf 42.0 574.0 Td (End of editable report. The PDF adds a selected-class UML view rendered directly as vector) Tj ET
+BT /F1 9 Tf 42.0 561.0 Td (boxes/arrows. Full class, use-case and sequence diagram sources accompany the submission.) Tj ET
+endstream
+endobj
+29 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 30 0 R >>
+endobj
+30 0 obj
 << /Length 5666 >>
 stream
 0.15 0.2 0.28 rg
 BT /F2 10 Tf 42.0 766.0 Td (Implemented UML - selected classes and runtime relationships) Tj ET
 0.75 G 42 754 m 570 754 l S 0 g
 BT /F2 8 Tf 42.0 24.0 Td (EECS3311 | Career Preparation Agent | November 14, 2026) Tj ET
-BT /F2 8 Tf 535.0 24.0 Td (12) Tj ET
+BT /F2 8 Tf 535.0 24.0 Td (13) Tj ET
 0.96 0.97 0.99 rg 42 628 164 92 re f 0.3 G 42 628 164 92 re S 0 g
 BT /F2 10 Tf 48.0 704.0 Td (CliApp) Tj ET
 42 692 m 206 692 l S
@@ -798,38 +866,40 @@ BT /F2 9 Tf 42.0 77.0 Td (Sequence and use-case sources are supplied beside the 
 endstream
 endobj
 xref
-0 29
+0 31
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
-0000000193 00000 n 
-0000000261 00000 n 
-0000000336 00000 n 
-0000000472 00000 n 
-0000005624 00000 n 
-0000005760 00000 n 
-0000011258 00000 n 
-0000011395 00000 n 
-0000016498 00000 n 
-0000016636 00000 n 
-0000021724 00000 n 
-0000021862 00000 n 
-0000027105 00000 n 
-0000027243 00000 n 
-0000032363 00000 n 
-0000032501 00000 n 
-0000037632 00000 n 
-0000037770 00000 n 
-0000042857 00000 n 
-0000042995 00000 n 
-0000048453 00000 n 
-0000048591 00000 n 
-0000053859 00000 n 
-0000053997 00000 n 
-0000054886 00000 n 
-0000055024 00000 n 
+0000000200 00000 n 
+0000000268 00000 n 
+0000000343 00000 n 
+0000000479 00000 n 
+0000006192 00000 n 
+0000006328 00000 n 
+0000011580 00000 n 
+0000011717 00000 n 
+0000017222 00000 n 
+0000017360 00000 n 
+0000022727 00000 n 
+0000022865 00000 n 
+0000027673 00000 n 
+0000027811 00000 n 
+0000033029 00000 n 
+0000033167 00000 n 
+0000038804 00000 n 
+0000038942 00000 n 
+0000044247 00000 n 
+0000044385 00000 n 
+0000049572 00000 n 
+0000049710 00000 n 
+0000054803 00000 n 
+0000054941 00000 n 
+0000060028 00000 n 
+0000060166 00000 n 
+0000061869 00000 n 
+0000062007 00000 n 
 trailer
-<< /Size 29 /Root 1 0 R >>
+<< /Size 31 /Root 1 0 R >>
 startxref
-60742
+67725
 %%EOF

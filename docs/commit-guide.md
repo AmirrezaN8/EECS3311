@@ -1,4 +1,12 @@
-# Current commit checkpoint
+# Commit checkpoints
+
+## Next: F01/F02
+
+Checkpoint 3 has 301 passing offline assertions. Complete the live/local walkthrough in checkpoint-3-inputs.md before calling it feature-verified. Then review `git status`, stage the actual source/test/build/sample/documentation changes (including new Java classes), check filenames and use `feat: restore Stage 1 job intake and resume import workflows`. Do not stage career.properties, personal notes, data or target. No new commit/push is claimed.
+
+## Previous: initial Java core
+
+Commit 99ca4c9 now exists and was synchronized with origin/main when checkpoint 3 began. The instructions below describe that preceding milestone; do not repeat its initial-commit command blindly.
 
 Checkpoints 1 and 2 are implemented: real Jev/Claude API adapters (with user-run live connectivity evidence), named domain entities and typed SQLite repositories (233 offline assertions passing). Other Stage 1 feature/architecture corrections remain in progress; this is an honest development snapshot, not a final submission.
 

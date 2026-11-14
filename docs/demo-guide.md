@@ -2,7 +2,7 @@
 
 No videos have been recorded or uploaded by this implementation session. Replace every **NOT RECORDED** cell with your real unlisted/public video URL and actual timestamp. Do not submit placeholders as if they were evidence.
 
-Before recording: build, start your real LLM, configure optional service keys, use a sample resume without private information, and verify the chosen model returns acceptable structured output. Keep the configuration file and keys off screen. Use both GUI and CLI in the overall demonstration.
+Before recording: build, configure the planned Jev/Claude APIs and required feature tool keys, use a sample resume without private information, and verify the chosen model returns acceptable structured output. Keep the configuration file and keys off screen. Use both GUI and CLI in the overall demonstration.
 
 | Feature | Action and evidence to capture | Interface | Video / timestamp |
 |---|---|---|---|
@@ -18,3 +18,17 @@ Before recording: build, start your real LLM, configure optional service keys, u
 | F10 | Submit goal, show planner decisions, Yes/No approvals, rejected and failed steps, final checklist and saved action trace. | GUI Preparation + CLI prepare | NOT RECORDED / TBD |
 
 Supplementary recording: `sh scripts/build.sh` output; CLI help and one-shot invocation; app restart retaining current job/profile/history/checklist. Only call integrations verified after actually running them. Record limitations honestly rather than masking failures.
+
+## F01/F02 recording gate
+
+Code-level acceptance checks pass for checkpoint 3. First complete the actual local walkthrough in checkpoint-3-inputs.md; do not record a claimed success from fixture-only results. F01 live Adzuna lookup needs its local app ID/key, and F02 structured extraction must have an empty warning. PDF/legacy Word need packaged dependency checks. Use samples/ for non-sensitive inputs and a separate demo database.
+
+Once those checks pass, record two labeled segments:
+1. **F01 — Job intake:** paste/save/show source; real lookup partial excerpt plus Jobs by Adzuna URL; decline/approve an estimate; show that rejection preserves the previous job. Explain Jev chooses a listing and Sonnet estimates only with consent.
+2. **F02 — Resume import:** import Markdown/DOCX and PDF if verified, show skills/all sections and preserved source; show one corrupt/unsupported-file or raw-fallback alternative honestly. Explain Haiku extracts source-supported facts, not invented qualifications.
+
+Use CLI plus GUI across the segments. No URLs/timestamps have been recorded yet; replace placeholders only after actual recording. Later material UI changes require updating affected footage.
+
+## Current recording reminder
+
+The user has confirmed pasted F01 intake, real Markdown/DOCX F02 extraction (empty warnings) and basic GUI operation. Record these verified paths now if the interface is stable enough; use the fictional sample files and demo database. Label the segments F01 and F02, show invocation/input/results, and demonstrate one real error/alternative path. Do not present Adzuna lookup, estimates, PDF or binary Word as successful until separately exercised. Add later footage for those paths; rerecord if material GUI changes make the recording inaccurate. No recordings have been provided yet.

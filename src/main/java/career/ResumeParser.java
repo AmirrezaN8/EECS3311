@@ -1,5 +1,4 @@
 package career;
 
-import java.nio.file.Path;
-
-@FunctionalInterface public interface ResumeParser {String extractText(Path source) throws Exception;}
+/** File parsers receive a path string; the pasted strategy receives literal resume text. */
+@FunctionalInterface public interface ResumeParser { String extractText(String source) throws Exception; }

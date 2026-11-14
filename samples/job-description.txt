@@ -1,0 +1,8 @@
+FICTIONAL SAMPLE POSTING — demonstration input, not an actual vacancy.
+Title: Junior Java Developer
+Company: Example Company
+Country: Canada
+
+Required skills: Java, SQL, Git, JUnit, Docker.
+Responsibilities: develop Java applications, write automated tests, work with SQL databases, collaborate through Git, and learn container-based deployment.
+Apply by: 2026-12-01

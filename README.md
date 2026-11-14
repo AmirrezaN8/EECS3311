@@ -1,6 +1,6 @@
 # Career Preparation AI Agent — EECS3311 Stage 2
 
-**Alignment status:** Checkpoints 1 and 2 restore the planned Jev/Claude API boundaries, named domain entities and four typed SQLite repositories. Other Stage 1 corrections remain open (including resume tailoring, named commands/tools and planner/state behavior). See [the alignment review](docs/stage2-alignment-review.md) and [API checkpoint evidence](docs/checkpoint-1-apis.md) and [persistence checkpoint evidence](docs/checkpoint-2-persistence.md). This is not yet a submission-ready snapshot.
+**Alignment status:** Checkpoints 1 and 2 restore the planned Jev/Claude API boundaries, named domain entities and four typed SQLite repositories. Checkpoint 3 restores F01/F02 commands, source/parser strategies and ToolManager; live feature checks remain pending. Other corrections remain open, including resume tailoring, the remaining named commands and planner/state behavior. See [the alignment review](docs/stage2-alignment-review.md) and [API checkpoint evidence](docs/checkpoint-1-apis.md) and [persistence checkpoint evidence](docs/checkpoint-2-persistence.md). See the [F01/F02 walkthrough](docs/checkpoint-3-inputs.md). This is not yet a submission-ready snapshot.
 
 A Java application for graduates applying in Canada and the US. Swing and an independent CLI share an `AgentController` facade, SQLite memory, preparation services and a bounded, approval-driven AI workflow. The original [Stage1.md](Stage1.md) and [uml.uxf](uml.uxf) are preserved.
 
@@ -14,14 +14,14 @@ java -jar target/career-agent.jar
 java -jar target/career-agent.jar --gui
 ```
 
-`build.sh` builds the offline JAR and runs the assertion-based verification suite. It does not download dependencies. For PDF extraction and JUnit integration, install Maven separately, then:
+`build.sh` builds the offline JAR and runs the assertion-based verification suite. It does not download dependencies. For PDF/binary Word extraction and JUnit integration, install Maven separately, then:
 
 ```sh
 mvn test package
 java -jar target/career-agent-2.0.0.jar --gui
 ```
 
-The Maven package includes PDFBox. Maven/dependency resolution and PDF parsing could not be verified in this sandbox; PDF import in the offline JAR gives an explicit paste-text alternative. DOCX, Markdown and UTF-8 text import work without Maven. Legacy binary `.doc` and scanned/locked PDFs require pasted text. No Python or JavaScript application code is used.
+The Maven package includes PDFBox 3.0.8 and Apache POI 6.0.0. Maven/dependency resolution and PDF parsing could not be verified in this sandbox; PDF import in the offline JAR gives an explicit paste-text alternative. DOCX, Markdown and UTF-8 text import work without Maven. Legacy binary `.doc` uses POI in the Maven package and remains unverified with a valid sample; scanned/locked PDFs require pasted text. No Python or JavaScript application code is used.
 
 ## Configure real AI
 
@@ -87,11 +87,13 @@ GUI: save a posting in **Job**, save/import a resume in **Resume**, then use **P
 
 ## Verification and limitations
 
-`sh scripts/build.sh`: **233 passing assertions**, including 61 Jev/Claude boundary checks, 79 domain/repository checks and 93 core/service/workflow checks. Provider checks intercept HTTP using explicit fixtures; service scenarios use test-only scripted clients. No network connection, live model, or paid request is made by this suite, even when local credentials exist.
+`sh scripts/build.sh`: **325 passing assertions**, including 79 Jev/Claude/response checks, 79 domain/repository checks, 74 F01/F02 checks and 93 core/service/workflow checks. Provider checks intercept HTTP using explicit fixtures; service scenarios use test-only scripted clients. No network connection, live model, or paid request is made by this suite, even when local credentials exist.
 
-Checked: exact API endpoints/authentication/model routing, Jev probabilities/confidence, malformed and incomplete output rejection, missing credentials, separate provider routing, no fallback, one retry, cancellation, structured prompt/response validation, existing core behavior and restart persistence. The old generic-provider HTTP fixture suite was removed with its obsolete adapter. The user subsequently ran `ApiCheck all` successfully in their Terminal for Jev and both planned Claude models; see [the recorded user-run evidence](docs/checkpoint-1-apis.md). Agent-side networking is blocked by DNS restrictions. Complete live feature workflows still need verification.
+Checked: exact API endpoints/authentication/model routing, Jev probabilities/confidence, malformed and incomplete output rejection, missing credentials, separate provider routing, no fallback, one retry, cancellation, structured prompt/response validation, existing core behavior and restart persistence. The old generic-provider HTTP fixture suite was removed with its obsolete adapter. The user subsequently ran `ApiCheck all` successfully in their Terminal for Jev and both planned Claude models; see [the recorded user-run evidence](docs/checkpoint-1-apis.md). Agent-side networking is blocked by DNS restrictions. User-run pasted job intake and real Haiku Markdown/DOCX extraction have now passed (populated sections, empty warning); the user also confirmed basic GUI operation. Other live feature workflows still need verification.
 
 Headless GUI startup exits gracefully; desktop interaction has not been manually exercised. Maven/JUnit/PDFBox, full live AI feature workflows and search integrations remain unverified here. The three provider connectivity checks have user-run PASS evidence.
+F01/F02 use their planned named commands and shared tools/strategies. All extracted resume sections are checked against the original text. Model JSON may be plain or inside one complete JSON code block; extra prose/ambiguous output remains invalid. Retry prompts include the validation failure. A raw-only import publishes a warning, not completed. Use the fictional [sample inputs](samples/README.md) and [local walkthrough](docs/checkpoint-3-inputs.md) to exercise real paths. PDF/Word dependency checks print SKIP when unavailable; they are not counted as successful integrations.
+
 Tailoring deliberately permits only reordered original words/numbers, with unique substring matching and per-edit approval. This prevents introducing new skill names/numbers but cannot prove that a rearranged sentence preserves meaning; review each edit. Skill evidence uses literal normalized matches and flags absent evidence uncertain; synonyms may need manual review. Auto deadlines accept explicitly labeled ISO dates only; other deadline wording remains visible in the original posting and needs manual tracking. AI-assisted checklist ordering falls back to a useful deterministic order when unavailable.
 
 Data is in ignored `data/career.db` by default (`CAREER_DATA` overrides), with an owner-readable/writable database file, WAL transactions and no Java object deserialization. The four typed repositories retain original resumes, separate job/base-linked versions, memory and checklists. Legacy records remain readable without destructive migration. Entity/selection changes and interview restarts are transactional; restart archives both old answers and feedback. A separate-JVM fixture verifies restart persistence. The application uses `sqlite3` rather than a JDBC driver; repositories enforce the intended single-user entity relationships. Personal data is unencrypted; keep the data folder private and make backups. Do not delete the database while the app is running. API keys are never included in committed examples or HTTP error bodies.
@@ -104,7 +106,7 @@ Data is in ignored `data/career.db` by default (`CAREER_DATA` overrides), with a
 - [Feature recording checklist](docs/demo-guide.md)
 - [Actual verification log](docs/verification.md) and [commit guide](docs/commit-guide.md)
 
-No demo videos or historical activity have been fabricated. The official Stage 2 PDF has since been reviewed; the earlier report/PDF must be updated after the alignment corrections. All three specified weekly Git windows currently have zero commits. No new commit or push was possible from this session because `.git/index.lock` creation is restricted.
+No demo videos or historical activity have been fabricated. The official Stage 2 PDF has since been reviewed; the earlier report/PDF must be updated after the alignment corrections. All three specified weekly Git windows currently have zero commits. The user subsequently committed the initial milestone as `99ca4c9` and synchronized it with origin/main. F01/F02 checkpoint changes are not yet committed; no agent-side push is claimed.
 
 Regenerate the report after editing its Markdown source:
 

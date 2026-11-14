@@ -4,6 +4,10 @@ Reviewed November 14, 2026 against all five pages of `/Users/amir/Downloads/Proj
 
 The user's controlling instruction is now strict fidelity to the approved Stage 1 plan. Treat architectural substitutions as defects to correct, rather than relying on the professor's general permission to document changes.
 
+## Checkpoint 3 update
+
+F01/F02 now use GetJobDescriptionAction/ImportResumeAction and named top-level source/parser strategies. ToolManager/Tool/ToolResult are in actual Adzuna and web-search routes. Resume sections have source-evidence validation and the pasted parser implements the same contract as file parsers. Binary Word has a POI-backed strategy rather than a silent omission. 301 offline assertions pass; PDF/Word runtime and live feature/desktop checks remain pending. Later commands, full State/F10, F05 and remaining UI/feature gaps are still open. See checkpoint-3-inputs.md.
+
 ## Checkpoint 2 update
 
 Named top-level domain classes and the four typed repositories are now restored and in actual service/facade use. Compatibility decoding preserves older saved records; transactional selection/restart and entity links have offline checks. The suite now passes 233 assertions. Existing string IDs and sqlite3 transport remain representation choices documented in checkpoint-2-persistence.md; no JDBC Connection implementation is claimed. The original deviation table below is historical; command/tool/state/F05/F10/UI corrections remain open.

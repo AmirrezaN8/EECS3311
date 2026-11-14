@@ -107,7 +107,7 @@ public final class RepositoryTest {
         fails(()->jobs.restartInterview(new InterviewSession("old",List.of(q),Map.of(),Map.of(),Map.of(),Set.of(),false)),"failed interview restart reported");
         check(jobs.findInterview("old").answers().get("q").equals("Saved answer")&&store.all("interview-archive").isEmpty(),"failed restart preserves answers and rolls back archive write");check(jobs.findFeedback("old").perAnswerFeedback().equals(List.of("Saved feedback"))&&store.all("feedback-archive").isEmpty(),"failed restart retains current feedback and rolls back feedback archive");sql(path,"DROP TRIGGER reject_interview;");
     }
-    private static void sql(Path path,String sql)throws Exception {
+    static void sql(Path path,String sql)throws Exception {
         Process process=new ProcessBuilder("sqlite3","-batch","-bail",path.toString()).redirectErrorStream(true).start();try(var out=process.getOutputStream()){out.write(sql.getBytes(java.nio.charset.StandardCharsets.UTF_8));}
         if(!process.waitFor(10,TimeUnit.SECONDS)){process.destroyForcibly();throw new AssertionError("SQLite fixture setup timed out");}if(process.exitValue()!=0)throw new AssertionError("SQLite fixture setup failed");
     }

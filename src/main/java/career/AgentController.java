@@ -16,8 +16,9 @@ public final class AgentController {
     public AgentController(Config c,UserInteraction ui){this(new SqliteStore(c.data()),new Ai(new ClaudeAdapter(new AnthropicApi(c)),new JevAdapter(new JevApi(c))),new AdzunaTool(c,new HttpTransport()),new WebSearchTool(c,new HttpTransport()),ui,new AgentEventPublisher());}
     public AgentController(SqliteStore store,Ai ai,AdzunaTool adzuna,WebSearchTool search,UserInteraction ui,AgentEventPublisher events){
         this.jobs=new SqliteJobRepository(store);this.resumeRepository=new SqliteResumeRepository(store);this.checklistRepository=new SqliteChecklistRepository(store);this.ai=ai;this.ui=ui;this.events=events;gate=new ApprovalGate(ui);
-        resumes=new ResumeImporter(ai,store);intake=new JobDescriptionIntake(ai,adzuna,store,gate);memory=new MemoryManager(ai,store,gate,events);
-        gaps=new SkillGapService(ai,store);tailor=new ResumeTailorService(ai,store,gate);company=new CompanyResearchService(ai,search,store);
+        ToolManager tools=new ToolManager();tools.register(adzuna);tools.register(search);
+        resumes=new ResumeImporter(ai,store);intake=new JobDescriptionIntake(ai,tools,store,gate);memory=new MemoryManager(ai,store,gate,events);
+        gaps=new SkillGapService(ai,store);tailor=new ResumeTailorService(ai,store,gate);company=new CompanyResearchService(ai,tools,store);
         prep=new InterviewPrepService(ai,store);interview=new MockInterviewService(ai,store,memory);checklist=new ChecklistService(ai,store);
     }
     public JobDescription currentJob(){return jobs.current();}
@@ -40,13 +41,13 @@ public final class AgentController {
             if(command.equals("checklist build"))offerMissingSteps();return result;
         }
         return switch(command){
-            case "job add" -> {count(args,4);yield intake.add(args.get(0),args.get(1),args.get(2),readInput(args.get(3)));}
-            case "job find" -> {count(args,3);yield intake.find(args.get(0),args.get(1),args.get(2));}
+            case "job add" -> {count(args,4);yield execute(new GetJobDescriptionAction(intake,new JobDescriptionRequest(args.get(0),args.get(1),args.get(2),required(readInput(args.get(3)),"Pasted description"),"")));}
+            case "job find" -> {count(args,3);yield execute(new GetJobDescriptionAction(intake,new JobDescriptionRequest(args.get(0),args.get(1),args.get(2),"","")));}
             case "job show" -> {count(args,0);yield currentJob();}
             case "job list" -> {count(args,0);yield jobs.findAll();}
             case "job select" -> {count(args,1);jobs.select(args.getFirst());yield currentJob();}
-            case "resume import" -> {count(args,1);yield resumes.importResume(Path.of(args.getFirst()));}
-            case "resume paste" -> {count(args,1);yield resumes.importText(readInput(args.getFirst()));}
+            case "resume import" -> {count(args,1);yield execute(new ImportResumeAction(resumes,Path.of(args.getFirst())));}
+            case "resume paste" -> {count(args,1);yield execute(new ImportResumeAction(resumes,readInput(args.getFirst())));}
             case "resume show" -> {count(args,0);yield resumes.current();}
             case "resume versions" -> {count(args,0);yield resumeRepository.findVersions(currentJob().id());}
             case "history show" -> {count(args,0);yield memory.loadFacts();}
@@ -66,16 +67,17 @@ public final class AgentController {
             default -> throw new IllegalArgumentException("Unknown command: "+command+". Use help.");
         };
     }
+    private Object execute(AgentAction action){Object result=action.execute();events.publish(result instanceof ResumeProfile profile&&!profile.warning().isBlank()?"warning":"completed",action.name());return result;}
     public String startMockInterview(boolean restart){return interview.nextQuestion(interview.start(currentJob().id(),restart));}
     public List<String> handleGoal(String goal){
         goal=required(goal,"Goal");cancelled=false;memory.recordTurn(goal);
         try{currentJob();}catch(IllegalStateException e){
             if(!gate.review("No selected job. Paste a job description now?",false))throw e;
-            intake.add(required(ui.readText("Job title"),"Title"),required(ui.readText("Company"),"Company"),required(ui.readText("Country (CA or US)"),"Country"),required(ui.readText("Paste job description"),"Job description"));
+            runFeature("job add",List.of(required(ui.readText("Job title"),"Title"),required(ui.readText("Company"),"Company"),required(ui.readText("Country (CA or US)"),"Country"),required(ui.readText("Paste job description"),"Job description")));
         }
         try{resumes.current();}catch(IllegalStateException e){
             if(!gate.review("No resume saved. Paste it now?",false))throw e;
-            resumes.importText(required(ui.readText("Paste resume text"),"Resume"));
+            runFeature("resume paste",List.of(required(ui.readText("Paste resume text"),"Resume")));
         }
         if(memory.loadFacts().isEmpty()){
             String fact=ui.readText("No history yet. Optionally describe a target role or weakness (blank to skip)");if(fact!=null&&!fact.isBlank())memory.recordTurn(fact);
