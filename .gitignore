@@ -1,0 +1,9 @@
+/target/
+/.env
+/career.properties
+/data/
+*.db
+*.db-shm
+*.db-wal
+.DS_Store
+/docs/user-decisions.md

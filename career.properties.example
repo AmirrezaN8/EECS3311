@@ -1,0 +1,10 @@
+# Copy to career.properties (ignored by Git). Environment variables override local values.
+CAREER_DATA=data/career.db
+# Stage 1: Jev for constrained decisions; Claude Haiku 4.5 / Sonnet 5.5 for generation/reasoning.
+# Obtain keys separately from the providers and enter them ONLY in the ignored local file.
+TYPESAFE_API_KEY=
+ANTHROPIC_API_KEY=
+# Required for the corresponding Stage 1 external tool workflows:
+ADZUNA_APP_ID=
+ADZUNA_APP_KEY=
+BRAVE_SEARCH_API_KEY=

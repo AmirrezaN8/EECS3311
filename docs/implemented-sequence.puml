@@ -1,0 +1,44 @@
+@startuml
+actor Graduate
+participant "SwingGui / CliApp" as UI
+participant AgentController as Facade
+participant MemoryManager as Memory
+participant AgentSession as Session
+participant "AgentState objects" as State
+participant Planner
+participant "Ai / JevAdapter : DecisionClient" as Decision
+participant ApprovalGate as Gate
+participant "FeatureCommand : AgentAction" as Command
+participant "Feature services" as Service
+participant "JevApi / ClaudeAdapter / external tools" as Tools
+participant "Typed repositories / SqliteStore" as DB
+participant AgentEventPublisher as Events
+Graduate -> UI : prepare(goal)
+UI -> Facade : handleGoal(goal)
+Facade -> Memory : recordTurn(goal), loadFacts()
+Memory -> DB : read/save useful nonconflicting facts
+Facade -> UI : obtain missing job/resume/history if approved
+Facade -> Session : handleInput()
+Session -> State : advance()
+loop at most 10 steps; stop flag/interrupt ends loop
+State -> Planner : chooseNext(current context, eligible actions)
+Planner -> Decision : constrained decision
+Decision -> Tools : typed Jev Choice request (one retry)
+State -> Gate : review(proposed step, false)
+Gate -> UI : askApproval(description)
+UI -> Graduate : Yes / No
+alt approved
+State -> Command : execute()
+Command -> Service : feature operation
+Service -> Tools : AI/tool requests and validation
+Service -> DB : save verified/reviewed output
+State -> Events : publish completed or failed
+Events -> UI : progress callback (Swing event thread)
+else declined
+State -> Events : publish declined
+end
+State -> Session : transition to PlanningState / FinishedState
+end
+Facade -> DB : save timestamped action trace
+Facade --> UI : consolidated trace
+@enduml

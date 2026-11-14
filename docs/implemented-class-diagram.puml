@@ -1,0 +1,197 @@
+@startuml
+skinparam classAttributeIconSize 0
+interface LLMClient { +generate(prompt, tier): String }
+interface DecisionClient { +decide(question, options): Decision }
+class ClaudeAdapter { +generate(prompt, tier): String }
+class AnthropicApi { +postMessages(json): String }
+class JevAdapter { +decide(question, options): Decision }
+class JevApi { +postSystemOne(json): String }
+class Decision { +choice: String
++probabilities: Map
++confidence: double }
+enum ModelTier { HAIKU
+SONNET }
+class PromptBuilder { +build(task, context, retry): String }
+class ResponseParser { +parseJson(text)
++validate(text, schema)
++validateDecision(decision, options) }
+class Ai { +ask(task, context, tier, validate)
++decide(question, options): Decision }
+ClaudeAdapter ..|> LLMClient
+ClaudeAdapter --> AnthropicApi
+AnthropicApi --> HttpTransport
+JevAdapter ..|> DecisionClient
+JevAdapter --> JevApi
+JevAdapter --> Decision
+JevApi --> HttpTransport
+Ai ..|> DecisionClient
+Ai --> LLMClient
+Ai --> DecisionClient : delegates constrained decisions
+Ai --> PromptBuilder
+Ai --> ResponseParser
+class CliApp
+class SwingGui { +submitGoal()
++showChecklist(list) }
+class AgentController { +runFeature(command, args)
++handleGoal(goal)
++startMockInterview(restart) }
+CliApp --> AgentController
+SwingGui --> AgentController
+interface UserInteraction
+interface ApprovalPrompter
+UserInteraction --|> ApprovalPrompter
+CliApp ..|> UserInteraction
+SwingGui ..|> UserInteraction
+class ApprovalGate { +review(description, userRequested): boolean }
+ApprovalGate --> ApprovalPrompter
+AgentController --> ApprovalGate
+class Planner { +chooseNext(context, actions): AgentAction }
+Planner --> DecisionClient
+AgentController --> Planner
+interface AgentAction { +name()
++describe()
++execute() }
+class FeatureCommand { -operation: Supplier<Object> }
+FeatureCommand ..|> AgentAction
+AgentController --> FeatureCommand : registers service operations
+Planner --> AgentAction : selects
+class AgentSession { +handleInput()
+~setState(state) }
+interface AgentState { +advance(session) }
+class IdleState
+class PlanningState
+class AwaitingApprovalState
+class ExecutingState
+class FinishedState
+AgentSession *-- AgentState
+IdleState ..|> AgentState
+PlanningState ..|> AgentState
+AwaitingApprovalState ..|> AgentState
+ExecutingState ..|> AgentState
+FinishedState ..|> AgentState
+AgentSession --> Planner
+AgentSession --> ApprovalGate
+AgentSession --> AgentAction
+AgentController --> AgentSession
+class AgentEventPublisher { +attach(observer)
++publish(type, message) }
+interface ProgressObserver { +onEvent(event) }
+AgentEventPublisher o-- ProgressObserver
+AgentSession --> AgentEventPublisher
+SwingGui ..> ProgressObserver : event callback
+CliApp ..> ProgressObserver : event callback
+class SqliteStore { +save(kind, id, document)
++find(kind,id)
++all(kind)
++delete(kind,id) }
+class Documents { +save(store, kind, id, record)
++read(store, kind, id, type) }
+Documents --> SqliteStore
+package "Feature services" {
+class JobDescriptionIntake
+class ResumeImporter
+class MemoryManager
+class SkillGapService
+class ResumeTailorService
+class CompanyResearchService
+class InterviewPrepService
+class MockInterviewService
+class ChecklistService
+}
+AgentController --> JobDescriptionIntake
+AgentController --> ResumeImporter
+AgentController --> MemoryManager
+AgentController --> SkillGapService
+AgentController --> ResumeTailorService
+AgentController --> CompanyResearchService
+AgentController --> InterviewPrepService
+AgentController --> MockInterviewService
+AgentController --> ChecklistService
+interface "Repository<T>" as Repository { +save(entity)
++findById(id)
++findAll()
++delete(id) }
+class SqliteJobRepository { +saveAndSelect(job)
++saveQuestions(jobId, questions)
++restartInterview(session)
++results(jobId) }
+class SqliteResumeRepository { +saveAndSelect(profile)
++save(version)
++findVersions(jobId) }
+class SqliteMemoryRepository { +findByText(text) }
+class SqliteChecklistRepository { +tick(jobId,itemId,done) }
+SqliteJobRepository ..|> Repository
+SqliteResumeRepository ..|> Repository
+SqliteMemoryRepository ..|> Repository
+SqliteChecklistRepository ..|> Repository
+SqliteJobRepository --> Documents
+SqliteResumeRepository --> Documents
+SqliteMemoryRepository --> Documents
+SqliteChecklistRepository --> Documents
+AgentController --> SqliteJobRepository
+AgentController --> SqliteResumeRepository
+AgentController --> SqliteChecklistRepository
+JobDescriptionIntake --> SqliteJobRepository
+ResumeImporter --> SqliteResumeRepository
+MemoryManager --> SqliteMemoryRepository
+SkillGapService --> SqliteJobRepository
+ResumeTailorService --> SqliteResumeRepository
+CompanyResearchService --> SqliteJobRepository
+InterviewPrepService --> SqliteJobRepository
+MockInterviewService --> SqliteJobRepository
+ChecklistService --> SqliteChecklistRepository
+ChecklistService --> SqliteJobRepository
+ChecklistService --> SqliteResumeRepository
+interface JobDescriptionSource { +label()
++needsApproval()
++fetch(context) }
+class PastedTextSource
+class AdzunaExcerptSource
+class ExpandedEstimateSource
+class FullEstimateSource
+PastedTextSource ..|> JobDescriptionSource
+AdzunaExcerptSource ..|> JobDescriptionSource
+ExpandedEstimateSource ..|> JobDescriptionSource
+FullEstimateSource ..|> JobDescriptionSource
+JobDescriptionIntake --> JobDescriptionSource
+JobDescriptionIntake --> AdzunaTool
+class ResumeParserFactory { +createParser(path): ResumeParser }
+interface ResumeParser { +extractText(path): String }
+class PdfResumeParser
+class DocxResumeParser
+class MarkdownResumeParser
+PdfResumeParser ..|> ResumeParser
+DocxResumeParser ..|> ResumeParser
+MarkdownResumeParser ..|> ResumeParser
+ResumeParserFactory ..> ResumeParser : creates
+ResumeImporter --> ResumeParserFactory
+ResumeImporter --> ResumeParser
+CompanyResearchService --> WebSearchTool
+package "Domain entities (top-level records)" {
+class JobDescription
+class ResumeProfile { +getSkills(): List<Skill> }
+class Skill { +name: String
++level: String }
+class SkillGapReport
+class SkillAssessment
+class ResumeVersion
+class ResumeChange
+class MemoryFact
+class CompanySummary
+class SearchResult
+class InterviewQuestion
+class InterviewSession
+class FeedbackReport
+class Checklist
+class ChecklistItem
+}
+ResumeProfile *-- Skill
+ResumeProfile "1" -- "*" ResumeVersion : baseResumeId
+JobDescription "1" -- "*" ResumeVersion : jobId
+ResumeVersion *-- ResumeChange
+SkillGapReport *-- SkillAssessment
+CompanySummary *-- SearchResult
+InterviewSession *-- InterviewQuestion
+Checklist *-- ChecklistItem
+MockInterviewService --> MemoryManager : saves weaknesses
+@enduml
