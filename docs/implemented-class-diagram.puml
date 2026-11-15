@@ -42,7 +42,8 @@ interface ApprovalPrompter
 UserInteraction --|> ApprovalPrompter
 CliApp ..|> UserInteraction
 SwingGui ..|> UserInteraction
-class ApprovalGate { +review(description, userRequested): boolean }
+class ApprovalGate { +review(description, userRequested): boolean
++reviewResumeChange(change): boolean }
 ApprovalGate --> ApprovalPrompter
 AgentController --> ApprovalGate
 class Planner { +chooseNext(context, actions): AgentAction }
@@ -225,4 +226,9 @@ CompanySummary *-- SearchResult
 InterviewSession *-- InterviewQuestion
 Checklist *-- ChecklistItem
 MockInterviewService --> MemoryManager : saves weaknesses
+class TailorResumeAction { +execute(): ResumeVersion }
+TailorResumeAction ..|> AgentAction
+TailorResumeAction --> ResumeTailorService
+AgentController --> TailorResumeAction
+SwingGui ..> ResumeChange : side-by-side approval
 @enduml

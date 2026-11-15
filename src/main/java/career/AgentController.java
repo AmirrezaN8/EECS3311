@@ -26,7 +26,7 @@ public final class AgentController {
     private Map<String,AgentAction> actions(){
         Map<String,AgentAction> map=new LinkedHashMap<>();
         map.put("gap",new AgentAction.FeatureCommand("gap","identify skill gaps",()->gaps.identify(currentJob(),resumes.current())));
-        map.put("tailor",new AgentAction.FeatureCommand("tailor","propose and review evidence-preserving resume edits",()->tailor.tailor(currentJob(),resumes.current())));
+        map.put("tailor",new TailorResumeAction(tailor,this::currentJob,resumes::current));
         map.put("company",new AgentAction.FeatureCommand("company","research sourced company goals and values",()->company.research(currentJob())));
         map.put("interview prep",new AgentAction.FeatureCommand("interview prep","generate five tailored interview questions",()->prep.prepare(currentJob(),resumes.current(),memory.loadFacts())));
         map.put("checklist build",new AgentAction.FeatureCommand("checklist","build prioritized preparation checklist",()->checklist.build(currentJob())));
@@ -36,6 +36,7 @@ public final class AgentController {
         command=command.strip();Map<String,AgentAction> commands=actions();
         if(commands.containsKey(command)){
             if(!args.isEmpty())throw new IllegalArgumentException("This command takes no arguments");
+            if(Set.of("gap","tailor").contains(command))ensurePreparationInputs();
             Object result=commands.get(command).execute();events.publish("completed",command);
             if(command.equals("interview prep")&&gate.review("Questions saved. Start a typed mock interview now?",false))return Map.of("questions",result,"interview",startMockInterview(false));
             if(command.equals("checklist build"))offerMissingSteps();return result;
@@ -71,14 +72,7 @@ public final class AgentController {
     public String startMockInterview(boolean restart){return interview.nextQuestion(interview.start(currentJob().id(),restart));}
     public List<String> handleGoal(String goal){
         goal=required(goal,"Goal");cancelled=false;memory.recordTurn(goal);
-        try{currentJob();}catch(IllegalStateException e){
-            if(!gate.review("No selected job. Paste a job description now?",false))throw e;
-            runFeature("job add",List.of(required(ui.readText("Job title"),"Title"),required(ui.readText("Company"),"Company"),required(ui.readText("Country (CA or US)"),"Country"),required(ui.readText("Paste job description"),"Job description")));
-        }
-        try{resumes.current();}catch(IllegalStateException e){
-            if(!gate.review("No resume saved. Paste it now?",false))throw e;
-            runFeature("resume paste",List.of(required(ui.readText("Paste resume text"),"Resume")));
-        }
+        ensurePreparationInputs();
         if(memory.loadFacts().isEmpty()){
             String fact=ui.readText("No history yet. Optionally describe a target role or weakness (blank to skip)");if(fact!=null&&!fact.isBlank())memory.recordTurn(fact);
         }
@@ -89,6 +83,16 @@ public final class AgentController {
         try{jobs.saveTrace(id(),Map.of("at",java.time.Instant.now().toString(),"jobId",job.id(),"goal",goal,"steps",trace));}
         finally{if(interrupted)Thread.currentThread().interrupt();}
         return trace;
+    }
+    private void ensurePreparationInputs(){
+        try{currentJob();}catch(IllegalStateException e){
+            if(!gate.review("No selected job. Paste a job description now?",false))throw e;
+            runFeature("job add",List.of(required(ui.readText("Job title"),"Title"),required(ui.readText("Company"),"Company"),required(ui.readText("Country (CA or US)"),"Country"),required(ui.readText("Paste job description"),"Job description")));
+        }
+        try{resumes.current();}catch(IllegalStateException e){
+            if(!gate.review("No resume saved. Paste it now?",false))throw e;
+            runFeature("resume paste",List.of(required(ui.readText("Paste resume text"),"Resume")));
+        }
     }
     private void offerMissingSteps(){
         String job=currentJob().id();Map<String,String> related=Map.of("gap","gap","company","company","questions","interview prep");

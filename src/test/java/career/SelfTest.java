@@ -38,10 +38,50 @@ public final class SelfTest {
     public static void main(String[] args)throws Exception {
         temp=Files.createTempDirectory("career-tests-");
         try{
-            json();storage();parsers();resume();job();memory();gap();tailoring();research();questions();mockInterview();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
+            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();questions();mockInterview();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
             
             System.out.println("PASS: "+checks+" assertions. All model responses were test fixtures; no live LLM claim.");
         }finally{try(var paths=Files.walk(temp)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}}
+    }
+    private static void memoryAcceptance()throws Exception {
+        SqliteStore store=db("memory-acceptance");UI ui=new UI();var events=new AgentEventPublisher();
+        List<String> notices=new ArrayList<>();events.attach(e->notices.add(e.type()));
+        AtomicInteger generations=new AtomicInteger();
+        String[] output={"{\"category\":\"skills\",\"text\":\"I know Java\"}"};
+        String[] choice={"save","compatible"};
+        Ai ai=new Ai((p,t)->{generations.incrementAndGet();check(t==ModelTier.HAIKU,"memory uses Haiku");return output[0];},(q,options)->{
+            String selected=options.contains("save")?choice[0]:choice[1];Map<String,Double> probabilities=new LinkedHashMap<>();
+            for(String option:options)probabilities.put(option,option.equals(selected)?1.0:0.0);
+            return new Decision(selected,probabilities,1);
+        });
+        MemoryManager memory=new MemoryManager(ai,store,new ApprovalGate(ui),events);
+        choice[0]="skip";memory.recordTurn("Hello");check(generations.get()==0&&memory.loadFacts().isEmpty(),"irrelevant turn skips generation");
+        choice[0]="save";memory.recordTurn("I know Java");
+        check(memory.loadFacts().size()==1&&ui.approvals==0&&notices.contains("memory-saved"),"useful turn saved without approval");
+        memory.recordTurn(" I KNOW   JAVA ");check(memory.loadFacts().size()==1,"normalized AI fact deduplicated");
+        output[0]="{\"category\":\"skills\",\"text\":\"know Java\"}";choice[1]="duplicate";
+        memory.recordTurn("I know Java");check(memory.loadFacts().size()==1&&ui.approvals==0,"equivalent wording skips save without approval");
+        String id=memory.loadFacts().getFirst().id();
+        output[0]="{\"category\":\"skills\",\"text\":\"I do not know Java\"}";choice[1]="conflict";ui.approved=false;
+        memory.recordTurn("I do not know Java");check(memory.loadFacts().size()==1&&ui.approvals==1,"conflict rejection retains history");
+        ui.approved=true;memory.recordTurn("I do not know Java");check(memory.loadFacts().size()==2&&ui.approvals==2,"approved conflict saved alongside original");
+        output[0]="{\"category\":\"skills\",\"text\":\"Expert in Rust\"}";
+        int before=generations.get();memory.recordTurn("I am learning SQL");check(generations.get()-before==2&&memory.loadFacts().size()==2&&notices.contains("memory-warning"),"unsupported fact retries once then skips");
+        output[0]="{\"category\":\"invented\",\"text\":\"SQL\"}";
+        memory.recordTurn("SQL");check(memory.loadFacts().size()==2,"invalid category rejected");
+        output[0]="not JSON";memory.recordTurn("SQL");check(memory.loadFacts().size()==2,"malformed output preserves facts");
+        before=generations.get();memory.recordTurn(" ");check(generations.get()==before,"empty turn rejected before generation");
+        memory.editFact(id,"I know Java and SQL");
+        var reopened=new MemoryManager(ai,new SqliteStore(temp.resolve("memory-acceptance.db")),new ApprovalGate(ui),events);
+        check(reopened.loadFacts().stream().anyMatch(f->f.id().equals(id)&&f.text().equals("I know Java and SQL")),"edited fact survives restart");
+        reopened.delete(id);check(reopened.loadFacts().size()==1,"fact deletion persists");
+        fails(()->reopened.editFact("unknown","SQL"),"unknown fact cannot be edited");
+        Process trigger=new ProcessBuilder("sqlite3",temp.resolve("memory-acceptance.db").toString(),
+            "CREATE TRIGGER fail_memory BEFORE INSERT ON documents WHEN NEW.kind='memory' BEGIN SELECT RAISE(ABORT,'fixture write failure'); END;").start();
+        check(trigger.waitFor()==0,"write-failure fixture installed");
+        output[0]="{\"category\":\"skills\",\"text\":\"I know SQL\"}";choice[1]="compatible";notices.clear();
+        reopened.recordTurn("I know SQL");
+        check(reopened.loadFacts().size()==1&&notices.contains("memory-warning"),"failed database save warns and preserves prior facts without aborting turn");
     }
     private static void json(){
         Object x=Map.of("text","quotes \" slash \\ emoji 🍁\n", "array",List.of(true,2,"x"));
@@ -101,11 +141,87 @@ public final class SelfTest {
         SqliteStore s=preparedDb("gap");Ai a=scripted((p,t)->p.startsWith("Extract")?"{\"skills\":[\"SQL\",\"Java\"]}":"{\"choice\":\"STRONG\",\"confidence\":0.95}");
         var report=new SkillGapService(a,s).identify(sampleJob(),profile());check(report.groupedByPriority().getFirst().group()==GapGroup.MISSING,"missing skills first");check(report.assessments().getFirst().uncertain(),"unsupported positive classification forced missing uncertain");check(report.assessments().getLast().group()==GapGroup.STRONG,"supported strength");
     }
+    private static void gapAcceptance(){
+        SqliteStore store=preparedDb("gap-acceptance");
+        Ai ai=scripted((p,t)->{
+            if(p.startsWith("Extract"))return "{\"skills\":[\"SQL\",\"Java\",\" java \" ,\"Git\"]}";
+            if(p.contains("required skill sql"))return "{\"choice\":\"MISSING\",\"confidence\":0.95}";
+            if(p.contains("required skill git"))return "{\"choice\":\"DECENT\",\"confidence\":0.6}";
+            return "{\"choice\":\"STRONG\",\"confidence\":0.95}";
+        });
+        JobDescription job=new JobDescription("job","Developer","Acme","CA","Java SQL Git",SourceLabel.USER_PASTED,"",null);
+        var profile=new ResumeProfile("base","Developed Java applications; Git",List.of(new Skill("Java","UNSPECIFIED")),List.of(),List.of(),List.of(),List.of(),"");
+        var report=new SkillGapService(ai,store).identify(job,profile);
+        check(report.assessments().size()==3,"required skill names normalized and deduplicated");
+        check(report.groupedByPriority().stream().map(SkillAssessment::group).toList().equals(List.of(GapGroup.MISSING,GapGroup.STRONG,GapGroup.DECENT)),"all three gap groups in required order");
+        String display=Display.format(Map.of("gap",report));
+        check(display.indexOf("MISSING:")<display.indexOf("STRONG:")&&display.indexOf("STRONG:")<display.indexOf("DECENT:"),"saved and direct reports display ordered groups");
+        check(display.contains("uncertain: true")&&display.contains("uncertain: false"),"uncertainty displayed explicitly");
+        check(new SqliteJobRepository(store).findSkillGap(job.id()).equals(report),"gap report persists with job link");
+        var misleading=new ResumeProfile("base","JavaScript and SQLite",List.of(),List.of(),List.of(),List.of(),List.of(),"");
+        var cautious=new SkillGapService(ai,store).identify(job,misleading);
+        check(cautious.assessments().stream().allMatch(a->a.group()==GapGroup.MISSING&&a.uncertain()),"skill substrings do not invent resume evidence");
+        Ai unsupported=fixture("{\"skills\":[\"Python\"]}");
+        fails(()->new SkillGapService(unsupported,store).identify(job,profile),"unsupported extracted skill rejected after retry");
+        check(new SqliteJobRepository(store).findSkillGap(job.id()).equals(cautious),"failed extraction preserves saved report");
+        UI decline=new UI();decline.approved=false;
+        var missing=new AgentController(db("gap-missing"),ai,noAdzuna(),new WebSearchTool(new Config(),new HttpTransport()),decline,new AgentEventPublisher());
+        fails(()->missing.runFeature("gap",List.of()),"missing job recovery may be declined");check(decline.approvals==1,"gap offers missing job intake");
+        var noResumeStore=db("gap-no-resume");new SqliteJobRepository(noResumeStore).saveAndSelect(job);
+        var noResume=new AgentController(noResumeStore,ai,noAdzuna(),new WebSearchTool(new Config(),new HttpTransport()),decline,new AgentEventPublisher());
+        fails(()->noResume.runFeature("gap",List.of()),"missing resume recovery may be declined");check(decline.approvals==2,"gap offers missing resume intake");
+        Deque<String> inputs=new ArrayDeque<>(List.of("Developer","Acme","CA","Java SQL Git","Developed Java applications; Git"));
+        AtomicInteger approvals=new AtomicInteger();
+        var accepting=new AgentController.UserInteraction(){
+            public boolean askApproval(String prompt){approvals.incrementAndGet();return true;}
+            public String readText(String prompt){return inputs.removeFirst();}
+        };
+        Ai recovery=scripted((p,t)->p.startsWith("Extract only")?"{\"skills\":[\"Java\",\"Git\"],\"education\":[],\"experience\":[],\"projects\":[],\"certifications\":[]}":p.startsWith("Extract")?"{\"skills\":[\"Java\",\"SQL\",\"Git\"]}":"{\"choice\":\"STRONG\",\"confidence\":0.9}");
+        var recovered=new AgentController(db("gap-recovery"),recovery,noAdzuna(),new WebSearchTool(new Config(),new HttpTransport()),accepting,new AgentEventPublisher());
+        check(recovered.runFeature("gap",List.of()) instanceof SkillGapReport&&approvals.get()==2&&inputs.isEmpty(),"approved job and resume recovery completes actual gap command");
+    }
     private static void tailoring(){
         check(ResumeTailorService.safeChange(profile().rawText(),"Developed Java applications","Java applications Developed"),"supported reordered edit");
         check(!ResumeTailorService.safeChange(profile().rawText(),profile().rawText(),"Developed Python applications"),"new skill rejected");check(!ResumeTailorService.safeChange("Java Java","Java","JAVA"),"ambiguous match rejected");check(!ResumeTailorService.safeChange("Built 2 apps","Built 2 apps","Built 20 apps"),"invented metric rejected");
         SqliteStore s=preparedDb("tailor");UI ui=new UI();String response="{\"changes\":[{\"original\":\"Developed Java applications\",\"revised\":\"Java applications Developed\",\"reason\":\"Emphasize Java\"}]}";
         ResumeTailorService service=new ResumeTailorService(fixture(response),s,new ApprovalGate(ui));var version=service.tailor(sampleJob(),profile());check(version.changes().getFirst().accepted()&&!version.text().equals(profile().rawText()),"accepted edit saved");check(profile().rawText().equals("Developed Java applications"),"original unchanged");ui.approved=false;check(service.tailor(sampleJob(),profile()).text().equals(profile().rawText()),"rejected edit not applied");
+    }
+    private static void tailoringAcceptance(){
+        String original="Developed Java applications";
+        check(ResumeTailorService.safeChange(original,original,"Java application development"),"genuine wording improvement accepted");
+        check(ResumeTailorService.safeChange("Tested Java applications.","Tested Java applications.","Testing of Java applications"),"bounded word forms and punctuation supported");
+        check(!ResumeTailorService.safeChange(original,original,"Expert Java application development"),"new proficiency claim rejected");
+        check(!ResumeTailorService.safeChange(original,original,"Java application development with Docker"),"new technical skill rejected");
+        check(!ResumeTailorService.safeChange("Did not test Java","Did not test Java","Did test Java"),"negation cannot be removed");
+        check(!ResumeTailorService.safeChange("Built 2 applications","Built 2 applications","Built 20 applications"),"invented quantity rejected");
+        check(!ResumeTailorService.safeChange("C++ applications","C++ applications","C# applications"),"technical punctuation preserved");
+        check(!ResumeTailorService.safeChange("---","---","..."),"punctuation alone is not a rewrite");
+        var store=preparedDb("tailor-acceptance");var repository=new SqliteResumeRepository(store);
+        var base=new ResumeProfile("tailor-base","Developed Java applications. Tested Java applications.",List.of(new Skill("Java","UNSPECIFIED")),List.of(),List.of(),List.of(),List.of(),"");repository.saveAndSelect(base);
+        List<ResumeChange> offered=new ArrayList<>();
+        ApprovalGate.ApprovalPrompter reviewer=new ApprovalGate.ApprovalPrompter(){
+            public boolean askApproval(String prompt){throw new AssertionError("Expected structured resume comparison");}
+            public boolean reviewResumeChange(ResumeChange change){offered.add(change);return offered.size()==1;}
+        };
+        String response=Json.write(Map.of("changes",List.of(
+            Map.of("original","Developed Java applications.","revised","Java application development.","reason","Lead with relevant Java experience"),
+            Map.of("original","Tested Java applications.","revised","Testing of Java applications.","reason","Emphasize testing"))));
+        Ai ai=new Ai((prompt,tier)->{check(tier==ModelTier.SONNET,"tailoring uses reasoning model");return response;},(q,o)->{throw new AssertionError("No decision required for user review");});
+        var version=new TailorResumeAction(new ResumeTailorService(ai,store,new ApprovalGate(reviewer)),SelfTest::sampleJob,()->base).execute();
+        check(offered.size()==2&&version.changes().getFirst().accepted()&&!version.changes().getLast().accepted(),"each change receives an independent review");
+        check(version.text().equals("Java application development. Tested Java applications."),"only accepted wording applied");
+        check(repository.current().equals(base),"selected base resume remains unchanged");
+        var reopened=new SqliteResumeRepository(new SqliteStore(temp.resolve("tailor-acceptance.db")));
+        check(reopened.findVersions("job").contains(version)&&version.baseResumeId().equals(base.id()),"tailored version persists with job and base links");
+        AtomicInteger attempts=new AtomicInteger();Ai overlapping=new Ai((p,t)->{attempts.incrementAndGet();return Json.write(Map.of("changes",List.of(
+            Map.of("original","Developed Java applications.","revised","Java application development.","reason","One"),
+            Map.of("original","Developed Java applications","revised","Java application development","reason","Two"))));},(q,o)->{throw new AssertionError("No decision expected");});
+        int before=offered.size();
+        fails(()->new ResumeTailorService(overlapping,store,new ApprovalGate(reviewer)).tailor(sampleJob(),base),"overlapping or ambiguous proposals rejected");
+        check(attempts.get()==2&&offered.size()==before&&reopened.findVersions("job").size()==1,"invalid proposal retries once without approval or new version");
+        UI decline=new UI();decline.approved=false;
+        var controller=new AgentController(db("tailor-missing"),ai,noAdzuna(),new WebSearchTool(new Config(),new HttpTransport()),decline,new AgentEventPublisher());
+        fails(()->controller.runFeature("tailor",List.of()),"missing tailoring inputs offer recovery");check(decline.approvals==1,"tailoring asks before collecting missing job");
     }
     private static void research(){
         SqliteStore s=preparedDb("research");AtomicInteger searches=new AtomicInteger();WebSearchTool empty=new WebSearchTool(new Config(),new HttpTransport()){public List<SearchResult> search(String q){searches.incrementAndGet();return List.of();}};

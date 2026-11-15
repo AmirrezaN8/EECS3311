@@ -31,7 +31,7 @@ Working offline functionality verified: posting entry/selection/persistence, DOC
 
 GUI: job/profile/history/preparation/interview/checklist tabs; typed inputs, readable results, approval dialogs, progress events, check boxes and percentage progress. Long work runs in SwingWorker; dialogs use the Swing event thread. CLI supports interactive and one-shot commands. Both call the same facade. Desktop GUI interaction is pending; compilation and graceful headless startup were verified.
 
-Known limits: PDF parsing requires the Maven build and remains unverified here. Legacy binary Word .doc has a POI strategy requiring packaged dependencies and valid-sample verification; scanned and locked PDFs need pasted text. Tailoring permits only reordered existing tokens; it rejects broader prose rewrites. Token preservation is not a proof of semantic equivalence, so user review remains essential. Skill matching is conservative/literal and marks uncertain evidence. Automatic deadlines recognize explicitly labeled ISO dates only. Research summarizes search snippets, not entire crawled sites. Local SQLite data is unencrypted. Videos have not been recorded. The Git weekly requirements are currently unmet.
+Known limits: PDF parsing requires the Maven build and remains unverified here. Legacy binary Word .doc has a POI strategy requiring packaged dependencies and valid-sample verification; scanned and locked PDFs need pasted text. Tailoring supports a bounded set of word-form/connective changes while preserving substantive tokens; it rejects broader prose rewrites. Token preservation is not a proof of semantic equivalence, so user review remains essential. Skill matching is conservative/literal and marks uncertain evidence. Automatic deadlines recognize explicitly labeled ISO dates only. Research summarizes search snippets, not entire crawled sites. Local SQLite data is unencrypted. Videos have not been recorded. The Git weekly requirements are currently unmet.
 
 ## 2. Feature-to-implementation mapping
 
@@ -75,10 +75,10 @@ Verification: missing-first ordering, demonstrated strength, forced uncertain cl
 
 ### F05 — Resume tailoring
 
-Reference: F05, UC05. Status: Modified: conservative extractive tailoring rather than unrestricted rewording. Type: hybrid.
-Files/classes: ResumeTailorService.java; Models.ResumeChange, ResumeVersion; ApprovalGate.java.
-Methods: tailor(), safeChange(), tokens(), review().
-Flow: profile/posting -> proposed edits with original/revised/reason -> deterministic unique-substring and token-multiset validation -> per-change user accept/reject dialog -> save a new job/base-linked version. Changed numbers/new skill tokens are rejected. Previously stored original resume is never overwritten. Each approval displays both texts together; GUI uses a scrollable comparison dialog rather than two permanent columns.
+Reference: F05, UC05. Status: Bounded wording rewrites implemented; live model and GUI verification pending. Type: hybrid.
+Files/classes: TailorResumeAction.java; ResumeTailorService.java; ResumeChange.java; ResumeVersion.java; ApprovalGate.java; SwingGui.java.
+Methods: execute(), tailor(), safeChange(), tokens(), reviewResumeChange().
+Flow: profile/posting -> proposed edits with original/revised/reason -> deterministic unique-substring, bounded word-form/token-count and overlap validation -> per-change user accept/reject dialog -> save a new job/base-linked version. Changed numbers/new skill tokens are rejected. Previously stored original resume is never overwritten. Each approval displays both texts together; GUI uses original/proposed columns within each approval dialog.
 Patterns: Command, Facade, Adapter.
 Verification: accepted/rejected edits, unsupported skill and invented-number rejection, ambiguous repeated substring rejection and original preservation. Review is still needed to catch meaning changes from reordered words. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI tailoring dialog and CLI resume versions.
 
@@ -163,13 +163,13 @@ Initial command consolidation -> restored GetJobDescriptionAction and ImportResu
 
 AgentState onInput/onApproval -> state-specific advance() -> use the same blocking approval abstraction from CLI and background GUI -> preserves five runtime stages and allows typed shared interaction callbacks. Core application work remains off the Swing event thread.
 
-Broad free-form resume rewriting -> token-preserving extractive reordering with unique original match and per-edit consent -> provide an enforceable deterministic protection against new skill names/numbers -> reduced wording flexibility; Stage 1 F05 is marked Modified rather than overstated. Human review is still needed for semantic changes.
+Broad free-form resume rewriting -> bounded word-form changes with unique original match, technical/numeric token preservation and per-edit consent -> conservative deterministic validation at the cost of reduced wording flexibility. Live rewriting remains unverified; human review is still needed for semantic changes.
 
 Word/PDF input promise -> shared parser interface with top-level DOCX/Markdown/pasted/PDF strategies and supporting DocResumeParser for binary Word -> use Apache PDFBox/POI instead of handwritten binary parsing -> offline build verifies DOCX/Markdown/paste; PDF and binary Word require Maven dependencies and remaining runtime checks. The supporting .doc class implements the original Word feature rather than adding a separate feature.
 
 Unspecified posting deadline format -> explicitly labeled valid ISO dates only -> avoid inventing or guessing deadlines -> partial deadline automation, documented manual tracking for other formats.
 
-Permanent side-by-side tailoring columns -> original/revised/reason together in approval dialog -> one shared per-change approval mechanism -> equivalent review/accept/reject flow with a layout difference.
+Side-by-side tailoring review -> original/proposed columns and reason in each GUI approval dialog -> independent accept/reject decisions, shared with CLI review through ApprovalGate.
 
 Checklist solely model-prioritized -> model ordering validated as an exact permutation, with deterministic fallback -> keep useful preparation work available without AI -> fallback never presents fabricated LLM content and preserves checked progress on rebuild.
 
@@ -242,3 +242,5 @@ Adzuna API overview: https://developer.adzuna.com/overview
 Brave Search API: https://api-dashboard.search.brave.com/app/documentation/web-search
 
 End of editable report. The PDF adds a selected-class UML view rendered directly as vector boxes/arrows. Full class, use-case and sequence diagram sources accompany the submission.
+
+November 15 F05 checkpoint: TailorResumeAction, bounded word-form rewriting, overlap rejection, shared missing-input recovery and structured side-by-side GUI review are implemented. See docs/checkpoint-5-tailoring.md for evidence and live checks. The report PDF has not yet been refreshed for these checkpoint changes.

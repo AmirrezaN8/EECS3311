@@ -66,6 +66,18 @@ public final class SwingGui implements AgentController.UserInteraction {
         };worker.execute();
     }
     public boolean askApproval(String prompt){return onEdt(()->JOptionPane.showConfirmDialog(frame,scrollMessage(prompt),"Approval required",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE)==JOptionPane.YES_OPTION,false);}
+    @Override public boolean reviewResumeChange(ResumeChange change){
+        return onEdt(()->{
+            JPanel comparison=new JPanel(new GridLayout(1,2,10,0));
+            for(String label:List.of("Original","Proposed")){
+                JPanel column=new JPanel(new BorderLayout());column.add(new JLabel(label),BorderLayout.NORTH);
+                JTextArea text=area(10);text.setColumns(30);text.setEditable(false);text.setText(label.equals("Original")?change.original():change.revised());text.setCaretPosition(0);
+                text.getAccessibleContext().setAccessibleName(label+" resume wording");column.add(new JScrollPane(text));comparison.add(column);
+            }
+            JTextArea reason=area(3);reason.setEditable(false);reason.setText("Reason: "+change.reason());
+            return JOptionPane.showConfirmDialog(frame,new Object[]{comparison,new JScrollPane(reason),"Accept this change?"},"Review resume change",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE)==JOptionPane.YES_OPTION;
+        },false);
+    }
     public String readText(String prompt){return onEdt(()->{JTextArea text=area(10);int result=JOptionPane.showConfirmDialog(frame,new Object[]{prompt,new JScrollPane(text)},"Input required",JOptionPane.OK_CANCEL_OPTION);return result==JOptionPane.OK_OPTION?text.getText():"";},"");}
     private static Object scrollMessage(String prompt){JTextArea text=area(12);text.setText(prompt);text.setEditable(false);text.setCaretPosition(0);return new JScrollPane(text);}
     private static <T> T onEdt(Callable<T> task,T fallback){

@@ -10,7 +10,7 @@ Before recording: build, configure the planned Jev/Claude APIs and required feat
 | F02 | Import DOCX/Markdown (PDF with Maven build); show raw text and structured sections; demonstrate paste alternative on unsupported input. | GUI Resume | NOT RECORDED / TBD |
 | F03 | Remember a personal career message; show deduplication; edit/delete by fact ID. | GUI My History + CLI history show | NOT RECORDED / TBD |
 | F04 | Run gap analysis and show MISSING/STRONG/DECENT ordering and uncertainty/evidence labels. | GUI Preparation | NOT RECORDED / TBD |
-| F05 | Compare original/revised/reason in approval dialog, accept one edit and reject another if offered, show saved version and preserved base. Extractive edits may need a sufficiently capable model. | GUI Preparation + CLI resume versions | NOT RECORDED / TBD |
+| F05 | Compare original/revised/reason in approval dialog, accept one edit and reject another if offered, show saved version and preserved base. Conservative wording changes use validated word forms; broader paraphrases are rejected. | GUI Preparation + CLI resume versions | NOT RECORDED / TBD |
 | F06 | Run live research; show source URLs and summary; demonstrate missing-key/no-result failure clearly. A failed request alone is not evidence of live research working. | GUI Preparation | NOT RECORDED / TBD |
 | F07 | Generate exactly five personalized questions; decline/accept the separate mock-interview offer. | GUI Preparation | NOT RECORDED / TBD |
 | F08 | Answer one question; show at most one follow-up. Stop without feedback, continue saved answers, finish and show final report and saved weaknesses. | GUI Mock Interview + CLI interview commands | NOT RECORDED / TBD |
@@ -32,3 +32,9 @@ Use CLI plus GUI across the segments. No URLs/timestamps have been recorded yet;
 ## Current recording reminder
 
 The user has confirmed pasted F01 intake, real Markdown/DOCX F02 extraction (empty warnings) and basic GUI operation. Record these verified paths now if the interface is stable enough; use the fictional sample files and demo database. Label the segments F01 and F02, show invocation/input/results, and demonstrate one real error/alternative path. Do not present Adzuna lookup, estimates, PDF or binary Word as successful until separately exercised. Add later footage for those paths; rerecord if material GUI changes make the recording inaccurate. No recordings have been provided yet.
+
+F03 live verification and recording steps: [checkpoint-4-memory.md](checkpoint-4-memory.md). Offline checks pass; real Jev/Claude and GUI walkthrough remain pending.
+
+F04 live verification and recording steps: [checkpoint-5-gap.md](checkpoint-5-gap.md). Offline checks pass; real-provider and GUI walkthrough pending.
+
+F05 live verification and recording steps: [checkpoint-5-tailoring.md](checkpoint-5-tailoring.md). Real-provider and GUI review checks remain pending.

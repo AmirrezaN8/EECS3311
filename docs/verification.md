@@ -59,3 +59,19 @@ Original file SHA-256 checksums:
 - uml.uxf: `1e2c6417ac77a738dbf9b3166bfb1b8bb7c861ec96c6f39a4c26ad832c1e0ee4`
 
 Only basic Stage 2 verification is claimed. This is not a claim of Stage 3 acceptance, exhaustive security testing, or assessed model quality.
+
+## F03 memory checkpoint — November 14, 2026
+
+`sh scripts/build.sh` passes 350 offline assertions after memory validation/outcome events and focused acceptance checks, including a SQLite trigger that rejects writes while existing facts remain readable. `git diff --check` passes. See [checkpoint-4-memory.md](checkpoint-4-memory.md) for scope, limits and the pending real-provider/GUI walkthrough. PDFBox and valid legacy Word integration checks remain explicitly skipped in this dependency-free build. No F03 live or video success is claimed.
+
+## F03 live follow-up and F04 — November 15, 2026
+
+User-provided F03 output confirms conflict rejection, exact duplicate skipping, approved deletion, editing and retrieval across CLI processes. GUI target-role extraction initially skipped a useful aspiration; after clarifying the Jev prompt and restarting the GUI, the user supplied memory-saved and history output with category target roles. Semantic duplicate and accepted-conflict branches remain unverified live. No video URL supplied.
+
+F04 now offers missing-input recovery, displays ordered groups and explicit uncertainty for direct/saved output, and rejects substring-only skill evidence. `sh scripts/build.sh` passes 365 offline assertions, including normalization/deduplication, all three groups, nested saved-report presentation, uncertainty, linked persistence, unsupported extraction preserving prior reports, misleading substrings and accepted/declined input recovery. `git diff --check` passes. See checkpoint-5-gap.md for live steps and evidence limits. Real F04 providers/desktop remain unverified; PDF/legacy Word dependency skips remain.
+
+## F04 live result and F05 checkpoint — November 15, 2026
+
+User-provided F04 output confirms successful real sample import, required-skill analysis with Docker MISSING, Java/JUnit STRONG, SQL/Git DECENT, explicit uncertainty, and saved results with the original timestamp. The user confirmed the saved-result output came from GUI. Live missing-input recovery is not yet evidenced.
+
+F05 now supports bounded word-form rewriting, the named TailorResumeAction, structured per-change CLI/GUI approval, overlap rejection and missing-input recovery. `sh scripts/build.sh` passes 382 offline assertions, including supported prose changes, invented proficiency/skills/numbers, negation/technical punctuation, separate accept/reject, base preservation, linked restart persistence, overlapping-proposal retry with no approval/new version and missing-input consent. `git diff --check` passes. See checkpoint-5-tailoring.md. Live Claude rewriting and desktop comparison remain pending. The PDF report is not refreshed yet.
