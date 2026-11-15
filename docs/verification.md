@@ -79,3 +79,9 @@ F05 now supports bounded word-form rewriting, the named TailorResumeAction, stru
 ## F06 company research — November 15, 2026
 
 `sh scripts/build.sh` passes 404 offline assertions after restoring CompanyResearchAction and adding source-citation validation and query/URL boundary checks. Acceptance covers relevant filtering, bounded reformulation, supplied-only source context, missing/invented citations and retry, all-irrelevant results, HTTP request fixtures, unsafe URLs, missing keys, outages, restart persistence and preservation of previous results. `git diff --check` passes. Real-provider and desktop checks remain pending; see checkpoint-6-company.md. The existing F03–F05 commit is cfe23e8; no new commit/push made here.
+
+## F06 live evidence and F07 checkpoint — November 15, 2026
+
+User-provided F06 Terminal output confirms missing-key handling followed by successful Microsoft research with cited goals and values explicitly not stated. Saved-result/GUI research evidence and video URLs have not been supplied. F06 is committed as 8ca6813.
+
+F07 now uses InterviewPrepAction and passes full job/profile/company/history context to both reasoning and generation stages. `sh scripts/build.sh` passes 423 offline assertions. New checks verify model tiers/order, context, linked unanswered questions, restart persistence, invalid JSON/count/duplicate/empty/non-string retry without overwriting prior results, valid retry recovery, and independent mock-interview consent (decline retains questions without a session; acceptance starts one). `git diff --check` passes. Live F07 generation/personalization, GUI and consent checks remain pending. See checkpoint-6-questions.md. PDF report regeneration remains deferred until the submission refresh.

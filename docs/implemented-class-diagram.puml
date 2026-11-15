@@ -235,4 +235,8 @@ class CompanyResearchAction { +execute(): CompanySummary }
 CompanyResearchAction ..|> AgentAction
 CompanyResearchAction --> CompanyResearchService
 AgentController --> CompanyResearchAction
+class InterviewPrepAction { +execute(): List<InterviewQuestion> }
+InterviewPrepAction ..|> AgentAction
+InterviewPrepAction --> InterviewPrepService
+AgentController --> InterviewPrepAction
 @enduml

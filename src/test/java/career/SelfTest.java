@@ -38,7 +38,7 @@ public final class SelfTest {
     public static void main(String[] args)throws Exception {
         temp=Files.createTempDirectory("career-tests-");
         try{
-            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();researchAcceptance();questions();mockInterview();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
+            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();researchAcceptance();questions();questionAcceptance();mockInterview();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
             
             System.out.println("PASS: "+checks+" assertions. All model responses were test fixtures; no live LLM claim.");
         }finally{try(var paths=Files.walk(temp)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}}
@@ -281,6 +281,36 @@ public final class SelfTest {
     private static void questions(){
         SqliteStore s=preparedDb("questions");Ai a=scripted((p,t)->p.startsWith("Create tailored")?"{\"text\":\"Ask relevant questions\"}":questionJson());var q=new InterviewPrepService(a,s).prepare(sampleJob(),profile(),List.of());check(q.size()==5&&s.find("questions","job")!=null,"five questions saved");
         fails(()->new InterviewPrepService(fixture("{\"text\":\"prompt\",\"questions\":[\"only one\"]}"),s).prepare(sampleJob(),profile(),List.of()),"invalid question count rejected");
+    }
+    private static void questionAcceptance(){
+        var store=preparedDb("question-acceptance");var jobs=new SqliteJobRepository(store);jobs.select("job");new SqliteResumeRepository(store).saveAndSelect(profile());
+        var company=new CompanySummary("job","Public company goals","Collaboration",List.of(new SearchResult("Company","https://example.com/values","Collaboration")));jobs.save(company);
+        var memory=new MemoryFact("history-fact","weaknesses","Behavioral interview practice",java.time.Instant.now());new SqliteMemoryRepository(store).save(memory);
+        List<ModelTier> tiers=new ArrayList<>();List<String> prompts=new ArrayList<>();
+        Ai ai=new Ai((prompt,tier)->{tiers.add(tier);prompts.add(prompt);return tier==ModelTier.SONNET?"{\"text\":\"Ask about Java evidence and behavioral examples\"}":questionJson();},(q,o)->{throw new AssertionError("Question generation does not use a Jev decision");});
+        var prepared=new InterviewPrepAction(new InterviewPrepService(ai,store),SelfTest::sampleJob,SelfTest::profile,()->List.of(memory)).execute();
+        check(tiers.equals(List.of(ModelTier.SONNET,ModelTier.HAIKU)),"reasoning instructions precede Haiku questions");
+        check(prompts.stream().allMatch(p->p.contains("Public company goals")&&p.contains("Behavioral interview practice")&&p.contains("Developed Java applications")&&p.contains("Java SQL")),"both model calls receive profile/job/company/history evidence");
+        check(prompts.getLast().contains("Ask about Java evidence and behavioral examples"),"reasoning instructions passed to question generation");
+        check(prepared.size()==5&&prepared.stream().allMatch(q->q.jobId().equals("job")&&q.answer().isEmpty())&&prepared.stream().map(InterviewQuestion::id).distinct().count()==5,"five uniquely identified unanswered questions linked to job");
+        var restarted=new SqliteJobRepository(new SqliteStore(temp.resolve("question-acceptance.db")));
+        check(restarted.findQuestions("job").questions().equals(prepared),"prepared questions survive restart");
+        for(String invalid:List.of("not JSON",Json.write(Map.of("questions",List.of("One?"))),Json.write(Map.of("questions",List.of("One?"," one? ","Three?","Four?","Five?"))),Json.write(Map.of("questions",List.of("One?","Two?","Three?","Four?"," "))),Json.write(Map.of("questions",List.of("One?","Two?","Three?","Four?",7))))){
+            AtomicInteger attempts=new AtomicInteger();
+            Ai malformed=new Ai((p,t)->{if(t==ModelTier.SONNET)return "{\"text\":\"Ask five questions\"}";attempts.incrementAndGet();return invalid;},(q,o)->{throw new AssertionError("Unexpected decision");});
+            fails(()->new InterviewPrepService(malformed,store).prepare(sampleJob(),profile(),List.of(memory)),"invalid question format rejected");
+            check(attempts.get()==2&&restarted.findQuestions("job").questions().equals(prepared),"invalid generation retries once without overwriting saved set");
+        }
+        AtomicInteger attempts=new AtomicInteger();
+        Ai retry=new Ai((p,t)->t==ModelTier.SONNET?"{\"text\":\"Ask five questions\"}":attempts.incrementAndGet()==1?"{\"questions\":[\"Only one?\"]}":questionJson(),(q,o)->{throw new AssertionError("Unexpected decision");});
+        check(new InterviewPrepService(retry,store).prepare(sampleJob(),profile(),List.of()).size()==5&&attempts.get()==2,"valid retry saves recovered question set");
+        UI ui=new UI();ui.approved=false;
+        var facade=new AgentController(store,ai,noAdzuna(),new WebSearchTool("",new HttpTransport()),ui,new AgentEventPublisher());
+        Object result=facade.runFeature("interview prep",List.of());
+        check(result instanceof List<?> list&&list.size()==5&&ui.approvals==1&&jobs.findInterview("job")==null,"declined interview offer retains questions without starting session");
+        check(jobs.findQuestions("job").questions().equals(result),"declined interview offer does not delete saved questions");
+        ui.approved=true;Object started=facade.runFeature("interview prep",List.of());
+        check(started instanceof Map<?,?>&&jobs.findInterview("job")!=null&&ui.approvals==2,"accepted separate offer starts saved-question interview");
     }
     private static List<InterviewQuestion> questionList(){return List.of(new InterviewQuestion("q1","job","Explain Java?",""),new InterviewQuestion("q2","job","Project?",""));}
     private static void mockInterview(){

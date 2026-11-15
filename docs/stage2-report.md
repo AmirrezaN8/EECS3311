@@ -94,11 +94,11 @@ Verification: 404 total offline assertions; F06 checks include bounded empty/irr
 ### F07 — Interview question preparation
 
 Reference: F07, UC07. Status: Implemented. Type: AI-based.
-Files/classes: InterviewPrepService.java and QuestionSet; Models.InterviewQuestion; AgentController.java.
-Methods: prepare(); facade interview prep and startMockInterview().
-Flow: job/profile/company/history -> reasoning-tier generation instructions -> fast-tier exactly five distinct questions -> validation/retry -> persistence -> separate approval to start an interview. A rejected interview offer leaves the questions saved.
+Files/classes: InterviewPrepAction.java; InterviewPrepService.java; InterviewQuestionSet.java; InterviewQuestion.java; AgentController.java.
+Methods: execute(), prepare(); facade interview prep and startMockInterview().
+Flow: full job/profile/company/history evidence to both model stages -> reasoning-tier generation instructions -> fast-tier exactly five distinct questions -> validation/retry -> persistence -> separate approval to start an interview. A rejected interview offer leaves the questions saved.
 Patterns: Command, Adapter, Facade.
-Verification: five unique questions accepted/saved; invalid counts rejected; integrated interview flow tested with fixtures. Personalization quality requires a live model check. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Preparation.
+Verification: five uniquely identified unanswered questions linked to the job, complete context and tier ordering, malformed/count/duplicate/empty/non-string retry and prior-set preservation, valid retry recovery, restart retrieval, and separate interview consent tested with fixtures. Personalization quality requires a live model check. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Preparation.
 
 ### F08 — Mock interview with feedback
 

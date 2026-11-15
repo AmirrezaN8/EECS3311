@@ -40,3 +40,5 @@ F04 live verification and recording steps: [checkpoint-5-gap.md](checkpoint-5-ga
 F05 live verification and recording steps: [checkpoint-5-tailoring.md](checkpoint-5-tailoring.md). Real-provider and GUI review checks remain pending.
 
 F06 live verification and recording steps: [checkpoint-6-company.md](checkpoint-6-company.md). Use a real company with an explicitly labeled demo posting. Offline checks pass; live Brave/Jev/Claude and GUI checks remain pending.
+
+F07 live verification and recording steps: [checkpoint-6-questions.md](checkpoint-6-questions.md). Both model stages receive full evidence; live personalization, GUI and separate consent checks remain pending.
