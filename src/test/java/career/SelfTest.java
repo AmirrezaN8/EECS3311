@@ -38,7 +38,7 @@ public final class SelfTest {
     public static void main(String[] args)throws Exception {
         temp=Files.createTempDirectory("career-tests-");
         try{
-            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();researchAcceptance();questions();questionAcceptance();mockInterview();mockAcceptance();checklist();checklistAcceptance();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
+            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();researchAcceptance();questions();questionAcceptance();mockInterview();mockAcceptance();checklist();checklistAcceptance();workflow();workflowAcceptance();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
             
             System.out.println("PASS: "+checks+" assertions. All model responses were test fixtures; no live LLM claim.");
         }finally{try(var paths=Files.walk(temp)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}}
@@ -413,6 +413,61 @@ public final class SelfTest {
         ui.approved=true;new AgentSession(planner,new ApprovalGate(ui),events,actions,"goal",()->true).handleInput();check(executed.get()==0,"stop prevents execution");
         AtomicInteger n=new AtomicInteger();List<AgentAction> many=new ArrayList<>();for(int i=0;i<20;i++)many.add(new AgentAction.FeatureCommand("step"+i,"step",()->n.incrementAndGet()));new AgentSession(planner,new ApprovalGate(ui),events,many,"goal",()->false).handleInput();check(n.get()==10,"hard workflow step cap");
     }
+    private static Decision decision(String choice,List<String> options){
+        return new Decision(choice,options.stream().collect(java.util.stream.Collectors.toMap(o->o,o->o.equals(choice)?1.0:0.0)),1);
+    }
+    private static void workflowAcceptance(){
+        AtomicInteger executed=new AtomicInteger();UI ui=new UI();var events=new AgentEventPublisher();
+        var gap=new AgentAction.FeatureCommand("gap","identify skill gaps",()->{executed.incrementAndGet();return "gap";});
+        var company=new AgentAction.FeatureCommand("company","research company",()->{executed.incrementAndGet();return "company";});
+        var checklist=new AgentAction.FeatureCommand("checklist","build checklist",()->{executed.incrementAndGet();return "checklist";});
+        Planner done=new Planner((q,o)->{check(o.contains("done"),"done is a real planner option");return decision("done",o);});
+        var completed=new AgentSession(done,new ApprovalGate(ui),events,List.of(gap),"goal",()->false).handleInput();
+        check(executed.get()==0&&ui.approvals==0&&completed.contains("finished: Planner chose done"),"done ends without approval or execution");
+        Planner early=new Planner((q,o)->{check(o.contains("gap")&&o.contains("checklist"),"checklist eligible alongside other steps");return decision("checklist",o);});
+        var earlyTrace=new AgentSession(early,new ApprovalGate(ui),events,List.of(gap,checklist),"goal",()->false).handleInput();
+        check(executed.get()==1&&earlyTrace.contains("finished: Checklist produced")&&!earlyTrace.contains("completed: gap"),"successful checklist ends without forcing other work");
+        Planner first=new Planner((q,o)->decision(o.getFirst(),o));ui.approved=false;int before=executed.get();int approvals=ui.approvals;
+        var selective=new AgentSession(first,new ApprovalGate(ui),events,List.of(gap,company),()->"explicit gap",()->false,a->a.name().equals("gap"));
+        fails(()->selective.handleApproval(true),"approval rejected outside awaiting state");
+        var selectiveTrace=selective.handleInput();
+        check(executed.get()==before+1&&ui.approvals==approvals+1&&selectiveTrace.contains("requested: gap")&&selectiveTrace.contains("declined: company"),"explicit work runs directly while unrequested work requires approval");
+        before=executed.get();var uncertain=new AgentSession(first,new ApprovalGate(ui),events,List.of(gap),()->"goal",()->false,a->{throw new IllegalStateException("fixture request classification failure");});
+        check(uncertain.handleInput().stream().anyMatch(t->t.startsWith("approval-warning:"))&&executed.get()==before,"classification failure falls back to approval rather than execution");
+        boolean[] stopped={false};before=executed.get();
+        var stopping=new AgentSession(first,new ApprovalGate(prompt->{stopped[0]=true;return true;}),events,List.of(gap),"goal",()->stopped[0]);
+        check(stopping.handleInput().contains("finished: Stopped by user")&&executed.get()==before,"stop during approval prevents approved work from executing");
+        ui.approved=true;before=executed.get();
+        var brokenChecklist=new AgentAction.FeatureCommand("checklist","broken checklist",()->{throw new IllegalStateException("fixture failure");});
+        var failedTrace=new AgentSession(first,new ApprovalGate(ui),events,List.of(brokenChecklist,gap),"goal",()->false).handleInput();
+        check(failedTrace.stream().anyMatch(t->t.startsWith("step-error: checklist"))&&executed.get()==before+1,"failed checklist is explained and remaining work can continue");
+        var plannerFailure=new AgentSession(new Planner((q,o)->{throw new IllegalStateException("fixture outage");}),new ApprovalGate(ui),events,List.of(gap),"goal",()->false).handleInput();
+        check(plannerFailure.contains("finished: Planner failed; remaining work skipped"),"planner failure has explicit terminal outcome");
+        List<String> classificationQuestions=new ArrayList<>();Planner classification=new Planner((q,o)->{classificationQuestions.add(q);return decision(q.contains("Goal: Identify my skill gaps")?"requested":"proposed",o);});
+        check(classification.directlyRequested("Identify my skill gaps",gap)&&!classification.directlyRequested("Prepare me for this job",gap),"specific and generic goals use separate request decisions");
+        // Full controller starts with no preloaded inputs: intake/import are chosen within the same plan.
+        var store=db("workflow-inputs");Deque<String> inputs=new ArrayDeque<>(List.of("Developer","Acme","CA","Java SQL","Developed Java applications"));
+        var inputUi=new AgentController.UserInteraction(){public boolean askApproval(String prompt){throw new AssertionError("Explicitly requested steps need no step approval");}public String readText(String prompt){return inputs.removeFirst();}};
+        Deque<String> plan=new ArrayDeque<>(List.of("get description","import resume","gap","checklist"));List<List<String>> optionsSeen=new ArrayList<>();
+        Ai ai=new Ai((p,t)->p.startsWith("Extract only")?"{\"skills\":[\"Java\"],\"education\":[],\"experience\":[],\"projects\":[],\"certifications\":[]}":p.startsWith("Extract required")?"{\"skills\":[\"Java\",\"SQL\"]}":"bad",(q,o)->{
+            if(o.contains("skip"))return decision("skip",o);
+            if(o.contains("requested"))return decision("requested",o);
+            if(o.contains("STRONG"))return decision("STRONG",o);
+            optionsSeen.add(List.copyOf(o));return decision(plan.removeFirst(),o);
+        });
+        var controller=new AgentController(store,ai,noAdzuna(),new WebSearchTool("",new HttpTransport()),inputUi,new AgentEventPublisher());
+        var trace=controller.handleGoal("Get the job description, import my resume, identify skill gaps and build a checklist");
+        check(new HashSet<>(optionsSeen.getFirst()).equals(Set.of("get description","import resume","gap","tailor","company","interview prep","checklist","done")),"all seven planned actions plus done reach the provider");
+        check(inputs.isEmpty()&&trace.contains("completed: get description")&&trace.contains("completed: import resume")&&trace.contains("completed: gap")&&trace.contains("completed: checklist"),"empty-database goal executes selected intake import and dependent actions");
+        check(store.all("trace").size()==1&&new SqliteJobRepository(store).findSkillGap(controller.currentJob().id())!=null,"workflow saves linked results and trace");
+        var noJobStore=db("workflow-done-empty");
+        Ai noWork=new Ai((p,t)->{throw new AssertionError("No generation expected");},(q,o)->decision(o.contains("skip")?"skip":"done",o));
+        var noJob=new AgentController(noJobStore,noWork,noAdzuna(),new WebSearchTool("",new HttpTransport()),inputUi,new AgentEventPublisher());
+        check(noJob.handleGoal("No more preparation needed").contains("finished: Planner chose done")&&noJobStore.all("trace").size()==1&&noJobStore.all("trace").getFirst().get("jobId").equals(""),"done without a selected job saves an unlinked session trace without prompting inputs");
+        List<AgentAction> bounded=new ArrayList<>();for(int i=0;i<12;i++)bounded.add(new AgentAction.FeatureCommand("step"+i,"step",()->"ok"));
+        var capped=new AgentSession(first,new ApprovalGate(ui),events,bounded,"goal",()->false).handleInput();
+        check(capped.contains("finished: Step limit reached (10)")&&capped.stream().filter(t->t.startsWith("completed:")).count()==10,"cap terminates with an explicit reason");
+    }
     private static void facade(){
         SqliteStore s=db("facade");UI ui=new UI();ui.approved=false;
         Ai ai=scripted((p,t)->{
@@ -433,7 +488,7 @@ public final class SelfTest {
             if(p.startsWith("Choose one")){
                 int begin=p.indexOf("Options: ")+9,end=p.indexOf("\nINPUT DATA");
                 @SuppressWarnings("unchecked") List<String> options=(List<String>)(List<?>)Json.parse(p.substring(begin,end));
-                String choice=options.contains("skip")?"skip":options.contains("next")?"next":options.contains("STRONG")?"STRONG":options.getFirst();
+                String choice=options.contains("skip")?"skip":options.contains("proposed")?"proposed":options.contains("next")?"next":options.contains("STRONG")?"STRONG":options.stream().filter(o->!Set.of("get description","import resume").contains(o)).findFirst().orElse("done");
                 return Json.write(Map.of("choice",choice,"confidence",0.9));
             }
             if(p.startsWith("Extract only"))return "{\"skills\":[\"Java\"],\"education\":[],\"experience\":[],\"projects\":[],\"certifications\":[]}";

@@ -54,7 +54,7 @@ public final class SqliteJobRepository implements Repository<JobDescription> {
     }}
     public void save(FeedbackReport report){synchronized(store){require(report.jobId());var session=findInterview(report.jobId());if(session==null||session.answers().isEmpty()||report.perAnswerFeedback().size()!=session.answers().size())throw new IllegalArgumentException("Feedback must match a saved answered interview");Documents.save(store,"feedback",report.jobId(),report);}}
     public FeedbackReport findFeedback(String jobId){return Documents.read(store,"feedback",jobId,FeedbackReport.class);}
-    public void saveTrace(String traceId,Map<String,Object> trace){synchronized(store){require(Json.text(trace,"jobId"));store.save("trace",required(traceId,"Trace ID"),trace);}}
+    public void saveTrace(String traceId,Map<String,Object> trace){synchronized(store){if(!(trace.get("jobId") instanceof String jobId))throw new IllegalArgumentException("Trace job ID must be text");if(!jobId.isBlank())require(jobId);store.save("trace",required(traceId,"Trace ID"),trace);}}
     public boolean hasResult(String jobId,String kind){if(!RESULT_KINDS.contains(kind))throw new IllegalArgumentException("Unknown result kind");return store.find(kind,jobId)!=null;}
     public Map<String,Object> results(String jobId){require(jobId);Map<String,Object> out=new LinkedHashMap<>();
         Object[] values={findSkillGap(jobId),findCompany(jobId),findQuestions(jobId),findInterview(jobId),findFeedback(jobId),Documents.read(store,"checklist",jobId,Checklist.class)};

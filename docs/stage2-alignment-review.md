@@ -4,6 +4,10 @@ Reviewed November 14, 2026 against all five pages of `/Users/amir/Downloads/Proj
 
 The user's controlling instruction is now strict fidelity to the approved Stage 1 plan. Treat architectural substitutions as defects to correct, rather than relying on the professor's general permission to document changes.
 
+## November 15 current implementation update
+
+The earlier tables below are historical audit findings. F03–F09 corrections and evidence are recorded in verification.md and their checkpoint notes. F10 now uses all seven named commands plus done, lazy planned intake/import, model-based requested/proposed classification, state-owned onInput/onApproval handling, ActionResult, unrestricted checklist eligibility and explicit finished outcomes. Traces persist even before selecting a job. Build passes 480 offline assertions; see checkpoint-9-agent.md. Actual Jev goal planning, GUI stop and remaining alternative branches still need live evidence. Source-format packaging, videos/links, final report/PDF refresh and final remote checks remain outstanding. No full submission-readiness claim is made.
+
 ## Checkpoint 3 update
 
 F01/F02 now use GetJobDescriptionAction/ImportResumeAction and named top-level source/parser strategies. ToolManager/Tool/ToolResult are in actual Adzuna and web-search routes. Resume sections have source-evidence validation and the pasted parser implements the same contract as file parsers. Binary Word has a POI-backed strategy rather than a silent omission. 301 offline assertions pass; PDF/Word runtime and live feature/desktop checks remain pending. Later commands, full State/F10, F05 and remaining UI/feature gaps are still open. See checkpoint-3-inputs.md.

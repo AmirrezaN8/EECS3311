@@ -46,7 +46,8 @@ class ApprovalGate { +review(description, userRequested): boolean
 +reviewResumeChange(change): boolean }
 ApprovalGate --> ApprovalPrompter
 AgentController --> ApprovalGate
-class Planner { +chooseNext(context, actions): AgentAction }
+class Planner { +chooseNext(context, actions): AgentAction
++directlyRequested(goal, action): boolean }
 Planner --> DecisionClient
 AgentController --> Planner
 interface AgentAction { +name()
@@ -62,11 +63,13 @@ AgentController --> GetJobDescriptionAction
 AgentController --> ImportResumeAction
 class FeatureCommand { -operation: Supplier<Object> }
 FeatureCommand ..|> AgentAction
-AgentController --> FeatureCommand : registers service operations
+note right of FeatureCommand : Compatibility/test command; production uses named actions
 Planner --> AgentAction : selects
 class AgentSession { +handleInput()
++handleApproval(approved)
 ~setState(state) }
-interface AgentState { +advance(session) }
+interface AgentState { +onInput(session)
++onApproval(session, approved) }
 class IdleState
 class PlanningState
 class AwaitingApprovalState
@@ -243,4 +246,11 @@ class ChecklistAction { +execute(): Checklist }
 ChecklistAction ..|> AgentAction
 ChecklistAction --> ChecklistService
 AgentController --> ChecklistAction
+class SkillGapAction { +execute(): SkillGapReport }
+SkillGapAction ..|> AgentAction
+SkillGapAction --> SkillGapService
+AgentController --> SkillGapAction
+class ActionResult { +success: boolean
++message: String }
+ExecutingState --> ActionResult : execution outcome
 @enduml

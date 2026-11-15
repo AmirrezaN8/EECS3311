@@ -25,7 +25,7 @@ public final class AgentController {
     public void stop(){cancelled=true;events.publish("stop","Stop requested; completed work remains saved");}
     private Map<String,AgentAction> actions(){
         Map<String,AgentAction> map=new LinkedHashMap<>();
-        map.put("gap",new AgentAction.FeatureCommand("gap","identify skill gaps",()->gaps.identify(currentJob(),resumes.current())));
+        map.put("gap",new SkillGapAction(gaps,this::currentJob,resumes::current));
         map.put("tailor",new TailorResumeAction(tailor,this::currentJob,resumes::current));
         map.put("company",new CompanyResearchAction(company,this::currentJob));
         map.put("interview prep",new InterviewPrepAction(prep,this::currentJob,resumes::current,memory::loadFacts));
@@ -75,17 +75,31 @@ public final class AgentController {
     public String startMockInterview(boolean restart){return interview.nextQuestion(interview.start(currentJob().id(),restart));}
     public List<String> handleGoal(String goal){
         goal=required(goal,"Goal");cancelled=false;memory.recordTurn(goal);
-        ensurePreparationInputs();
-        if(memory.loadFacts().isEmpty()){
-            String fact=ui.readText("No history yet. Optionally describe a target role or weakness (blank to skip)");if(fact!=null&&!fact.isBlank())memory.recordTurn(fact);
-        }
-        JobDescription job=currentJob();List<AgentAction> planned=new ArrayList<>(actions().values());
-        String requestedGoal=goal;
-        AgentSession session=new AgentSession(new Planner(ai),gate,events,planned,()->"Goal: "+requestedGoal+" Job: "+Json.write(Documents.encode(job))+" Resume: "+Json.write(Documents.encode(resumes.current()))+" Memory: "+Json.write(Documents.encode(memory.loadFacts()))+" Saved preparation results: "+Json.write(Documents.encode(runFeature("results",List.of()))),()->cancelled);
+        String requestedGoal=goal;Planner planner=new Planner(ai);
+        List<AgentAction> planned=new ArrayList<>();
+        planned.add(new GetJobDescriptionAction(intake,()->{
+            String title=required(ui.readText("Job title"),"Title"),company=required(ui.readText("Company"),"Company"),country=required(ui.readText("Country (CA or US)"),"Country");
+            String text=required(ui.readText("Paste job description (or type LOOKUP to search Adzuna)"),"Job description or LOOKUP");
+            return new JobDescriptionRequest(title,company,country,text.equals("LOOKUP")?"":readInput(text),"");
+        }));
+        planned.add(new ImportResumeAction(resumes,()->readInput(required(ui.readText("Paste resume text (or @path to a UTF-8 text file)"),"Resume"))));
+        planned.addAll(actions().values());
+        AgentSession session=new AgentSession(planner,gate,events,planned,()->planningContext(requestedGoal),()->cancelled,action->planner.directlyRequested(requestedGoal,action));
         List<String> trace=session.handleInput();boolean interrupted=Thread.interrupted();
-        try{jobs.saveTrace(id(),Map.of("at",java.time.Instant.now().toString(),"jobId",job.id(),"goal",goal,"steps",trace));}
-        finally{if(interrupted)Thread.currentThread().interrupt();}
+        try{
+            JobDescription job=selectedJob();jobs.saveTrace(id(),Map.of("at",java.time.Instant.now().toString(),"jobId",job==null?"":job.id(),"goal",goal,"steps",trace));
+        }finally{if(interrupted)Thread.currentThread().interrupt();}
         return trace;
+    }
+    private String planningContext(String goal){
+        JobDescription job=selectedJob();ResumeProfile profile=selectedResume();
+        return "Goal: "+goal+" Job: "+Json.write(Documents.encode(job))+" Resume: "+Json.write(Documents.encode(profile))+" Memory: "+Json.write(Documents.encode(memory.loadFacts()))+" Saved preparation results: "+Json.write(Documents.encode(job==null?Map.of():jobs.results(job.id())));
+    }
+    private JobDescription selectedJob(){
+        try{return currentJob();}catch(IllegalStateException e){if(!e.getMessage().equals("Add or find a job first"))throw e;return null;}
+    }
+    private ResumeProfile selectedResume(){
+        try{return resumes.current();}catch(IllegalStateException e){if(!e.getMessage().equals("Import or paste a resume first"))throw e;return null;}
     }
     private void ensurePreparationInputs(){
         try{currentJob();}catch(IllegalStateException e){
