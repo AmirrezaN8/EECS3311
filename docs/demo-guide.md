@@ -44,3 +44,5 @@ F06 live verification and recording steps: [checkpoint-6-company.md](checkpoint-
 F07 live verification and recording steps: [checkpoint-6-questions.md](checkpoint-6-questions.md). Both model stages receive full evidence; live personalization, GUI and separate consent checks remain pending.
 
 F08 live verification and recording steps: [checkpoint-7-interview.md](checkpoint-7-interview.md). Final feedback now appears automatically after completion; weakness-save failure warns without hiding the report. Real-model and GUI checks remain pending.
+
+F09 live verification and recording steps: [checkpoint-8-checklist.md](checkpoint-8-checklist.md). Use F04 sample data, decline optional missing work for the partial path, and show GUI tick/untick/restart/rebuild. Live checks remain pending.

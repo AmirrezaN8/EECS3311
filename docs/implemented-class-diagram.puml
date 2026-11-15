@@ -239,4 +239,8 @@ class InterviewPrepAction { +execute(): List<InterviewQuestion> }
 InterviewPrepAction ..|> AgentAction
 InterviewPrepAction --> InterviewPrepService
 AgentController --> InterviewPrepAction
+class ChecklistAction { +execute(): Checklist }
+ChecklistAction ..|> AgentAction
+ChecklistAction --> ChecklistService
+AgentController --> ChecklistAction
 @enduml

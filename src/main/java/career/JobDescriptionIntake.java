@@ -43,5 +43,17 @@ public final class JobDescriptionIntake {
     private boolean approve(JobDescriptionSource source,String explanation){return !source.needsApproval()||gate.review(explanation,false);}
     private JobDescription save(JobDescription job){repository.saveAndSelect(job);return job;}
     static String country(String c){c=required(c,"Country").toUpperCase(Locale.ROOT);if(c.equals("CANADA"))c="CA";if(c.equals("USA"))c="US";if(!Set.of("CA","US").contains(c))throw new IllegalArgumentException("Country must be CA or US");return c;}
-    static String explicitDeadline(String text){Matcher m=Pattern.compile("(?im)^.*(?:deadline|apply by|closing date)\\s*:?\\s*(\\d{4}-\\d{2}-\\d{2}).*$").matcher(text);if(!m.find())return "";try{return java.time.LocalDate.parse(m.group(1)).toString();}catch(Exception e){return "";}}
+    static String explicitDeadline(String text){
+        Matcher matches=Pattern.compile("(?i)(?:deadline|apply by|closing date)\\s*:?\\s*(\\d{4}-\\d{2}-\\d{2}|[a-z]{3,9}\\s+\\d{1,2},?\\s+\\d{4}|\\d{1,2}\\s+[a-z]{3,9}\\s+\\d{4})\\b").matcher(text);
+        Set<String> dates=new HashSet<>();
+        while(matches.find()){
+            String candidate=matches.group(1).replace(",","").replaceAll("\\s+"," ");
+            for(String pattern:List.of("uuuu-MM-dd","MMMM d uuuu","MMM d uuuu","d MMMM uuuu","d MMM uuuu")){
+                var format=new java.time.format.DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern(pattern).toFormatter(Locale.ENGLISH).withResolverStyle(java.time.format.ResolverStyle.STRICT);
+                try{dates.add(java.time.LocalDate.parse(candidate,format).toString());break;}
+                catch(java.time.format.DateTimeParseException ignored){/* Try the next explicit format. */}
+            }
+        }
+        return dates.size()==1?dates.iterator().next():"";
+    }
 }

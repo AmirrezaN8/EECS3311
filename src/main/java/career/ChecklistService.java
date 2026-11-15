@@ -17,7 +17,7 @@ public final class ChecklistService {
         List<String> ordered=labels;
         try{ordered=ai.ask("Order these exact checklist labels by priority: resume match, explicit deadline, missing skills, interview prep, company. Return {\"items\":[\"unchanged label\"]}.",labels,ModelTier.SONNET,m->{
             List<String> list=Json.strings(m,"items");if(list.size()!=labels.size()||!new HashSet<>(list).equals(new HashSet<>(labels)))throw new IllegalArgumentException("Checklist labels changed");return list;
-        });}catch(RuntimeException ignored){/* Deterministic priority order remains useful without an LLM. */}
+        });}catch(RuntimeException e){if(Thread.currentThread().isInterrupted())throw e;/* Deterministic priority order remains useful without an LLM. */}
         Checklist old=repository.findById(job.id());Map<String,ChecklistItem> prior=new HashMap<>();if(old!=null)old.items().forEach(i->prior.put(i.label(),i));
         List<ChecklistItem> items=new ArrayList<>();for(String label:ordered){ChecklistItem before=prior.get(label);items.add(new ChecklistItem(before==null?id():before.id(),label,items.size()+1,before!=null&&before.done()));}
         Checklist list=new Checklist(old==null?id():old.id(),job.id(),job.deadline(),items);repository.save(list);return list;

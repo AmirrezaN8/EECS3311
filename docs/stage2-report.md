@@ -31,7 +31,7 @@ Working offline functionality verified: posting entry/selection/persistence, DOC
 
 GUI: job/profile/history/preparation/interview/checklist tabs; typed inputs, readable results, approval dialogs, progress events, check boxes and percentage progress. Long work runs in SwingWorker; dialogs use the Swing event thread. CLI supports interactive and one-shot commands. Both call the same facade. Desktop GUI interaction is pending; compilation and graceful headless startup were verified.
 
-Known limits: PDF parsing requires the Maven build and remains unverified here. Legacy binary Word .doc has a POI strategy requiring packaged dependencies and valid-sample verification; scanned and locked PDFs need pasted text. Tailoring supports a bounded set of word-form/connective changes while preserving substantive tokens; it rejects broader prose rewrites. Token preservation is not a proof of semantic equivalence, so user review remains essential. Skill matching is conservative/literal and marks uncertain evidence. Automatic deadlines recognize explicitly labeled ISO dates only. Research summarizes search snippets, not entire crawled sites. Local SQLite data is unencrypted. Videos have not been recorded. The Git weekly requirements are currently unmet.
+Known limits: PDF parsing requires the Maven build and remains unverified here. Legacy binary Word .doc has a POI strategy requiring packaged dependencies and valid-sample verification; scanned and locked PDFs need pasted text. Tailoring supports a bounded set of word-form/connective changes while preserving substantive tokens; it rejects broader prose rewrites. Token preservation is not a proof of semantic equivalence, so user review remains essential. Skill matching is conservative/literal and marks uncertain evidence. Automatic deadlines recognize explicitly labeled ISO or unambiguous English month dates; ambiguous/conflicting dates require manual review. Research summarizes search snippets, not entire crawled sites. Local SQLite data is unencrypted. Videos have not been recorded. The Git weekly requirements are currently unmet.
 
 ## 2. Feature-to-implementation mapping
 
@@ -114,7 +114,7 @@ Verification: 443 total offline assertions, covering full/partial feedback, supp
 Reference: F09, UC09. Status: Implemented with ISO-deadline limitation and deterministic fallback. Type: hybrid.
 Files/classes: ChecklistService.java; Models.Checklist, ChecklistItem; SwingGui.java.
 Methods: build(), tick(), Checklist.progress(), ChecklistItem.tick(), SwingGui.showChecklist().
-Flow: read saved gap/company/questions/versions and explicit posting deadline -> useful partial/full task set -> AI prioritizes unchanged labels -> deterministic priority fallback on AI failure -> save checklist preserving ticks/IDs of unchanged tasks. GUI renders tick boxes; CLI tick/untick updates persistent progress. Partial checklist command offers approved missing features. After those complete, rebuild refreshes task labels.
+Flow: read saved gap/company/questions/versions and explicit posting deadline -> useful partial/full task set -> AI prioritizes unchanged labels -> deterministic priority fallback on AI failure -> save checklist preserving ticks/IDs of unchanged tasks. GUI renders tick boxes; CLI tick/untick updates persistent progress. Partial checklist offers missing features with approval and refreshes labels after successful work. Initial checklist show builds a list; later show retrieves it. Shared textual output includes progress.
 Patterns: Command, Facade, Adapter.
 Verification: partial offline checklist, no invented deadline, item-ID validation, tick/untick, progress and preservation on rebuild/restart. Non-ISO deadlines require manual tracking. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Checklist and CLI checklist show.
 
@@ -244,3 +244,5 @@ Brave Search API: https://api-dashboard.search.brave.com/app/documentation/web-s
 End of editable report. The PDF adds a selected-class UML view rendered directly as vector boxes/arrows. Full class, use-case and sequence diagram sources accompany the submission.
 
 November 15 F05 checkpoint: TailorResumeAction, bounded word-form rewriting, overlap rejection, shared missing-input recovery and structured side-by-side GUI review are implemented. See docs/checkpoint-5-tailoring.md for evidence and live checks. The report PDF has not yet been refreshed for these checkpoint changes.
+
+November 15 F09 checkpoint: ChecklistAction, first-show building, CLI progress, stable missing-work consent, automatic refresh after approved work and strict explicit ISO/English-month deadlines are implemented. Build passes 464 offline assertions; live steps and evidence limits are in docs/checkpoint-8-checklist.md. PDF report is not refreshed yet.

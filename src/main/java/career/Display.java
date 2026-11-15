@@ -12,6 +12,8 @@ public final class Display {
                 Map<String,Object> item=new LinkedHashMap<>(Json.object(Documents.encode(a)));item.put("uncertain",a.uncertain());return item;
             }).toList());
             v=output;
+        }else if(v instanceof Checklist checklist){
+            Map<String,Object> output=new LinkedHashMap<>(Json.object(Documents.encode(checklist)));output.put("progress",checklist.progress()+"%");v=output;
         }else if(!(v instanceof Map<?,?>)&&!(v instanceof Collection<?>))v=Documents.encode(v);
         String indent="  ".repeat(Math.min(depth,20));
         if(v instanceof Map<?,?> m){for(var e:m.entrySet()){b.append(indent).append(e.getKey()).append(": ");if(e.getValue() instanceof Map<?,?>||e.getValue() instanceof Collection<?>||e.getValue()!=null&&e.getValue().getClass().isRecord()){b.append('\n');append(b,e.getValue(),depth+1);}else b.append(e.getValue()).append('\n');}}

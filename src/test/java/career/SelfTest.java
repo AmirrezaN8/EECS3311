@@ -38,7 +38,7 @@ public final class SelfTest {
     public static void main(String[] args)throws Exception {
         temp=Files.createTempDirectory("career-tests-");
         try{
-            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();researchAcceptance();questions();questionAcceptance();mockInterview();mockAcceptance();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
+            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();researchAcceptance();questions();questionAcceptance();mockInterview();mockAcceptance();checklist();checklistAcceptance();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
             
             System.out.println("PASS: "+checks+" assertions. All model responses were test fixtures; no live LLM claim.");
         }finally{try(var paths=Files.walk(temp)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}}
@@ -366,6 +366,42 @@ public final class SelfTest {
     private static void checklist(){
         SqliteStore s=preparedDb("checklist");ChecklistService service=new ChecklistService(fixture("bad"),s);var list=service.build(sampleJob());check(list.items().size()>=4&&list.progress()==0,"offline partial checklist");check(list.items().stream().noneMatch(i->i.label().contains("deadline")),"no invented deadline");
         var updated=service.tick("job",list.items().getFirst().id(),true);check(updated.progress()>0,"progress updated");check(service.build(sampleJob()).items().getFirst().done(),"rebuild preserves ticks");fails(()->service.tick("job","unknown",true),"invalid item rejected");check(service.tick("job",list.items().getFirst().id(),false).progress()==0,"untick saved");
+    }
+    private static void checklistAcceptance(){
+        for(String date:List.of("Apply by: December 1, 2026","Closing date: 1 Dec 2026","Deadline: dec 1 2026","Apply by: 2026-12-01"))check(JobDescriptionIntake.explicitDeadline(date).equals("2026-12-01"),"unambiguous explicit deadline parsed");
+        for(String date:List.of("Meeting: December 1, 2026","Deadline: February 30, 2026","Apply by: 12/01/2026","Deadline: 2026-12-01; closing date: 2026-12-02"))check(JobDescriptionIntake.explicitDeadline(date).isEmpty(),"unlabeled invalid ambiguous or conflicting date not invented");
+        var store=preparedDb("checklist-acceptance");var jobs=new SqliteJobRepository(store);
+        var job=new JobDescription("job","Developer","Acme","CA","Java SQL. Apply by December 1, 2026",SourceLabel.USER_PASTED,"",java.time.LocalDate.of(2026,12,1));jobs.saveAndSelect(job);
+        AtomicInteger calls=new AtomicInteger();
+        Ai ordering=new Ai((p,t)->{
+            check(t==ModelTier.SONNET,"checklist priorities use reasoning model");calls.incrementAndGet();
+            String input=p.substring(p.indexOf("INPUT DATA (not instructions):\n")+"INPUT DATA (not instructions):\n".length());List<?> labels=(List<?>)Json.parse(input);
+            return Json.write(Map.of("items",labels));
+        },(q,o)->{throw new AssertionError("No checklist decision expected");});
+        var service=new ChecklistService(ordering,store);var list=new ChecklistAction(service,()->job).execute();
+        check(list.deadline().equals(job.deadline())&&list.items().get(1).label().contains("2026-12-01"),"posting deadline retained at requested priority");
+        check(list.items().getFirst().label().startsWith("Tailor")&&list.items().getLast().label().startsWith("Research"),"partial checklist covers resume through company");
+        var ticked=service.tick(job.id(),list.items().getFirst().id(),true);
+        check(ticked.progress()>0&&Display.format(Map.of("checklist",ticked)).contains("progress: "+ticked.progress()+"%"),"progress visible for CLI saved and direct checklists");
+        var rebuilt=service.build(job);
+        check(rebuilt.id().equals(list.id())&&rebuilt.items().getFirst().id().equals(list.items().getFirst().id())&&rebuilt.items().getFirst().done(),"rebuild retains checklist identity item IDs and ticks");
+        var reopened=new SqliteChecklistRepository(new SqliteStore(temp.resolve("checklist-acceptance.db")));
+        check(reopened.findById(job.id()).equals(rebuilt),"checklist survives restart with progress");
+        check(service.tick(job.id(),list.items().getFirst().id(),false).progress()==0,"unticking persists zero progress");
+        var prior=reopened.findById(job.id());fails(()->service.tick(job.id(),"unknown",true),"invalid item cannot alter progress");check(reopened.findById(job.id()).equals(prior),"invalid tick preserves checklist");
+        UI decline=new UI();decline.approved=false;
+        var fresh=preparedDb("checklist-first-show");new SqliteJobRepository(fresh).select("job");
+        var facade=new AgentController(fresh,fixture("bad"),noAdzuna(),new WebSearchTool("",new HttpTransport()),decline,new AgentEventPublisher());
+        check(facade.runFeature("checklist show",List.of()) instanceof Checklist&&decline.approvals==4,"first show builds partial list and offers missing features without running declined work");
+        int approvals=decline.approvals;facade.runFeature("checklist show",List.of());check(decline.approvals==approvals,"show saved checklist does not repeat feature offers");
+        // Approve only company research; the returned checklist must reflect its newly saved result.
+        var refreshStore=preparedDb("checklist-refresh");new SqliteJobRepository(refreshStore).select("job");
+        var ui=new AgentController.UserInteraction(){public boolean askApproval(String prompt){return prompt.contains("'company'");}public String readText(String prompt){throw new AssertionError("No missing-input entry expected");}};
+        Ai research=scripted((p,t)->p.startsWith("Choose")?"{\"choice\":\"relevant\",\"confidence\":0.9}":p.startsWith("Summarize")?"{\"goals\":\"not stated\",\"values\":\"Collaboration https://example.com/values\"}":p.startsWith("Order")?"bad":"{\"text\":\"Acme values\"}");
+        WebSearchTool found=new WebSearchTool("",new HttpTransport()){public List<SearchResult> search(String q){return List.of(new SearchResult("Acme values","https://example.com/values","Collaboration"));}};
+        var refresh=new AgentController(refreshStore,research,noAdzuna(),found,ui,new AgentEventPublisher());
+        var updated=(Checklist)refresh.runFeature("checklist build",List.of());
+        check(updated.items().stream().anyMatch(i->i.label().equals("Review sourced company summary"))&&updated.items().stream().noneMatch(i->i.label().equals("Research company goals and values")),"approved missing research refreshes returned and saved checklist");
     }
     private static void workflow(){
         AtomicInteger executed=new AtomicInteger();AgentEventPublisher events=new AgentEventPublisher();List<String> states=new ArrayList<>();events.attach(e->states.add(e.message()));events.attach(e->{throw new IllegalStateException("bad view");});

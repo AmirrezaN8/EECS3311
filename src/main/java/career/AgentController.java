@@ -29,7 +29,7 @@ public final class AgentController {
         map.put("tailor",new TailorResumeAction(tailor,this::currentJob,resumes::current));
         map.put("company",new CompanyResearchAction(company,this::currentJob));
         map.put("interview prep",new InterviewPrepAction(prep,this::currentJob,resumes::current,memory::loadFacts));
-        map.put("checklist build",new AgentAction.FeatureCommand("checklist","build prioritized preparation checklist",()->checklist.build(currentJob())));
+        map.put("checklist build",new ChecklistAction(checklist,this::currentJob));
         return map;
     }
     public Object runFeature(String command,List<String> args){
@@ -39,7 +39,7 @@ public final class AgentController {
             if(Set.of("gap","tailor").contains(command))ensurePreparationInputs();
             Object result=commands.get(command).execute();events.publish("completed",command);
             if(command.equals("interview prep")&&gate.review("Questions saved. Start a typed mock interview now?",false))return Map.of("questions",result,"interview",startMockInterview(false));
-            if(command.equals("checklist build"))offerMissingSteps();return result;
+            if(command.equals("checklist build")&&offerMissingSteps())result=checklist.build(currentJob());return result;
         }
         return switch(command){
             case "job add" -> {count(args,4);yield execute(new GetJobDescriptionAction(intake,new JobDescriptionRequest(args.get(0),args.get(1),args.get(2),required(readInput(args.get(3)),"Pasted description"),"")));}
@@ -64,7 +64,7 @@ public final class AgentController {
             }
             case "interview stop" -> {count(args,0);interview.stop(currentJob().id());if(gate.review("Progress saved. Generate feedback for answered questions?",false))yield interview.feedback(currentJob().id(),true);yield "Stopped; saved answers remain available";}
             case "interview feedback" -> {count(args,0);var s=interview.load(currentJob().id());boolean partial=s!=null&&!s.finished()&&gate.review("End this interview and evaluate only answered questions?",false);if(partial)interview.stop(currentJob().id());yield interview.feedback(currentJob().id(),partial);}
-            case "checklist show" -> {count(args,0);var list=checklistRepository.findById(currentJob().id());if(list==null)throw new IllegalStateException("Build checklist first");yield list;}
+            case "checklist show" -> {count(args,0);var list=checklistRepository.findById(currentJob().id());if(list==null)yield runFeature("checklist build",List.of());yield list;}
             case "checklist tick" -> {if(args.size()<1||args.size()>2)throw new IllegalArgumentException("Use checklist tick ITEM_ID [true|false]");if(args.size()==2&&!Set.of("true","false").contains(args.get(1)))throw new IllegalArgumentException("Use true or false");yield checklist.tick(currentJob().id(),args.getFirst(),args.size()==1||Boolean.parseBoolean(args.get(1)));}
             case "prepare" -> {if(args.size()>1)throw new IllegalArgumentException("Use prepare [goal]");yield handleGoal(args.isEmpty()?"prepare me for this job":args.getFirst());}
             case "results" -> {count(args,0);yield jobs.results(currentJob().id());}
@@ -97,9 +97,15 @@ public final class AgentController {
             runFeature("resume paste",List.of(required(ui.readText("Paste resume text"),"Resume")));
         }
     }
-    private void offerMissingSteps(){
-        String job=currentJob().id();Map<String,String> related=Map.of("gap","gap","company","company","questions","interview prep");
-        for(var entry:related.entrySet())if(!jobs.hasResult(job,entry.getKey())&&gate.review("Partial checklist: run missing feature '"+entry.getValue()+"' now?",false))try{runFeature(entry.getValue(),List.of());}catch(RuntimeException e){events.publish("step-error",e.getMessage());}
+    private boolean offerMissingSteps(){
+        String job=currentJob().id();Map<String,String> related=new LinkedHashMap<>();
+        if(resumeRepository.findVersions(job).stream().noneMatch(v->v.changes().stream().anyMatch(ResumeChange::accepted)))related.put("resume","tailor");
+        related.put("gap","gap");related.put("questions","interview prep");related.put("company","company");boolean changed=false;
+        for(var entry:related.entrySet())if((entry.getKey().equals("resume")||!jobs.hasResult(job,entry.getKey()))&&gate.review("Partial checklist: run missing feature '"+entry.getValue()+"' now?",false)){
+            try{runFeature(entry.getValue(),List.of());changed=true;}
+            catch(RuntimeException e){if(Thread.currentThread().isInterrupted())throw e;events.publish("step-error",e.getMessage());}
+        }
+        return changed;
     }
     private static void count(List<String> args,int count){if(args.size()!=count)throw new IllegalArgumentException("Expected "+count+" argument(s); quote text or use @path for job/resume text");}
     private static String readInput(String arg){if(!arg.startsWith("@"))return arg;try{Path p=Path.of(arg.substring(1));if(Files.size(p)>400_000)throw new IllegalArgumentException("Input text file too large");return Files.readString(p);}catch(java.io.IOException e){throw new IllegalArgumentException("Cannot read text file",e);}}
