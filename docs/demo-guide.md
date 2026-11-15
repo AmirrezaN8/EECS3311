@@ -38,3 +38,5 @@ F03 live verification and recording steps: [checkpoint-4-memory.md](checkpoint-4
 F04 live verification and recording steps: [checkpoint-5-gap.md](checkpoint-5-gap.md). Offline checks pass; real-provider and GUI walkthrough pending.
 
 F05 live verification and recording steps: [checkpoint-5-tailoring.md](checkpoint-5-tailoring.md). Real-provider and GUI review checks remain pending.
+
+F06 live verification and recording steps: [checkpoint-6-company.md](checkpoint-6-company.md). Use a real company with an explicitly labeled demo posting. Offline checks pass; live Brave/Jev/Claude and GUI checks remain pending.

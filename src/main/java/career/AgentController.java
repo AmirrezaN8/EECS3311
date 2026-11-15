@@ -27,7 +27,7 @@ public final class AgentController {
         Map<String,AgentAction> map=new LinkedHashMap<>();
         map.put("gap",new AgentAction.FeatureCommand("gap","identify skill gaps",()->gaps.identify(currentJob(),resumes.current())));
         map.put("tailor",new TailorResumeAction(tailor,this::currentJob,resumes::current));
-        map.put("company",new AgentAction.FeatureCommand("company","research sourced company goals and values",()->company.research(currentJob())));
+        map.put("company",new CompanyResearchAction(company,this::currentJob));
         map.put("interview prep",new AgentAction.FeatureCommand("interview prep","generate five tailored interview questions",()->prep.prepare(currentJob(),resumes.current(),memory.loadFacts())));
         map.put("checklist build",new AgentAction.FeatureCommand("checklist","build prioritized preparation checklist",()->checklist.build(currentJob())));
         return map;

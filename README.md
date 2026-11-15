@@ -113,3 +113,5 @@ Regenerate the report after editing its Markdown source:
 ```sh
 java scripts/ReportPdf.java docs/stage2-report.md stage2-report.pdf
 ```
+
+F06 company research requires Brave search credentials and a real company. Summary sections must cite supplied search-result URLs or say `not stated`; citation validation does not prove factual entailment. See [company research verification](docs/checkpoint-6-company.md) for the live walkthrough and evidence limits.

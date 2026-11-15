@@ -231,4 +231,8 @@ TailorResumeAction ..|> AgentAction
 TailorResumeAction --> ResumeTailorService
 AgentController --> TailorResumeAction
 SwingGui ..> ResumeChange : side-by-side approval
+class CompanyResearchAction { +execute(): CompanySummary }
+CompanyResearchAction ..|> AgentAction
+CompanyResearchAction --> CompanyResearchService
+AgentController --> CompanyResearchAction
 @enduml

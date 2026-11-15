@@ -38,7 +38,7 @@ public final class SelfTest {
     public static void main(String[] args)throws Exception {
         temp=Files.createTempDirectory("career-tests-");
         try{
-            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();questions();mockInterview();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
+            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();researchAcceptance();questions();mockInterview();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
             
             System.out.println("PASS: "+checks+" assertions. All model responses were test fixtures; no live LLM claim.");
         }finally{try(var paths=Files.walk(temp)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}}
@@ -229,6 +229,53 @@ public final class SelfTest {
         WebSearchTool found=new WebSearchTool(new Config(),new HttpTransport()){public List<SearchResult> search(String q){return List.of(new SearchResult("Acme values","https://example.com/values","Acme values collaboration"));}};
         Ai a=scripted((p,t)->p.startsWith("Choose")?"{\"choice\":\"relevant\",\"confidence\":0.9}":p.startsWith("Summarize")?"{\"goals\":\"not stated\",\"values\":\"Collaboration https://example.com/values\"}":"{\"text\":\"Acme values\"}");
         check(new CompanyResearchService(a,tools(found),s).research(sampleJob()).sources().size()==1,"sourced company result");
+    }
+    private static void researchAcceptance(){
+        var store=preparedDb("research-acceptance");
+        var relevant=new SearchResult("Acme values","https://example.com/values","Acme values collaboration");
+        var irrelevant=new SearchResult("Other company","https://example.org/other","Unrelated business");
+        List<String> queries=new ArrayList<>();List<String> prompts=new ArrayList<>();
+        WebSearchTool search=new WebSearchTool("",new HttpTransport()){
+            public List<SearchResult> search(String query){queries.add(query);return queries.size()==1?List.of(irrelevant):List.of(relevant,irrelevant);}
+        };
+        Ai ai=new Ai((prompt,tier)->{
+            check(tier==ModelTier.HAIKU,"company research uses Haiku");prompts.add(prompt);
+            return prompt.startsWith("Summarize")?"{\"goals\":\"not stated\",\"values\":\"Collaboration [source](https://example.com/values).\"}":prompt.startsWith("Reformulate")?"{\"text\":\"Acme official values\"}":"{\"text\":\"Acme goals and values\"}";
+        },(question,options)->{
+            String choice=question.contains("Other company")?"irrelevant":"relevant";
+            return new Decision(choice,Map.of("relevant",choice.equals("relevant")?1.0:0.0,"irrelevant",choice.equals("irrelevant")?1.0:0.0),1);
+        });
+        var service=new CompanyResearchService(ai,tools(search),store);
+        var summary=new CompanyResearchAction(service,SelfTest::sampleJob).execute();
+        check(queries.equals(List.of("Acme goals and values","Acme official values")),"no relevant results triggers one reformulated search");
+        check(summary.sources().equals(List.of(relevant)),"irrelevant results excluded from saved summary");
+        String summaryPrompt=prompts.stream().filter(p->p.startsWith("Summarize")).findFirst().orElseThrow();
+        check(!summaryPrompt.contains("Other company")&&summaryPrompt.contains("Acme values collaboration"),"generation receives only relevant evidence");
+        check(new SqliteJobRepository(new SqliteStore(temp.resolve("research-acceptance.db"))).findCompany("job").equals(summary),"sourced summary survives restart");
+        WebSearchTool found=new WebSearchTool("",new HttpTransport()){public List<SearchResult> search(String query){return List.of(relevant);}};
+        for(String values:List.of("Collaboration","Collaboration https://invented.example/values","Collaboration https://example.com/values/unsupported")){
+            AtomicInteger generations=new AtomicInteger();
+            Ai invalid=new Ai((p,t)->{if(p.startsWith("Summarize")){generations.incrementAndGet();return Json.write(Map.of("goals","not stated","values",values));}return "{\"text\":\"Acme values\"}";},(q,o)->new Decision("relevant",Map.of("relevant",1.0,"irrelevant",0.0),1));
+            fails(()->new CompanyResearchService(invalid,tools(found),store).research(sampleJob()),"missing or invented citation rejected");
+            check(generations.get()==2&&new SqliteJobRepository(store).findCompany("job").equals(summary),"invalid summary retries once and preserves previous result");
+        }
+        AtomicInteger searches=new AtomicInteger(),summaries=new AtomicInteger();
+        WebSearchTool unrelated=new WebSearchTool("",new HttpTransport()){public List<SearchResult> search(String q){searches.incrementAndGet();return List.of(irrelevant);}};
+        Ai reject=new Ai((p,t)->{if(p.startsWith("Summarize"))summaries.incrementAndGet();return "{\"text\":\"Acme official values\"}";},(q,o)->new Decision("irrelevant",Map.of("relevant",0.0,"irrelevant",1.0),1));
+        fails(()->new CompanyResearchService(reject,tools(unrelated),store).research(sampleJob()),"all irrelevant sources stop research");
+        check(searches.get()==2&&summaries.get()==0&&new SqliteJobRepository(store).findCompany("job").equals(summary),"no relevant evidence never generates or replaces summary");
+        AtomicInteger requests=new AtomicInteger();List<String> urls=new ArrayList<>();
+        HttpTransport transport=new HttpTransport(){public String request(String url,Map<String,String> headers,String body){
+            requests.incrementAndGet();urls.add(url);check(headers.get("X-Subscription-Token").equals("fixture-key")&&headers.get("Accept").equals("application/json")&&body==null,"web search sends authenticated JSON GET");
+            return "{\"web\":{\"results\":[{\"title\":\"Values\",\"url\":\"https://example.com/values\",\"description\":\"Collaboration\"},{\"title\":\"Bad\",\"url\":\"https:///missing-host\",\"description\":\"Bad\"},{\"title\":\"Credentials\",\"url\":\"https://user:secret@example.com/values\",\"description\":\"Bad\"}]}}";
+        }};
+        var web=new WebSearchTool("fixture-key",transport);
+        check(web.search("Acme & values").size()==1&&urls.getFirst().contains("q=Acme+%26+values"),"search encoding and invalid-source filtering");
+        fails(()->web.search(" "),"blank query rejected before HTTP");
+        fails(()->new WebSearchTool("",transport).search("Acme"),"missing search key fails explicitly");check(requests.get()==1,"invalid query and missing key send no HTTP");
+        WebSearchTool broken=new WebSearchTool("",new HttpTransport()){public List<SearchResult> search(String q){throw new IllegalStateException("fixture search outage");}};
+        fails(()->new CompanyResearchService(reject,tools(broken),store).research(sampleJob()),"tool failure remains a failure");
+        check(new SqliteJobRepository(store).findCompany("job").equals(summary),"search outage preserves existing summary");
     }
     private static String questionJson(){return "{\"questions\":[\"Explain Java?\",\"Describe a project?\",\"How do you test?\",\"How do you collaborate?\",\"Why this role?\"]}";}
     private static void questions(){

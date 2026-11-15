@@ -14,7 +14,23 @@ public final class CompanyResearchService {
         }
         if(relevant.isEmpty())throw new IllegalStateException("No relevant company sources found; no summary generated");
         var sources=List.copyOf(relevant);
-        CompanySummary summary=ai.ask("Summarize goals and values ONLY from supplied source snippets. Cite their URLs inline. Say 'not stated' when absent. Return {\"goals\":\"...\",\"values\":\"...\"}.",sources,ModelTier.HAIKU,m->new CompanySummary(job.id(),Json.text(m,"goals"),Json.text(m,"values"),sources));
+        CompanySummary summary=ai.ask("Summarize goals and values ONLY from supplied source snippets. Cite their URLs inline. Each nonempty goals/values section must include an exact supplied source URL. Use exactly 'not stated' when absent. Never invent a URL. Return {\"goals\":\"...\",\"values\":\"...\"}.",sources,ModelTier.HAIKU,m->new CompanySummary(job.id(),cited(Json.text(m,"goals"),sources),cited(Json.text(m,"values"),sources),sources));
         repository.save(summary);return summary;
     }
+    private static String cited(String text,List<SearchResult> sources){
+        text=required(text,"Sourced company summary");
+        if(normalize(text).equals("not stated"))return text;
+        Set<String> allowed=new HashSet<>();for(var source:sources)allowed.add(source.url());
+        var urls=java.util.regex.Pattern.compile("https?://[^\\s<>\\[\\]\"']+").matcher(text);
+        boolean cited=false;
+        while(urls.find()){
+            String url=urls.group();
+            while(!allowed.contains(url)&&url.matches(".*[.,;:!)]$"))url=url.substring(0,url.length()-1);
+            if(!allowed.contains(url))throw new IllegalArgumentException("Summary cites a URL outside supplied sources");
+            cited=true;
+        }
+        if(!cited)throw new IllegalArgumentException("Company claims require a supplied source URL or 'not stated'");
+        return text;
+    }
+
 }

@@ -85,11 +85,11 @@ Verification: accepted/rejected edits, unsupported skill and invented-number rej
 ### F06 — Company goals and values research
 
 Reference: F06, UC06. Status: Implemented; live service pending. Type: hybrid/agentic.
-Files/classes: CompanyResearchService.java; WebSearchTool.java; Models.CompanySummary, SearchResult; Ai.java.
-Methods: research(), search(), decide(), ask().
+Files/classes: CompanyResearchAction.java; CompanyResearchService.java; WebSearchTool.java; CompanySummary.java; SearchResult.java; Ai.java.
+Methods: execute(), research(), search(), cited(), decide(), ask().
 Flow: model query -> Brave search snippets -> per-source relevant/irrelevant decision -> reformulated query if empty, maximum two searches -> sourced goals/values summary -> persist sources alongside result. Missing configuration or no relevant sources yields an error and no new summary. Stored older evidence is retained rather than overwritten with invented content.
 Patterns: Command, Adapter, Facade.
-Verification: bounded empty-result retry/no invented summary and relevant-source storage with explicit fixtures. Factual summarization/relevance quality and live Brave connectivity are unverified. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Research/company CLI.
+Verification: 404 total offline assertions; F06 checks include bounded empty/irrelevant-result retry, relevant-only context, source-link provenance, missing/invented citations, URL/query validation, outages preserving prior results and restart persistence with explicit fixtures. Citation validation does not prove entailment. Factual summarization/relevance quality and live Brave connectivity are unverified. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Research/company CLI.
 
 ### F07 — Interview question preparation
 
