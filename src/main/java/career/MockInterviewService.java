@@ -40,7 +40,7 @@ public final class MockInterviewService {
         FeedbackReport report=ai.ask("Evaluate ONLY answered interview questions and any answered follow-ups. Return {\"perAnswer\":[\"one feedback string per answered base question in order\"],\"summary\":\"...\",\"weaknesses\":[\"...\"]}. Do not treat unattempted questions as failures.",s,ModelTier.SONNET,m->{
             var per=Json.strings(m,"perAnswer");if(per.size()!=s.answers().size())throw new IllegalArgumentException("Feedback count does not match answers");return new FeedbackReport(jobId,per,Json.text(m,"summary"),Json.strings(m,"weaknesses"));
         });
-        repository.save(report);for(String w:report.weaknesses())memory.save("weaknesses",w);return report;
+        repository.save(report);for(String w:report.weaknesses())memory.recordWeakness(w);return report;
     }
     private void save(InterviewSession s){repository.save(s);}
 }

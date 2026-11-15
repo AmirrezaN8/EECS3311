@@ -14,6 +14,10 @@ public final class MemoryManager {
     }
     public void editFact(String id,String text){MemoryFact f=repository.findById(id);if(f==null)throw new IllegalArgumentException("Unknown fact ID");repository.save(f.edit(required(text,"Fact")));}
     public void delete(String id){if(repository.findById(id)==null)throw new IllegalArgumentException("Unknown fact ID");repository.delete(id);}
+    public void recordWeakness(String text){
+        try{save("weaknesses",text);}
+        catch(RuntimeException e){events.publish("memory-warning","Feedback saved; weakness not added to history: "+e.getMessage());}
+    }
     public void recordTurn(String message){
         try{
             message=required(message,"Career message");

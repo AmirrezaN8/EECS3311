@@ -38,7 +38,7 @@ public final class SelfTest {
     public static void main(String[] args)throws Exception {
         temp=Files.createTempDirectory("career-tests-");
         try{
-            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();researchAcceptance();questions();questionAcceptance();mockInterview();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
+            json();storage();memoryAcceptance();parsers();resume();job();memory();gap();gapAcceptance();tailoring();tailoringAcceptance();research();researchAcceptance();questions();questionAcceptance();mockInterview();mockAcceptance();checklist();workflow();facade();endToEnd();checks+=ApiAdaptersTest.run();checks+=RepositoryTest.run();checks+=InputFeaturesTest.run();
             
             System.out.println("PASS: "+checks+" assertions. All model responses were test fixtures; no live LLM claim.");
         }finally{try(var paths=Files.walk(temp)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}}
@@ -324,6 +324,44 @@ public final class SelfTest {
         check(service.load("job").finished()&&service.load("job").followups().size()==2,"completion persisted with max one followup per base");check(service.feedback("job",false).perAnswerFeedback().size()==2&&m.loadFacts().size()==1,"final feedback and weaknesses persisted");
         service.start("job",true);check(s.all("interview-archive").size()==1,"restart archives answers");
         service.answer("job","short answer");Ai partial=fixture("{\"perAnswer\":[\"More detail\"],\"summary\":\"Partial only\",\"weaknesses\":[]}");var partialService=new MockInterviewService(partial,s,m);check(partialService.feedback("job",true).perAnswerFeedback().size()==1,"approved partial feedback");
+    }
+    private static void mockAcceptance()throws Exception {
+        var store=preparedDb("mock-acceptance");var jobs=new SqliteJobRepository(store);jobs.select("job");jobs.saveQuestions("job",questionList());
+        UI ui=new UI();ui.approved=false;var events=new AgentEventPublisher();List<String> warnings=new ArrayList<>();events.attach(e->warnings.add(e.type()));
+        AtomicInteger feedbackCalls=new AtomicInteger(),decisions=new AtomicInteger();
+        String[] report={"{\"perAnswer\":[\"First answer evaluation\",\"Second answer evaluation\"],\"summary\":\"Practice specific examples\",\"weaknesses\":[\"Explain personal contributions\"]}"};
+        Ai ai=new Ai((prompt,tier)->{feedbackCalls.incrementAndGet();check(tier==ModelTier.SONNET,"final feedback uses reasoning model");return report[0];},(q,o)->{decisions.incrementAndGet();return new Decision("next",Map.of("next",1.0,"followup",0.0),1);});
+        var controller=new AgentController(store,ai,noAdzuna(),new WebSearchTool("",new HttpTransport()),ui,events);
+        check(controller.runFeature("interview start",List.of()).equals("Explain Java?"),"facade starts first base question");
+        fails(()->controller.runFeature("interview answer",List.of(" ")),"blank answer rejected");
+        check(jobs.findInterview("job").answers().isEmpty(),"blank answer leaves progress untouched");
+        check(controller.runFeature("interview answer",List.of("I used Java for a course project")).equals("Project?")&&feedbackCalls.get()==0,"first answer advances without feedback generation");
+        var restarted=new AgentController(new SqliteStore(temp.resolve("mock-acceptance.db")),ai,noAdzuna(),new WebSearchTool("",new HttpTransport()),ui,events);
+        check(restarted.runFeature("interview start",List.of()).equals("Project?")&&jobs.findInterview("job").answers().size()==1,"new controller resumes saved next question");
+        check(restarted.runFeature("interview stop",List.of()).toString().contains("saved answers")&&jobs.findFeedback("job")==null,"declined partial feedback pauses without evaluation");
+        Process trigger=new ProcessBuilder("sqlite3",temp.resolve("mock-acceptance.db").toString(),"CREATE TRIGGER fail_weakness BEFORE INSERT ON documents WHEN NEW.kind='memory' BEGIN SELECT RAISE(ABORT,'fixture memory failure'); END;").start();
+        check(trigger.waitFor()==0,"weakness failure fixture installed");
+        Object completed=restarted.runFeature("interview answer",List.of("I implemented the application and its tests"));
+        check(completed instanceof Map<?,?> map&&map.get("feedback") instanceof FeedbackReport&&feedbackCalls.get()==1,"completion returns automatic final report");
+        check(jobs.findInterview("job").finished()&&jobs.findFeedback("job")!=null&&decisions.get()==2,"full progress and report persisted with one decision per base answer");
+        check(warnings.contains("memory-warning")&&new SqliteMemoryRepository(store).findAll().isEmpty(),"weakness save failure warns without hiding saved report");
+        var saved=jobs.findFeedback("job");
+        AtomicInteger attempts=new AtomicInteger();Ai invalid=new Ai((p,t)->{attempts.incrementAndGet();return "{\"perAnswer\":[\"Only one\"],\"summary\":\"Bad count\",\"weaknesses\":[]}";},(q,o)->{throw new AssertionError("No decision expected for feedback");});
+        var memory=new MemoryManager(ai,store,new ApprovalGate(ui),events);
+        fails(()->new MockInterviewService(invalid,store,memory).feedback("job",false),"wrong feedback count rejected");
+        check(attempts.get()==2&&jobs.findFeedback("job").equals(saved),"failed feedback retry preserves prior report");
+        ui.approved=true;restarted.runFeature("interview restart",List.of());
+        check(store.all("interview-archive").size()==1&&store.all("feedback-archive").size()==1&&jobs.findInterview("job").answers().isEmpty()&&jobs.findFeedback("job")==null,"new attempt archives previous answers/report and resets progress");
+        restarted.runFeature("interview answer",List.of("I used Java"));
+        report[0]="{\"perAnswer\":[\"Evaluate only the attempted answer\"],\"summary\":\"Partial interview\",\"weaknesses\":[]}";
+        check(restarted.runFeature("interview stop",List.of()) instanceof FeedbackReport partial&&partial.perAnswerFeedback().size()==1,"approved early stop evaluates only answered base questions");
+        check(jobs.findInterview("job").answers().size()==1,"early feedback retains saved progress");
+        var pendingStore=preparedDb("mock-pending");new SqliteJobRepository(pendingStore).saveQuestions("job",questionList());boolean[] failing={true};
+        Ai recovering=new Ai((p,t)->{throw new AssertionError("No generation expected");},(q,o)->{if(failing[0])throw new IllegalStateException("fixture decision outage");return new Decision("next",Map.of("next",1.0,"followup",0.0),1);});
+        var pending=new MockInterviewService(recovering,pendingStore,new MemoryManager(recovering,pendingStore,new ApprovalGate(ui),events));pending.start("job",false);
+        fails(()->pending.answer("job","Saved before the decision fails"),"decision outage surfaced");
+        check(pending.load("job").answers().size()==1&&pending.load("job").decided().isEmpty(),"outage cannot lose submitted answer");
+        failing[0]=false;check(pending.nextQuestion(pending.start("job",false)).equals("Project?"),"resume recovers pending follow-up decision without duplicate answer");
     }
     private static void checklist(){
         SqliteStore s=preparedDb("checklist");ChecklistService service=new ChecklistService(fixture("bad"),s);var list=service.build(sampleJob());check(list.items().size()>=4&&list.progress()==0,"offline partial checklist");check(list.items().stream().noneMatch(i->i.label().contains("deadline")),"no invented deadline");

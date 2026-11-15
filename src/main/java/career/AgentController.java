@@ -58,7 +58,10 @@ public final class AgentController {
             case "chat" -> {count(args,1);memory.recordTurn(args.getFirst());yield "Message processed for useful career facts; see history and any memory warning.";}
             case "interview start" -> {count(args,0);yield startMockInterview(false);}
             case "interview restart" -> {count(args,0);if(!gate.review("Archive current interview and start a new attempt?",false))yield "Cancelled";yield startMockInterview(true);}
-            case "interview answer" -> {count(args,1);yield interview.answer(currentJob().id(),args.getFirst());}
+            case "interview answer" -> {
+                count(args,1);String jobId=currentJob().id();String next=interview.answer(jobId,args.getFirst());
+                yield interview.load(jobId).finished()?Map.of("interview",next,"feedback",interview.feedback(jobId,false)):next;
+            }
             case "interview stop" -> {count(args,0);interview.stop(currentJob().id());if(gate.review("Progress saved. Generate feedback for answered questions?",false))yield interview.feedback(currentJob().id(),true);yield "Stopped; saved answers remain available";}
             case "interview feedback" -> {count(args,0);var s=interview.load(currentJob().id());boolean partial=s!=null&&!s.finished()&&gate.review("End this interview and evaluate only answered questions?",false);if(partial)interview.stop(currentJob().id());yield interview.feedback(currentJob().id(),partial);}
             case "checklist show" -> {count(args,0);var list=checklistRepository.findById(currentJob().id());if(list==null)throw new IllegalStateException("Build checklist first");yield list;}

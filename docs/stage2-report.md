@@ -103,11 +103,11 @@ Verification: five uniquely identified unanswered questions linked to the job, c
 ### F08 — Mock interview with feedback
 
 Reference: F08, UC08. Status: Implemented. Type: AI-based/agentic.
-Files/classes: MockInterviewService.java; Models.InterviewSession, FeedbackReport; MemoryManager.java.
+Files/classes: MockInterviewService.java; InterviewSession.java; FeedbackReport.java; MemoryManager.java; AgentController.java.
 Methods: start(), nextQuestion(), answer(), stop(), feedback(); facade startMockInterview().
-Flow: load saved questions/session -> one question -> persist answer immediately -> constrained follow-up/next choice -> at most one generated follow-up per base question -> persist follow-up answer -> continue. No feedback is requested mid-interview. End/approved early feedback -> evaluate only answered questions -> validate count -> save final report and weaknesses. Stop pauses and preserves progress; start continues; restart archives the previous session.
+Flow: load saved questions/session -> one question -> persist answer immediately -> constrained follow-up/next choice -> at most one generated follow-up per base question -> persist follow-up answer -> continue. No feedback is requested mid-interview. Completing answer automatically triggers final feedback through the facade; approved early feedback -> evaluate only answered questions -> validate count -> save final report and weaknesses. Stop pauses and preserves progress; start continues; restart archives the previous session. Weakness-memory failures warn without hiding the saved report.
 Patterns: Facade, Adapter; persistent interview data is separate from the main agent's State pattern.
-Verification: full and partial feedback, suppression during interview, follow-up limit, pause/resume across saved state, completion, restart archive and weakness storage. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Mock Interview plus CLI continuation.
+Verification: 443 total offline assertions, covering full/partial feedback, suppression during interview, follow-up limit, pause/resume across saved state, automatic final report, invalid-count preservation, restart archive, weakness-write failure isolation and pending-decision recovery. Live F08 behavior remains pending. Demo: NOT RECORDED; URL/TIMESTAMP TBD; GUI Mock Interview plus CLI continuation.
 
 ### F09 — Preparation checklist
 

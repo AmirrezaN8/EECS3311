@@ -225,7 +225,7 @@ SkillGapReport *-- SkillAssessment
 CompanySummary *-- SearchResult
 InterviewSession *-- InterviewQuestion
 Checklist *-- ChecklistItem
-MockInterviewService --> MemoryManager : saves weaknesses
+MockInterviewService --> MemoryManager : recordWeakness (failure warning)
 class TailorResumeAction { +execute(): ResumeVersion }
 TailorResumeAction ..|> AgentAction
 TailorResumeAction --> ResumeTailorService
