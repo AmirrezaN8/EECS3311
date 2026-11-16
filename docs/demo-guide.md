@@ -1,50 +1,42 @@
-# Demonstration recording checklist
+# Stage 2 Demonstration Index
 
-The user reports the F10 demo recorded; no video URLs or timestamps have been supplied. Other recordings discussed in chat still need their actual links and coverage confirmed. Replace every placeholder with a real accessible video URL and timestamp; do not submit placeholders as evidence.
+Playlist: [EECS3311demos](https://www.youtube.com/playlist?list=PLWFiN1jmW3sI).
 
-Before recording: build, configure the planned Jev/Claude APIs and required feature tool keys, use a sample resume without private information, and verify the chosen model returns acceptable structured output. Keep the configuration file and keys off screen. Use both GUI and CLI in the overall demonstration.
+Checked November 15, 2026. The playlist and its nine F01–F09 videos were retrieved without account cookies or signing in. All nine are unlisted and accessible by link; downloaded review copies contain actual screen video and audio streams. The newly added 39-second F10 upload was also retrieved without login and reviewed at readable resolution; all ten videos are now accessible.
 
-| Feature | Action and evidence to capture | Interface | Video / timestamp |
+Each entry is a dedicated feature recording, so 00:00 links to the whole feature demonstration. These are actual start timestamps, not invented internal segment boundaries. Descriptions below state what was observed in sampled footage, not every behavior in the source code.
+
+| Feature | Direct video / start | Interface observed | Observed application evidence |
 |---|---|---|---|
-| F01 | Save pasted Canadian/US posting; show source label and stored job. If keys available, find an Adzuna excerpt and reject/approve an explicitly labeled estimate. | GUI Job + CLI job show | NOT RECORDED / TBD |
-| F02 | Import DOCX/Markdown (PDF with Maven build); show raw text and structured sections; demonstrate paste alternative on unsupported input. | GUI Resume | NOT RECORDED / TBD |
-| F03 | Remember a personal career message; show deduplication; edit/delete by fact ID. | GUI My History + CLI history show | NOT RECORDED / TBD |
-| F04 | Run gap analysis and show MISSING/STRONG/DECENT ordering and uncertainty/evidence labels. | GUI Preparation | NOT RECORDED / TBD |
-| F05 | Compare original/revised/reason in approval dialog, accept one edit and reject another if offered, show saved version and preserved base. Conservative wording changes use validated word forms; broader paraphrases are rejected. | GUI Preparation + CLI resume versions | NOT RECORDED / TBD |
-| F06 | Run live research; show source URLs and summary; demonstrate missing-key/no-result failure clearly. A failed request alone is not evidence of live research working. | GUI Preparation | NOT RECORDED / TBD |
-| F07 | Generate exactly five personalized questions; decline/accept the separate mock-interview offer. | GUI Preparation | NOT RECORDED / TBD |
-| F08 | Answer one question; show at most one follow-up. Stop without feedback, continue saved answers, finish and show final report and saved weaknesses. | GUI Mock Interview + CLI interview commands | NOT RECORDED / TBD |
-| F09 | Build partial/full checklist; show that deadlines come only from an explicitly labeled supported date in the posting; tick and restart to show persistence and progress. | GUI Checklist | NOT RECORDED / TBD |
-| F10 | Submit goal, show planner decisions, Yes/No approvals, rejected and failed steps, final checklist and saved action trace. | GUI Preparation + CLI prepare | USER-REPORTED RECORDED / URL and timestamps pending |
+| F01 — Job Description Intake | [Watch from 00:00](https://www.youtube.com/watch?v=qXdWoMGQRNM&t=0s) | GUI | Pasted posting entry/save, USER_PASTED source, explicit deadline and missing-title validation. |
+| F02 — Resume Import and Skill Extraction | [Watch from 00:00](https://www.youtube.com/watch?v=3hR3z8x4h0c&t=0s) | CLI | DOCX and Markdown import, structured profile output, missing-file error and retained profile. |
+| F03 — User History Memory | [Watch from 00:00](https://www.youtube.com/watch?v=k6f0MA-zz0g&t=0s) | GUI; prior CLI output visible | Saved history, AI duplicate skipping, missing fact-ID validation and approved deletion. |
+| F04 — Skill-Gap Identification | [Watch from 00:00](https://www.youtube.com/watch?v=O3Qmxmvgtns&t=0s) | CLI and GUI | Posting/resume context, gap invocation, ordered groups, uncertainty flags and GUI saved results. |
+| F05 — Resume Tailoring | [Watch from 00:00](https://www.youtube.com/watch?v=WQtftW-NVN8&t=0s) | GUI | Original profile, side-by-side proposal/reason, acceptance, saved version and original profile inspection. |
+| F06 — Company Goals and Values Research | [Watch from 00:00](https://www.youtube.com/watch?v=r0O5peysyWs&t=0s) | CLI and GUI | Microsoft company input/research, goals with source URLs, explicit not-stated values and GUI retrieval. |
+| F07 — Interview Question Preparation | [Watch from 00:00](https://www.youtube.com/watch?v=q5oq_tFzdRQ&t=0s) | GUI; prior CLI output visible | Generation of five questions, separate mock-interview approval dialog and retrieval after reopening. |
+| F08 — Mock Interview with Feedback | [Watch from 00:00](https://www.youtube.com/watch?v=PTBeonTQZ9A&t=0s) | GUI | New interview attempt, progression through typed questions/answers and end-of-interview feedback/weaknesses. |
+| F09 — Preparation Checklist | [Watch from 00:00](https://www.youtube.com/watch?v=mvviBAHe5yw&t=0s) | GUI | Partial-checklist consent, deadline/tasks, ticking with percentage progress, reopening and retained tick. |
+| F10 — Prepare Me For This Job | [F10 — 00:00](https://www.youtube.com/watch?v=NZzGRP7kGIw&t=0s) | GUI | Requested gap/checklist execution, Planning/Executing/Finished states, Checklist produced, and checklist output. Trace visible at 00:21; output visible at 00:29. |
 
-Supplementary recording: `sh scripts/build.sh` output; CLI help and one-shot invocation; app restart retaining current job/profile/history/checklist. Only call integrations verified after actually running them. Record limitations honestly rather than masking failures.
+## Review findings and limits
 
-## F01/F02 recording gate
+- **GUI and CLI coverage verified:** F01 and F03–F09 show Swing; F02 shows CLI invocation/results, and F04/F06 show CLI and GUI.
+- **Explanation gap across all nine:** FFmpeg measured mean and maximum audio levels of approximately -91 dB for every complete downloaded audio track (effectively silent). YouTube reported no uploaded or automatic captions. Titles/descriptions identify the feature name and sometimes explain AI, but an audible explanation or explanatory on-screen text was not established in the sampled footage. The official Stage 2 instructions, p. 4, require each demonstration to identify its feature ID/name and briefly explain its purpose/AI role. Do not mark that requirement fully verified from a description alone. Brief explanation cards or narration can be added to the existing footage; a complete re-recording is not required.
+- **F01 scope:** pasted intake and input validation are shown. Adzuna selection, attribution and approved estimates are not established by this recording.
+- **F02 scope:** DOCX/Markdown extraction and the missing-file alternative are shown. PDF/legacy Word and scanned/locked input are not established by this recording.
+- **F03 scope:** duplicate skipping and deletion are visible; a fresh AI fact save and conflict rejection were not established in the sampled recording. Prior CLI history visible behind the GUI is not treated as proof those actions ran during this video.
+- **F05 scope:** side-by-side proposal/reason is visible at 00:34, accepted result at 00:36. Rejection of an edit is not established by the sampled recording.
+- **F07 scope:** mock-interview consent is visible at 00:28; the subsequent question list and reopened results are visible. This is not a demonstration of a completed mock interview.
+- **F08 scope:** real question progression and final feedback are visible. Optional follow-ups, pause/resume and approved partial-feedback behavior are not established by the sampled recording. Short placeholder answers demonstrate the application flow, not interview performance.
+- **F09 scope:** consent and checklist ticking/persistence are visible. Rebuild preservation after a later rebuild is not established by the sampled recording.
+- **F10:** [00:21](https://www.youtube.com/watch?v=NZzGRP7kGIw&t=21s) shows requested gap/checklist execution and Checklist produced; [00:29](https://www.youtube.com/watch?v=NZzGRP7kGIw&t=29s) shows checklist output. Proposed-step approval/rejection, cancellation and early done are not established by this recording. Its title remains a generic screen-recording filename, description is empty, audio mean/max is approximately -90.3 dB, and no captions are available. The author accepts the existing title and description; no metadata edits are planned. Upload availability is verified; the recording alone does not establish the full explanation requirement.
+- **Secrets/readability:** no API keys were identified in the inspected frames. This was sampled visual review, not exhaustive frame-by-frame credential certification. Review the original videos before final submission and keep configuration/private data off screen.
 
-Code-level acceptance checks pass for checkpoint 3. First complete the actual local walkthrough in checkpoint-3-inputs.md; do not record a claimed success from fixture-only results. F01 live Adzuna lookup needs its local app ID/key, and F02 structured extraction must have an empty warning. PDF/legacy Word need packaged dependency checks. Use samples/ for non-sensitive inputs and a separate demo database.
+The review used metadata extraction, actual temporary video downloads, sampled frames across each clip, additional close inspection of F05/F07 dialogs and whole-audio volume analysis. It did not infer every claimed behavior from video titles/descriptions. Review copies and extracted frames remain outside the repository in temporary storage; they are not submission assets.
 
-Once those checks pass, record two labeled segments:
-1. **F01 — Job intake:** paste/save/show source; real lookup partial excerpt plus Jobs by Adzuna URL; decline/approve an estimate; show that rejection preserves the previous job. Explain Jev chooses a listing and Sonnet estimates only with consent.
-2. **F02 — Resume import:** import Markdown/DOCX and PDF if verified, show skills/all sections and preserved source; show one corrupt/unsupported-file or raw-fallback alternative honestly. Explain Haiku extracts source-supported facts, not invented qualifications.
+## Source walkthroughs
 
-Use CLI plus GUI across the segments. No URLs/timestamps have been recorded yet; replace placeholders only after actual recording. Later material UI changes require updating affected footage.
+[F01/F02](checkpoint-3-inputs.md), [F03](checkpoint-4-memory.md), [F04](checkpoint-5-gap.md), [F05](checkpoint-5-tailoring.md), [F06](checkpoint-6-company.md), [F07](checkpoint-6-questions.md), [F08](checkpoint-7-interview.md), [F09](checkpoint-8-checklist.md), [F10](checkpoint-9-agent.md).
 
-## Current recording reminder
-
-The user has confirmed pasted F01 intake, real Markdown/DOCX F02 extraction (empty warnings) and basic GUI operation. Record these verified paths now if the interface is stable enough; use the fictional sample files and demo database. Label the segments F01 and F02, show invocation/input/results, and demonstrate one real error/alternative path. Do not present Adzuna lookup, estimates, PDF or binary Word as successful until separately exercised. Add later footage for those paths; rerecord if material GUI changes make the recording inaccurate. No recordings have been provided yet.
-
-F03 live verification and recording steps: [checkpoint-4-memory.md](checkpoint-4-memory.md). Offline checks pass; real Jev/Claude and GUI walkthrough remain pending.
-
-F04 live verification and recording steps: [checkpoint-5-gap.md](checkpoint-5-gap.md). Offline checks pass; real-provider and GUI walkthrough pending.
-
-F05 live verification and recording steps: [checkpoint-5-tailoring.md](checkpoint-5-tailoring.md). Real-provider and GUI review checks remain pending.
-
-F06 live verification and recording steps: [checkpoint-6-company.md](checkpoint-6-company.md). Use a real company with an explicitly labeled demo posting. Offline checks pass; live Brave/Jev/Claude and GUI checks remain pending.
-
-F07 live verification and recording steps: [checkpoint-6-questions.md](checkpoint-6-questions.md). Both model stages receive full evidence; live personalization, GUI and separate consent checks remain pending.
-
-F08 live verification and recording steps: [checkpoint-7-interview.md](checkpoint-7-interview.md). Final feedback now appears automatically after completion; weakness-save failure warns without hiding the report. Real-model and GUI checks remain pending.
-
-F09 live verification and recording steps: [checkpoint-8-checklist.md](checkpoint-8-checklist.md). Use F04 sample data, decline optional missing work for the partial path, and show GUI tick/untick/restart/rebuild. Live checks remain pending.
-
-F10 live verification and recording steps: [checkpoint-9-agent.md](checkpoint-9-agent.md). Full action set/done, requested/proposed consent, state transitions and traces are offline-verified; actual Jev planning and GUI stop need live evidence.
+Supporting commands (job selection, output/version inspection, direct fact entry, interview restart and untick) are part of the original F01–F10 workflows, not extra counted features. If a substantial new feature is added later, add a dedicated demonstration or labeled segment.

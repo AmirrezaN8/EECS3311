@@ -1,22 +1,62 @@
 @startuml
+!pragma layout smetana
+title Implemented class relationships — Career Preparation Agent
+skinparam backgroundColor white
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam shadowing false
+hide empty members
+package "Feature services" {
+class JobDescriptionIntake
+class ResumeImporter
+class MemoryManager
+class SkillGapService
+class ResumeTailorService
+class CompanyResearchService
+class InterviewPrepService
+class MockInterviewService
+class ChecklistService
+}
 skinparam classAttributeIconSize 0
-interface LLMClient { +generate(prompt, tier): String }
-interface DecisionClient { +decide(question, options): Decision }
-class ClaudeAdapter { +generate(prompt, tier): String }
-class AnthropicApi { +postMessages(json): String }
-class JevAdapter { +decide(question, options): Decision }
-class JevApi { +postSystemOne(json): String }
-class Decision { +choice: String
+interface LLMClient {
++generate(prompt, tier): String
+}
+interface DecisionClient {
++decide(question, options): Decision
+}
+class ClaudeAdapter {
++generate(prompt, tier): String
+}
+class AnthropicApi {
++postMessages(json): String
+}
+class JevAdapter {
++decide(question, options): Decision
+}
+class JevApi {
++postSystemOne(json): String
+}
+class Decision {
++choice: String
 +probabilities: Map
-+confidence: double }
-enum ModelTier { HAIKU
-SONNET }
-class PromptBuilder { +build(task, context, retry): String }
-class ResponseParser { +parseJson(text)
++confidence: double
+}
+enum ModelTier {
+HAIKU
+SONNET
+}
+class PromptBuilder {
++build(task, context, retry): String
+}
+class ResponseParser {
++parseJson(text)
 +validate(text, schema)
-+validateDecision(decision, options) }
-class Ai { +ask(task, context, tier, validate)
-+decide(question, options): Decision }
++validateDecision(decision, options)
+}
+class Ai {
++ask(task, context, tier, validate)
++decide(question, options): Decision
+}
 ClaudeAdapter ..|> LLMClient
 ClaudeAdapter --> AnthropicApi
 AnthropicApi --> HttpTransport
@@ -30,11 +70,15 @@ Ai --> DecisionClient : delegates constrained decisions
 Ai --> PromptBuilder
 Ai --> ResponseParser
 class CliApp
-class SwingGui { +submitGoal()
-+showChecklist(list) }
-class AgentController { +runFeature(command, args)
-+handleGoal(goal)
-+startMockInterview(restart) }
+class SwingGui {
++submitGoal()
++showChecklist(list)
+}
+class AgentController {
++runFeature(command, args): Object
++handleGoal(goal): List<String>
++startMockInterview(restart): String
+}
 CliApp --> AgentController
 SwingGui --> AgentController
 interface UserInteraction
@@ -42,17 +86,23 @@ interface ApprovalPrompter
 UserInteraction --|> ApprovalPrompter
 CliApp ..|> UserInteraction
 SwingGui ..|> UserInteraction
-class ApprovalGate { +review(description, userRequested): boolean
-+reviewResumeChange(change): boolean }
+class ApprovalGate {
++review(description, userRequested): boolean
++reviewResumeChange(change): boolean
+}
 ApprovalGate --> ApprovalPrompter
 AgentController --> ApprovalGate
-class Planner { +chooseNext(context, actions): AgentAction
-+directlyRequested(goal, action): boolean }
+class Planner {
++chooseNext(context, actions): AgentAction
++directlyRequested(goal, action): boolean
+}
 Planner --> DecisionClient
-AgentController --> Planner
-interface AgentAction { +name()
+AgentController ..> Planner : creates per goal
+interface AgentAction {
++name()
 +describe()
-+execute() }
++execute()
+}
 class GetJobDescriptionAction
 class ImportResumeAction
 GetJobDescriptionAction ..|> AgentAction
@@ -61,15 +111,16 @@ GetJobDescriptionAction --> JobDescriptionIntake
 ImportResumeAction --> ResumeImporter
 AgentController --> GetJobDescriptionAction
 AgentController --> ImportResumeAction
-class FeatureCommand { -operation: Supplier<Object> }
-FeatureCommand ..|> AgentAction
-note right of FeatureCommand : Compatibility/test command; production uses named actions
 Planner --> AgentAction : selects
-class AgentSession { +handleInput()
+class AgentSession {
++handleInput()
 +handleApproval(approved)
-~setState(state) }
-interface AgentState { +onInput(session)
-+onApproval(session, approved) }
+~setState(state)
+}
+interface AgentState {
++onInput(session)
++onApproval(session, approved)
+}
 class IdleState
 class PlanningState
 class AwaitingApprovalState
@@ -84,32 +135,30 @@ FinishedState ..|> AgentState
 AgentSession --> Planner
 AgentSession --> ApprovalGate
 AgentSession --> AgentAction
-AgentController --> AgentSession
-class AgentEventPublisher { +attach(observer)
-+publish(type, message) }
-interface ProgressObserver { +onEvent(event) }
+AgentController ..> AgentSession : creates per goal
+class AgentEventPublisher {
++attach(observer)
++publish(type, message)
+}
+interface ProgressObserver {
++onEvent(event)
+}
 AgentEventPublisher o-- ProgressObserver
 AgentSession --> AgentEventPublisher
 SwingGui ..> ProgressObserver : event callback
 CliApp ..> ProgressObserver : event callback
-class SqliteStore { +save(kind, id, document)
+class SqliteStore {
++save(kind, id, document)
 +find(kind,id)
 +all(kind)
-+delete(kind,id) }
-class Documents { +save(store, kind, id, record)
-+read(store, kind, id, type) }
-Documents --> SqliteStore
-package "Feature services" {
-class JobDescriptionIntake
-class ResumeImporter
-class MemoryManager
-class SkillGapService
-class ResumeTailorService
-class CompanyResearchService
-class InterviewPrepService
-class MockInterviewService
-class ChecklistService
++delete(kind,id)
 }
+class Documents {
++save(store, kind, id, record)
++read(store, kind, id, type)
+}
+Documents --> SqliteStore
+
 AgentController --> JobDescriptionIntake
 AgentController --> ResumeImporter
 AgentController --> MemoryManager
@@ -119,19 +168,29 @@ AgentController --> CompanyResearchService
 AgentController --> InterviewPrepService
 AgentController --> MockInterviewService
 AgentController --> ChecklistService
-interface "Repository<T>" as Repository { +save(entity)
+interface "Repository<T>" as Repository {
++save(entity)
 +findById(id)
 +findAll()
-+delete(id) }
-class SqliteJobRepository { +saveAndSelect(job)
++delete(id)
+}
+class SqliteJobRepository {
++saveAndSelect(job)
 +saveQuestions(jobId, questions)
 +restartInterview(session)
-+results(jobId) }
-class SqliteResumeRepository { +saveAndSelect(profile)
++results(jobId)
+}
+class SqliteResumeRepository {
++saveAndSelect(profile)
 +save(version)
-+findVersions(jobId) }
-class SqliteMemoryRepository { +findByText(text) }
-class SqliteChecklistRepository { +tick(jobId,itemId,done) }
++findVersions(jobId)
+}
+class SqliteMemoryRepository {
++findByText(text)
+}
+class SqliteChecklistRepository {
++tick(jobId,itemId,done)
+}
 SqliteJobRepository ..|> Repository
 SqliteResumeRepository ..|> Repository
 SqliteMemoryRepository ..|> Repository
@@ -154,9 +213,11 @@ MockInterviewService --> SqliteJobRepository
 ChecklistService --> SqliteChecklistRepository
 ChecklistService --> SqliteJobRepository
 ChecklistService --> SqliteResumeRepository
-interface JobDescriptionSource { +label()
+interface JobDescriptionSource {
++label()
 +needsApproval()
-+fetch(request): JobDescription }
++fetch(request): JobDescription
+}
 class PastedTextSource
 class AdzunaExcerptSource
 class ExpandedEstimateSource
@@ -167,27 +228,37 @@ ExpandedEstimateSource ..|> JobDescriptionSource
 FullEstimateSource ..|> JobDescriptionSource
 JobDescriptionIntake --> JobDescriptionSource
 class JobDescriptionRequest
-class ToolManager { +register(tool)
-+executeTool(name,args): ToolResult }
-interface Tool { +getName()
-+execute(args): ToolResult }
-class ToolResult { +success: boolean
+class ToolManager {
++register(tool)
++executeTool(name,args): ToolResult
+}
+interface Tool {
++getName()
++execute(args): ToolResult
+}
+class ToolResult {
++success: boolean
 +data: List<SearchResult>
-+message: String }
++message: String
+}
 AdzunaTool ..|> Tool
 WebSearchTool ..|> Tool
 ToolManager o-- Tool
 ToolManager --> ToolResult
-AgentController --> ToolManager
+AgentController ..> ToolManager : registers tools
 JobDescriptionIntake --> ToolManager
 AdzunaExcerptSource --> ToolManager
 AdzunaExcerptSource --> DecisionClient
 JobDescriptionSource --> JobDescriptionRequest
 ExpandedEstimateSource --> Ai
 FullEstimateSource --> Ai
-class ResumeParserFactory { +createParser(path): ResumeParser
-+createParser(fileType): ResumeParser }
-interface ResumeParser { +extractText(source): String }
+class ResumeParserFactory {
++createParser(path): ResumeParser
++createParser(fileType): ResumeParser
+}
+interface ResumeParser {
++extractText(source): String
+}
 class PdfResumeParser
 class PastedTextResumeParser
 class DocResumeParser
@@ -203,22 +274,38 @@ ResumeImporter --> ResumeParserFactory
 ResumeImporter --> ResumeParser
 CompanyResearchService --> ToolManager
 package "Domain entities (top-level records)" {
-class JobDescription
-class ResumeProfile { +getSkills(): List<Skill> }
-class Skill { +name: String
-+level: String }
-class SkillGapReport
-class SkillAssessment
+class JobDescription {
++isEstimate(): boolean
+}
+class ResumeProfile {
++getSkills(): List<Skill>
+}
+class Skill {
++name: String
++level: String
+}
+class SkillGapReport {
++groupedByPriority(): List<SkillAssessment>
+}
+class SkillAssessment {
++uncertain(): boolean
+}
 class ResumeVersion
 class ResumeChange
-class MemoryFact
+class MemoryFact {
++edit(text): MemoryFact
+}
 class CompanySummary
 class SearchResult
 class InterviewQuestion
 class InterviewSession
 class FeedbackReport
-class Checklist
-class ChecklistItem
+class Checklist {
++progress(): int
+}
+class ChecklistItem {
++tick(value): ChecklistItem
+}
 }
 ResumeProfile *-- Skill
 ResumeProfile "1" -- "*" ResumeVersion : baseResumeId
@@ -229,28 +316,46 @@ CompanySummary *-- SearchResult
 InterviewSession *-- InterviewQuestion
 Checklist *-- ChecklistItem
 MockInterviewService --> MemoryManager : recordWeakness (failure warning)
-class TailorResumeAction { +execute(): ResumeVersion }
+class TailorResumeAction {
++execute(): ResumeVersion
+}
 TailorResumeAction ..|> AgentAction
 TailorResumeAction --> ResumeTailorService
 AgentController --> TailorResumeAction
 SwingGui ..> ResumeChange : side-by-side approval
-class CompanyResearchAction { +execute(): CompanySummary }
+class CompanyResearchAction {
++execute(): CompanySummary
+}
 CompanyResearchAction ..|> AgentAction
 CompanyResearchAction --> CompanyResearchService
 AgentController --> CompanyResearchAction
-class InterviewPrepAction { +execute(): List<InterviewQuestion> }
+class InterviewPrepAction {
++execute(): List<InterviewQuestion>
+}
 InterviewPrepAction ..|> AgentAction
 InterviewPrepAction --> InterviewPrepService
 AgentController --> InterviewPrepAction
-class ChecklistAction { +execute(): Checklist }
+class ChecklistAction {
++execute(): Checklist
+}
 ChecklistAction ..|> AgentAction
 ChecklistAction --> ChecklistService
 AgentController --> ChecklistAction
-class SkillGapAction { +execute(): SkillGapReport }
+class SkillGapAction {
++execute(): SkillGapReport
+}
 SkillGapAction ..|> AgentAction
 SkillGapAction --> SkillGapService
 AgentController --> SkillGapAction
-class ActionResult { +success: boolean
-+message: String }
+class ActionResult {
++success: boolean
++message: String
+}
 ExecutingState --> ActionResult : execution outcome
+legend bottom
+  Selected methods are shown; domain types are Java records.
+  State types are nested in AgentSession; event/observer types in AgentEventPublisher.
+  Resume-version relationships are persisted by jobId/baseResumeId.
+  See the compact class overview for the main runtime collaboration.
+endlegend
 @enduml

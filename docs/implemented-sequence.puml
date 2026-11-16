@@ -1,44 +1,108 @@
 @startuml
-actor Graduate
+title F10 — Planning, consent, execution and saved completion
+skinparam backgroundColor white
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam shadowing false
+hide footbox
+autonumber
+actor User
 participant "SwingGui / CliApp" as UI
-participant AgentController as Facade
+participant AgentController as Controller
 participant MemoryManager as Memory
-participant AgentSession as Session
-participant "AgentState objects" as State
+participant "AgentSession\n+ current AgentState" as Session
 participant Planner
-participant "Ai / JevAdapter : DecisionClient" as Decision
+participant "Ai\n(Jev / Claude adapters)" as AI
 participant ApprovalGate as Gate
-participant "FeatureCommand : AgentAction" as Command
-participant "Feature services" as Service
-participant "JevApi / ClaudeAdapter / external tools" as Tools
-participant "Typed repositories / SqliteStore" as DB
+participant "Selected named\nAgentAction" as Action
+participant "Selected feature\nservice / tools" as Feature
+database "Typed repositories\n+ SqliteStore" as Store
 participant AgentEventPublisher as Events
-Graduate -> UI : prepare(goal)
-UI -> Facade : handleGoal(goal)
-Facade -> Memory : recordTurn(goal), loadFacts()
-Memory -> DB : read/save useful nonconflicting facts
-Facade -> UI : obtain missing job/resume/history if approved
-Facade -> Session : handleInput()
-Session -> State : advance()
-loop at most 10 steps; stop flag/interrupt ends loop
-State -> Planner : chooseNext(current context, eligible actions)
-Planner -> Decision : constrained decision
-Decision -> Tools : typed Jev Choice request (one retry)
-State -> Gate : review(proposed step, false)
-Gate -> UI : askApproval(description)
-UI -> Graduate : Yes / No
-alt approved
-State -> Command : execute()
-Command -> Service : feature operation
-Service -> Tools : AI/tool requests and validation
-Service -> DB : save verified/reviewed output
-State -> Events : publish completed or failed
-Events -> UI : progress callback (Swing event thread)
-else declined
-State -> Events : publish declined
+
+User -> UI : submit goal
+UI -> Controller : handleGoal(goal)
+Controller -> Memory : recordTurn(goal)
+Memory -> AI : save/skip; extract and compare if useful
+Memory -> Store : retain or save validated fact
+Controller -> Session : handleInput()
+Session -> Events : PlanningState
+loop Until FinishedState; at most 10 selected actions
+  Session -> Session : check stop / step boundary
+  alt cancelled / interrupted / limit / no remaining actions
+    Session -> Events : FinishedState
+  else planning continues
+    Session -> Session : PlanningState.onInput(session)
+    Session -> Controller : context supplier.get()
+    Controller -> Memory : loadFacts()
+    Controller -> Store : read current job, resume and results
+    Controller --> Session : current goal/input/history/result context
+    Session -> Planner : chooseNext(context, remaining)
+    Planner -> AI : decide among seven actions + done
+    AI --> Planner : fixed-option decision or bounded failure
+    alt planner fails or chooses done
+      Planner --> Session : failure or no pending action
+      Session -> Events : planner-error or done; FinishedState
+    else an action is selected
+      Planner --> Session : selected AgentAction
+      Session -> Planner : directlyRequested(goal, action)
+      Planner -> AI : requested / proposed decision
+      AI --> Planner : choice or failure
+      Planner --> Session : requested status
+      alt explicitly requested
+        Session -> Events : requested; ExecutingState
+      else proposed or classification failed
+        Session -> Events : AwaitingApprovalState
+        Session -> Session : AwaitingApprovalState.onInput(session)
+        Session -> Gate : review(proposed step, false)
+        Gate -> UI : askApproval(description)
+        UI --> Gate : Yes / No
+        Gate --> Session : approved / declined
+        Session -> Session : handleApproval(approved)\nstate.onApproval(session, approved)
+      end
+      alt requested or approved
+        opt not stopped at the next state boundary
+        Session -> Session : ExecutingState.onInput(session)
+        Session -> Action : execute()
+        opt selected intake/import needs user input
+          Action -> UI : lazy input supplier
+          UI --> Action : validated posting/resume input
+        end
+        Action -> Feature : feature operation
+        Feature -> AI : generation/decision when required
+        opt estimate or resume-edit approval is required
+          Feature -> Gate : review() / reviewResumeChange()
+          Gate -> UI : show estimate/edit and request approval
+          UI --> Gate : individual decision
+          Gate --> Feature : accepted / rejected
+        end
+        Feature -> Store : persist validated/reviewed output
+        Feature --> Action : domain result or surfaced failure
+        Action --> Session : domain result or exception
+        Session -> Events : ActionResult: completed / warning / step-error
+        Session -> Session : remove attempted action
+        alt checklist succeeded
+          Session -> Events : FinishedState
+        else other success or failed step
+          Session -> Events : PlanningState
+        end
+        end
+      else declined
+        Session -> Session : remove declined action
+        Session -> Events : declined; PlanningState
+      end
+    end
+  end
 end
-State -> Session : transition to PlanningState / FinishedState
-end
-Facade -> DB : save timestamped action trace
-Facade --> UI : consolidated trace
+Session -> Events : finished with explicit reason
+Events -> UI : progress callback (also throughout the run)
+Session --> Controller : trace
+Controller -> Store : save timestamped trace\n(job-linked or unlinked before intake)
+Controller --> UI : returned trace
+
+note over Session,Feature
+  Stop is checked at state boundaries; completed saves remain.
+  Feature services own bounded retry/recovery. Failed steps are
+  explained and skipped; they do not fabricate a successful output.
+  A successful partial checklist may end the run before other steps.
+end note
 @enduml

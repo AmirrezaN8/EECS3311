@@ -61,3 +61,7 @@ Commit after live checks: `feat: restore full preparation planner and approval s
 ## User-run F10 evidence
 
 The user supplied a generic-goal trace selecting gap then checklist through AwaitingApprovalState/ExecutingState and ending with Checklist produced. Supplied checklist output contains the 2026-12-01 deadline, skill practice, remaining preparation tasks and progress. A second supplied trace shows requested: gap and requested: checklist with direct execution and successful completion. The user subsequently reported the F10 demo done. No video URL/timestamps were supplied; live rejection, done and cancellation branches remain unverified.
+
+## Uploaded F10 demonstration — November 15, 2026
+
+[F10 — 00:00](https://www.youtube.com/watch?v=NZzGRP7kGIw&t=0s) is now in the playlist and was retrieved without login. Readable sampled frames show requested gap/checklist execution and Checklist produced at 00:21, with checklist output at 00:29. Proposed approvals/rejections, early done and cancellation remain unverified in this recording. The 39-second upload has a generic filename title, empty description, effectively silent audio (approximately -90.3 dB) and no captions; feature-ID/purpose/AI explanation remains open. This supersedes the earlier upload-pending status.

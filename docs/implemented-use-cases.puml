@@ -1,46 +1,66 @@
 @startuml
+!pragma layout smetana
+title Implemented use cases — Swing and independent CLI
 left to right direction
-actor Graduate
-actor "Configured LLM" as LLM
+skinparam backgroundColor white
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam shadowing false
+actor "Graduate / User" as User
+actor "Jev\nfixed-option decisions" as Jev
+actor "Claude\ngeneration / reasoning" as Claude
 actor Adzuna
 actor "Brave Search" as Search
-rectangle "Java career preparation (Swing / CLI)" {
-usecase "F01 / UC01\nAdd, find or approve estimated posting" as UC1
-usecase "F02 / UC02\nImport resume and extract profile" as UC2
-usecase "F03 / UC03\nRemember, view, edit, delete facts" as UC3
-usecase "F04 / UC04\nIdentify prioritized skill gaps" as UC4
-usecase "F05 / UC05\nReview and accept extractive edits" as UC5
-usecase "F06 / UC06\nResearch sourced goals and values" as UC6
-usecase "F07 / UC07\nGenerate five interview questions" as UC7
-usecase "F08 / UC08\nTyped mock interview and final feedback" as UC8
-usecase "F09 / UC09\nBuild checklist and track progress" as UC9
-usecase "F10 / UC10\nApprove a multi-step preparation plan" as UC10
+rectangle "Career Preparation Agent — Java / SQLite" {
+  usecase "F01 / UC01\nSave pasted posting, look up excerpt\nor approve an estimate" as UC1
+  usecase "F02 / UC02\nImport resume and extract profile" as UC2
+  usecase "F03 / UC03\nRemember, view, edit and delete facts" as UC3
+  usecase "F04 / UC04\nIdentify grouped skill gaps" as UC4
+  usecase "F05 / UC05\nReview/approve bounded wording edits" as UC5
+  usecase "F06 / UC06\nResearch sourced company goals/values" as UC6
+  usecase "F07 / UC07\nPrepare five interview questions" as UC7
+  usecase "F08 / UC08\nTyped interview, optional follow-ups\nand final/approved partial feedback" as UC8
+  usecase "F09 / UC09\nBuild checklist and persist progress" as UC9
+  usecase "F10 / UC10\nPlan and execute preparation steps" as UC10
 }
-Graduate --> UC1
-Graduate --> UC2
-Graduate --> UC3
-Graduate --> UC4
-Graduate --> UC5
-Graduate --> UC6
-Graduate --> UC7
-Graduate --> UC8
-Graduate --> UC9
-Graduate --> UC10
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+User --> UC8
+User --> UC9
+User --> UC10
 UC1 --> Adzuna
-UC1 --> LLM
-UC2 --> LLM
-UC3 --> LLM
-UC4 --> LLM
-UC5 --> LLM
+UC1 --> Jev
+UC1 --> Claude
+UC2 --> Claude
+UC3 --> Jev
+UC3 --> Claude
+UC4 --> Jev
+UC4 --> Claude
+UC5 --> Claude
 UC6 --> Search
-UC6 --> LLM
-UC7 --> LLM
-UC8 --> LLM
-UC9 --> LLM
-UC10 --> LLM
-UC10 ..> UC4 : approved action
-UC10 ..> UC5 : approved action
-UC10 ..> UC6 : approved action
-UC10 ..> UC7 : approved action
-UC10 ..> UC9 : final action
+UC6 --> Jev
+UC6 --> Claude
+UC7 --> Claude
+UC8 --> Jev
+UC8 --> Claude
+UC9 --> Claude
+UC10 --> Jev
+UC10 ..> UC1 : selected step
+UC10 ..> UC2 : selected step
+UC10 ..> UC4 : selected step
+UC10 ..> UC5 : selected step
+UC10 ..> UC6 : selected step
+UC10 ..> UC7 : selected step
+UC10 ..> UC9 : selected step
+note bottom of UC10
+  Available selected steps are optional, not mandatory includes.
+  Explicit requests run directly; proposed steps need approval.
+  Checklist success, done, stop, a limit or exhaustion ends the plan.
+  A mock interview is started separately, with consent.
+end note
 @enduml

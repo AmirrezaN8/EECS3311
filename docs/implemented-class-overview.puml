@@ -1,0 +1,89 @@
+@startuml
+!pragma layout smetana
+title Runtime class overview — Career Preparation Agent
+skinparam backgroundColor white
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+class SwingGui {
+  +submitGoal(): void
+  +showChecklist(list): void
+}
+class CliApp {
+  +run(args): void
+}
+class AgentController <<Facade>> {
+  +runFeature(command, args): Object
+  +handleGoal(goal): List<String>
+  +startMockInterview(restart): String
+}
+class MemoryManager {
+  +recordTurn(message): void
+  +loadFacts(): List<MemoryFact>
+}
+class AgentSession <<State context>> {
+  -state: AgentState
+  +handleInput(): List<String>
+  +handleApproval(approved): void
+}
+interface AgentState {
+  +onInput(session): void
+  +onApproval(session, approved): void
+}
+class Planner {
+  +chooseNext(context, actions): AgentAction
+  +directlyRequested(goal, action): boolean
+}
+interface AgentAction <<Command>> {
+  +name(): String
+  +describe(): String
+  +execute(): Object
+}
+class ApprovalGate {
+  +review(description, requested): boolean
+  +reviewResumeChange(change): boolean
+}
+class AgentEventPublisher <<Observer publisher>> {
+  +attach(observer): void
+  +publish(type, message): void
+}
+
+SwingGui --> AgentController
+CliApp --> AgentController
+AgentController --> MemoryManager
+AgentController ..> AgentSession : creates per goal
+AgentSession *-- AgentState
+AgentSession --> Planner
+AgentSession --> AgentAction : executes selected command
+AgentSession --> ApprovalGate
+AgentSession --> AgentEventPublisher
+AgentController --> ApprovalGate
+
+note bottom of AgentState
+  Nested concrete states:
+  Idle, Planning, AwaitingApproval,
+  Executing, Finished.
+end note
+note bottom of AgentAction
+  Named commands:
+  GetJobDescriptionAction
+  ImportResumeAction
+  SkillGapAction
+  TailorResumeAction
+  CompanyResearchAction
+  InterviewPrepAction
+  ChecklistAction
+end note
+note bottom of AgentEventPublisher
+  Attached CLI / Swing callbacks
+  receive state/progress events.
+end note
+note bottom of Planner
+  DecisionClient via Ai / JevAdapter.
+  Full diagram includes providers,
+  source/parser strategies and storage.
+end note
+@enduml
