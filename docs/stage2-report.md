@@ -44,6 +44,10 @@ Each subsection identifies the original feature/use case, status, implementation
 
 ### F01 — Job Description Intake
 
+**Original requirement (Stage 1).** The user pastes a job description in the GUI, or enters a job title, company and country (US or Canada) and clicks Find for me. If nothing was pasted, the agent searches Adzuna, Jev picks the closest listing, and the excerpt is shown labeled as partial. With the user's approval, Sonnet 5.5 expands it into a labeled estimate, or writes a fully estimated description if Adzuna finds nothing. Each fallback needs approval, and the approved description is saved with its source label and the Adzuna attribution. If Adzuna is down or a model call fails, the system retries once, then offers paste or an estimate.
+
+![F01 Saved pasted posting](screenshots/F01.png)
+
 **Stage 1 reference:** F01 / UC01. **Type:** Hybrid / agentic.
 **Status:** Implemented; pasted intake demonstrated, live lookup/estimate branches not verified.
 
@@ -64,6 +68,10 @@ Each subsection identifies the original feature/use case, status, implementation
 **Demonstration:** [F01 — 00:00](https://www.youtube.com/watch?v=qXdWoMGQRNM&t=0s)
 
 ### F02 — Resume Import and Skill Extraction
+
+**Original requirement (Stage 1).** The user imports a resume (PDF, Word, Markdown or pasted text) through the GUI. A format-specific parser extracts the text, Haiku 4.5 structures it into skills, education, experience, projects and certifications, and the full profile is saved to memory as the user's base. If the file is scanned, corrupt or password protected, the user is asked to paste the text instead. If the model output is malformed, it retries once, then stores the raw text.
+
+![F02 Imported resume profile](screenshots/F02.png)
 
 **Stage 1 reference:** F02 / UC02. **Type:** Hybrid.
 **Status:** Implemented; Markdown/DOCX/text verified, dependency-backed PDF and legacy Word integration pending.
@@ -86,6 +94,10 @@ Each subsection identifies the original feature/use case, status, implementation
 
 ### F03 — User History Memory
 
+**Original requirement (Stage 1).** After each chat turn, Jev decides whether the user's message contains something worth saving (skills, target roles, weaknesses, previous actions), and Haiku 4.5 writes it as a short fact. The fact is deduplicated and saved without asking approval. The user can view and edit all saved facts in the My History panel. If saving fails, the turn is skipped without losing data, and conflicting facts are put to the user.
+
+![F03 Saved career fact](screenshots/F03.png)
+
 **Stage 1 reference:** F03 / UC03. **Type:** Hybrid.
 **Status:** Modified: explicit career-message/goal entry, source-bound facts and model-assisted equivalent-fact checks.
 
@@ -105,6 +117,10 @@ Each subsection identifies the original feature/use case, status, implementation
 **Demonstration:** [F03 — 00:00](https://www.youtube.com/watch?v=k6f0MA-zz0g&t=0s)
 
 ### F04 — Skill-Gap Identification
+
+**Original requirement (Stage 1).** The user opens the Skill Gap tab on a job. Haiku 4.5 extracts the required skills from the job description, the names are normalized, and Jev classifies each one against the stored profile. Results are shown in three ordered groups: completely missing skills, strong skills, and decent skills that could improve. Low-confidence results are marked uncertain. If the resume or job description is missing, the system offers to get it first.
+
+![F04 Skill-gap report](screenshots/F04.png)
 
 **Stage 1 reference:** F04 / UC04. **Type:** Hybrid.
 **Status:** Implemented with conservative literal-evidence matching.
@@ -127,6 +143,10 @@ Each subsection identifies the original feature/use case, status, implementation
 
 ### F05 — Resume Tailoring
 
+**Original requirement (Stage 1).** The agent rewrites the resume's wording to match the job description and shows the original and tailored text side by side, with each change explained. A deterministic validator rejects any change that adds a skill the user does not have, and the user accepts or rejects each change. Accepted changes are saved as a new resume version linked to the job.
+
+![F05 Resume change review](screenshots/F05.png)
+
 **Stage 1 reference:** F05 / UC05. **Type:** Hybrid.
 **Status:** Modified: bounded wording transformations with deterministic source-token checks and human review.
 
@@ -146,6 +166,10 @@ Each subsection identifies the original feature/use case, status, implementation
 **Demonstration:** [F05 — 00:00](https://www.youtube.com/watch?v=WQtftW-NVN8&t=0s)
 
 ### F06 — Company Goals and Values Research
+
+**Original requirement (Stage 1).** The user clicks Research on a job's Company tab. Haiku 4.5 builds a search query such as "Google SWE goals and values 2026", the web search tool returns results, and Jev marks each result relevant or not. If none are relevant, the agent reformulates and retries up to a limit, then summarizes only the goals and values from relevant results. If nothing relevant is found, it says so and writes no invented summary.
+
+![F06 Company research output](screenshots/F06.png)
 
 **Stage 1 reference:** F06 / UC06. **Type:** Hybrid / agentic.
 **Status:** Implemented; sourced Microsoft research demonstrated.
@@ -167,6 +191,10 @@ Each subsection identifies the original feature/use case, status, implementation
 
 ### F07 — Interview Question Preparation
 
+**Original requirement (Stage 1).** The user clicks Generate on the Interview Prep tab. Sonnet 5.5 writes a prompt tailored to the user's profile, the job and the company, and Haiku 4.5 generates the questions (default 5). The questions are checked for count and format, then saved. The agent then offers to start a mock interview, which needs approval. Malformed output is retried once.
+
+![F07 Generated interview questions](screenshots/F07.png)
+
 **Stage 1 reference:** F07 / UC07. **Type:** AI-based.
 **Status:** Implemented with a fixed five-question set.
 
@@ -186,6 +214,10 @@ Each subsection identifies the original feature/use case, status, implementation
 **Demonstration:** [F07 — 00:00](https://www.youtube.com/watch?v=q5oq_tFzdRQ&t=0s)
 
 ### F08 — Mock Interview with Answer Feedback
+
+**Original requirement (Stage 1).** The user starts a mock interview and answers the prepared questions one by one by typing. After each answer, Jev decides whether to ask a follow-up (at most one per question, written by Haiku 4.5) or move on. No feedback is shown during the interview. When it ends, Sonnet 5.5 judges all answers and produces a feedback report, and the weaknesses are saved to history. If the user quits midway, progress is saved and feedback is offered for the answered questions.
+
+![F08 Mock interview feedback](screenshots/F08.png)
 
 **Stage 1 reference:** F08 / UC08. **Type:** AI-based / agentic.
 **Status:** Implemented; typed progression and final feedback demonstrated.
@@ -207,6 +239,10 @@ Each subsection identifies the original feature/use case, status, implementation
 
 ### F09 — Preparation Checklist
 
+**Original requirement (Stage 1).** The agent builds a checklist from the skill gaps, company summary, interview questions and resume match status, and Sonnet 5.5 orders the items by priority: resume match, deadline, skills to learn, interview prep and company summary. A deadline is added only if the user's posting states one. The checklist panel in the GUI shows tick boxes and a progress indicator, and ticking an item saves it. If inputs are missing, a partial checklist is built and the missing features are offered, with approval.
+
+![F09 Saved preparation checklist](screenshots/F09.png)
+
 **Stage 1 reference:** F09 / UC09. **Type:** Hybrid.
 **Status:** Implemented with explicit supported-date parsing and a deterministic ordering fallback.
 
@@ -226,6 +262,10 @@ Each subsection identifies the original feature/use case, status, implementation
 **Demonstration:** [F09 — 00:00](https://www.youtube.com/watch?v=mvviBAHe5yw&t=0s)
 
 ### F10 — Prepare Me For This Job
+
+**Original requirement (Stage 1).** The user types a goal such as "prepare me for this job" in the GUI chat. The agent loads memory, and Jev repeatedly chooses the next action from a fixed list (get the description, import the resume, skill gap, tailor resume, company research, interview prep, checklist, done). Steps the user asked for run directly, and any other step is proposed with Yes and No buttons through the approval gate. The loop ends when the checklist is produced or the user stops. If a tool fails, the agent retries or skips the step and explains why, and a step limit prevents endless loops.
+
+![F10 Preparation workflow output](screenshots/F10.png)
 
 **Stage 1 reference:** F10 / UC10. **Type:** Hybrid / agentic.
 **Status:** Implemented; proposed/direct-request traces supplied, uploaded GUI demonstration reviewed.
@@ -399,7 +439,7 @@ There are no qualifying commits within those windows to link. The eight implemen
 ### Remaining verification and submission work
 
 1. Accounting limitation documented: historical development-tool tokens and exact serving-model/project billing data are unavailable through the current session tools. Runtime usage is recorded: Claude 26,837 input/14,053 output tokens ($0.16 combined), Jev 53 requests/27,043 tokens (exact charge unknown) and Brave 3 requests ($0.01). Preserve the separate $20/month development subscription; do not infer zero Jev cost from its rounded balance.
-2. Resolve the ten recordings' explanation/feature-ID and relevant coverage gaps; F10 upload/link/access are now verified without assuming every source branch is demonstrated.
+2. The original recordings have the explanation and coverage limits documented in section 7. The supplementary recordings are offered for consideration there.
 3. Regenerate the PDF again if remaining evidence or video links are supplied before submission.
 4. Verify Maven/JUnit packaging, PDFBox extraction and a valid legacy .doc sample. Do not count skipped parser checks as successful integrations.
 5. Retain honest limits for Adzuna/estimate live paths, semantic/model quality and unobserved cancellation/rejection/partial-feedback alternatives.
@@ -409,7 +449,9 @@ Only Stage 2 implementation and basic verification are claimed. Stage 3 determin
 
 ## 7. Demonstration index
 
-Playlist: [EECS3311demos](https://www.youtube.com/playlist?list=PLWFiN1jmW3sI). The author confirms oldest-to-newest uploads correspond to F01–F09. Ten unlisted videos were accessed without signing in on November 15, 2026. Each is a dedicated feature clip, so its direct 00:00 link covers that feature recording. The newly added 39-second F10 recording shows explicitly requested gap/checklist execution and checklist output.
+The original demonstration links are listed below. I recorded this supplementary playlist after the deadline. If late evidence can be considered, I would appreciate your taking a look. The playlist contains updated F01–F10 recordings, including F01’s demonstration of the same job-intake task in Swing and then in the standalone CLI. [Supplementary Stage 2 demo playlist](https://www.youtube.com/playlist?list=PLTA01MSBttJc)
+
+Original playlist: [EECS3311demos](https://www.youtube.com/playlist?list=PLWFiN1jmW3sI). The author confirms oldest-to-newest uploads correspond to F01–F09. Ten unlisted videos were accessed without signing in on November 15, 2026. Each is a dedicated feature clip, so its direct 00:00 link covers that feature recording. The newly added 39-second F10 recording shows explicitly requested gap/checklist execution and checklist output.
 
 | Feature | Direct video / start | Interface observed | Evidence scope |
 |---|---|---|---|
@@ -426,4 +468,4 @@ Playlist: [EECS3311demos](https://www.youtube.com/playlist?list=PLWFiN1jmW3sI). 
 
 F05 original/proposed/reason review is directly visible at [00:34](https://www.youtube.com/watch?v=WQtftW-NVN8&t=34s); F07 separate mock-interview consent at [00:28](https://www.youtube.com/watch?v=q5oq_tFzdRQ&t=28s). Collectively, the footage shows both required interfaces running the application. Sampled frames are not an exhaustive frame-by-frame or audio-narration review; whole-audio analysis establishes effectively silent tracks. No API keys were identified in inspected frames, but the author should check original recordings before submission.
 
-**Explanation/coverage limit:** titles/descriptions and live application screens do not by themselves certify every required feature-ID, purpose/AI explanation or relevant alternative path. All ten tracks are effectively silent and have no available captions. F10 also retains a generic screen-recording title and empty description. The author accepts the existing title and description; no metadata changes are planned. The observed explanation/coverage limits remain disclosed. [docs/demo-guide.md](demo-guide.md) records exact observed scope and unverified branches. No video link, timestamp, behavior, usage figure or completion status has been invented.
+**Original recordings’ explanation and coverage limits.** titles/descriptions and live application screens do not by themselves certify every required feature-ID, purpose/AI explanation or relevant alternative path. All ten tracks are effectively silent and have no available captions. F10 also retains a generic screen-recording title and empty description. The author accepts the existing title and description; no metadata changes are planned. The observed explanation/coverage limits remain disclosed. [docs/demo-guide.md](demo-guide.md) records exact observed scope and unverified branches. No video link, timestamp, behavior, usage figure or completion status has been invented.

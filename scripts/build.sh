@@ -7,4 +7,5 @@ find src/main/java -name '*.java' > target/sources.txt
 javac --release 21 -encoding UTF-8 -d target/classes @target/sources.txt
 jar --create --file target/career-agent.jar --main-class career.CliApp -C target/classes .
 javac --release 21 -encoding UTF-8 -cp target/classes -d target/test-classes src/test/java/career/SelfTest.java src/test/java/career/ApiAdaptersTest.java src/test/java/career/RepositoryTest.java src/test/java/career/InputFeaturesTest.java
+sh scripts/test-cli-input.sh
 java -ea -cp target/classes:target/test-classes career.SelfTest

@@ -20,6 +20,8 @@ Swing and the CLI share an [`AgentController`](src/main/java/career/AgentControl
 | Original Stage 1 design | [Stage1.md](Stage1.md) · [uml.uxf](uml.uxf) | Original files preserved unchanged. |
 | Reproduction inputs | [pom.xml](pom.xml) · [build script](scripts/build.sh) · [safe configuration](career.properties.example) · [fictional samples](samples/README.md) | No credentials or personal databases are required to build or run offline checks. |
 
+I recorded the supplementary demos after the deadline. If late evidence can be considered, I would appreciate your reviewing the updated clips, including the GUI-to-CLI demonstration. [Supplementary Stage 2 demo playlist](https://www.youtube.com/playlist?list=PLTA01MSBttJc)
+
 **Final submission items still open:** video explanation/coverage findings, remaining development-session/exact-cost accounting, dependency-backed PDF/legacy Word verification. The current report is a working artifact, not a claim that these items are complete. Final documentation must be committed and pushed before submitting the repository URL.
 
 ## Prerequisites
@@ -134,6 +136,15 @@ java -jar target/career-agent.jar
 # A one-shot CLI command:
 java -jar target/career-agent.jar job show
 ```
+
+From the repository root, run the fictional posting task without keyboard input:
+
+```sh
+java -jar target/career-agent.jar -input samples/add-job.task
+java -jar target/career-agent.jar job show
+```
+
+`-input <file>` executes one interactive CLI command on one UTF-8 line, using the same quoting and `@path` syntax. Relative paths resolve from the working directory. Approval requests receive the default decline and text requests receive empty input. Supply required inputs in advance. File, syntax and uncaught command errors exit nonzero. Use `help` or `--help` for commands, `--gui` for Swing, and no arguments for the interactive CLI. Model roles are configured separately through the environment or ignored `career.properties` as described above, so there is no per-invocation `-LLMAPI` switch.
 
 For the Maven package, substitute `target/career-agent-2.0.0.jar` in these commands.
 

@@ -1,6 +1,8 @@
 # Stage 2 Demonstration Index
 
-Playlist: [EECS3311demos](https://www.youtube.com/playlist?list=PLWFiN1jmW3sI).
+The original demonstration links are listed below. I recorded this supplementary playlist after the deadline. If late evidence can be considered, I would appreciate your taking a look. The playlist contains updated F01–F10 recordings, including F01’s demonstration of the same job-intake task in Swing and then in the standalone CLI. [Supplementary Stage 2 demo playlist](https://www.youtube.com/playlist?list=PLTA01MSBttJc)
+
+Original playlist: [EECS3311demos](https://www.youtube.com/playlist?list=PLWFiN1jmW3sI).
 
 Checked November 15, 2026. The playlist and its nine F01–F09 videos were retrieved without account cookies or signing in. All nine are unlisted and accessible by link; downloaded review copies contain actual screen video and audio streams. The newly added 39-second F10 upload was also retrieved without login and reviewed at readable resolution; all ten videos are now accessible.
 
@@ -40,3 +42,20 @@ The review used metadata extraction, actual temporary video downloads, sampled f
 [F01/F02](checkpoint-3-inputs.md), [F03](checkpoint-4-memory.md), [F04](checkpoint-5-gap.md), [F05](checkpoint-5-tailoring.md), [F06](checkpoint-6-company.md), [F07](checkpoint-6-questions.md), [F08](checkpoint-7-interview.md), [F09](checkpoint-8-checklist.md), [F10](checkpoint-9-agent.md).
 
 Supporting commands (job selection, output/version inspection, direct fact entry, interview restart and untick) are part of the original F01–F10 workflows, not extra counted features. If a substantial new feature is added later, add a dedicated demonstration or labeled segment.
+
+## Stage 2 narrated demonstration (3 minutes 30 seconds)
+
+Before recording, build with `sh scripts/build.sh`. From the repository root, run the following in one terminal so both interfaces use a disposable database. Keep that terminal open for the CLI segment. Open `samples/add-job.task` in a text editor for reference.
+
+```sh
+export CAREER_DATA="$(mktemp -d)/demo.db"
+java -jar target/career-agent.jar --gui
+```
+
+| Time | On screen | Narration |
+|---|---|---|
+| 0:00–0:25 | Show the sample task next to the Job tab. Highlight its title, company, country and posting text. | “I’ll save this fictional job twice. The first time I’ll enter it in Swing. The second time I’ll give the standalone JAR exactly the same inputs in a file.” |
+| 0:25–1:15 | Enter Junior Java Developer, Example Company and CA. Paste the final quoted argument from the sample without its quotation marks. Click **Save pasted posting**. | “This is the pasted-posting path. The title and company identify the role, and the description supplies the requirements. I can complete intake without a job search or a model call.” |
+| 1:15–1:50 | Click **Show current job**. Point to its title, source label, description and ID. Close Swing. | “The selected record contains the Java and SQL text I supplied. Its source label tells us where that text came from. I’ll use these fields to check the terminal result.” |
+| 1:50–2:40 | In the same terminal run `cat samples/add-job.task`, then `java -jar target/career-agent.jar -input samples/add-job.task`. Pause on the result. | “The file contains one CLI command. Quotes keep the multiword arguments together. This invocation saves the posting again and exits without waiting for keyboard input.” |
+| 2:40–3:30 | Run `java -jar target/career-agent.jar job show`. Point to the selected ID from the CLI save and compare its title, company, country, source and description with the GUI result. | “This is a fresh process reading the selection from SQLite. Both interfaces completed job intake through AgentController. The matching posting fields are the evidence, and the same task file can now drive a behavioural test.” |

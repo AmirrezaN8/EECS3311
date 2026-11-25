@@ -37,6 +37,7 @@ public final class CommandLine {
         interview answer "ANSWER" | interview stop | interview feedback
         checklist build | checklist show | checklist tick ITEM_ID [true|false]
         prepare ["GOAL"] | results | help | exit
+        Run one command from a UTF-8 file: java -jar target/career-agent.jar -input FILE
         Launch Swing: java -jar target/career-agent.jar --gui
         Personal documents are stored locally; configured AI services receive relevant input.
         """;
